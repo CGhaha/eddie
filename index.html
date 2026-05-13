@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mamba Promo | SAGE A+ Supplier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <style>
+        .page { display: none; }
+        .page.active { display: block; }
+        /* 确保3D预览图比例统一 */
+        .model-card model-viewer {
+            width: 100%;
+            height: 150px;
+            --poster-color: transparent;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- 全局导航栏 -->
+    <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 flex justify-center gap-6 shadow-lg">
+        <button onclick="showPage('home')" class="hover:text-blue-400 font-medium">Home</button>
+        <button onclick="showPage('hot-sales')" class="hover:text-blue-400 font-medium">Hot Sales</button>
+        <button onclick="showPage('videos')" class="hover:text-blue-400 font-medium">Videos</button>
+        <button onclick="showPage('3d-view')" class="hover:text-blue-400 font-medium">3D Showroom</button>
+    </nav>
+
+    <!-- 1. 首页 -->
+    <div id="home" class="page active">
+        <div class="h-80 flex flex-col justify-center items-center bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-600 text-white text-center px-4">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 italic">Mamba Promotional Gifts</h1>
+            <p class="text-lg opacity-90 max-w-2xl">Expert SAGE & ASI Supplier. Premium Custom Solutions Delivered Worldwide.</p>
+        </div>
+    </div>
+
+    <!-- 2. 热销产品 (一行5个) -->
+    <div id="hot-sales" class="page container mx-auto py-12 px-4">
+        <div class="flex justify-between items-end mb-8 border-b pb-4">
+            <h2 class="text-3xl font-bold">Hot Sales</h2>
+            <span class="text-gray-400 text-sm">Top Trending Items</span>
+        </div>
+        <!-- grid-cols-2 (手机) md:grid-cols-3 (平板) lg:grid-cols-5 (电脑) -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="product-list">
+            <!-- 示例卡片 -->
+            <div class="bg-white rounded-lg shadow-sm border hover:shadow-md transition cursor-pointer p-2" onclick="openModal('product')">
+                <div class="aspect-square bg-gray-100 rounded mb-2 overflow-hidden">
+                    <img src="https://via.placeholder.com/300" class="w-full h-full object-cover">
+                </div>
+                <h3 class="font-bold text-sm truncate">Custom Sports Bag</h3>
+                <p class="text-xs text-gray-500">MOQ: 100pcs</p>
+                <p class="text-blue-600 font-bold text-sm mt-1">$4.25</p>
+            </div>
+            <!-- 重复以上 div 即可 -->
+        </div>
+    </div>
+
+    <!-- 3. 视频展示 (一行5个) -->
+    <div id="videos" class="page container mx-auto py-12 px-4">
+        <h2 class="text-3xl font-bold mb-8 border-b pb-4">Product Videos</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <!-- 视频卡片 -->
+            <div class="group relative cursor-pointer" onclick="openModal('video')">
+                <div class="aspect-video bg-black rounded-lg overflow-hidden flex items-center justify-center shadow">
+                    <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg" class="w-full opacity-60 group-hover:scale-110 transition">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white pl-1 shadow-xl">▶</div>
+                    </div>
+                </div>
+                <p class="mt-2 text-sm font-medium truncate text-center">Factory Production Tour</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. 三维展示 (一行5个) -->
+    <div id="3d-view" class="page container mx-auto py-12 px-4">
+        <h2 class="text-3xl font-bold mb-8 border-b pb-4">3D Virtual Showroom</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <!-- 3D预览卡片 -->
+            <div class="bg-white border rounded-xl overflow-hidden hover:border-blue-500 transition model-card shadow-sm">
+                <model-viewer 
+                    src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" 
+                    auto-rotate camera-controls disable-zoom>
+                </model-viewer>
+                <div class="p-3 bg-gray-50 border-t text-center">
+                    <button onclick="openFull3D()" class="text-xs font-bold text-blue-600">VIEW FULLSCREEN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗：左右浏览 -->
+    <div id="media-modal" class="fixed inset-0 bg-black/95 z-[60] hidden flex items-center justify-center">
+        <button onclick="closeModal()" class="absolute top-6 right-6 text-white text-4xl">&times;</button>
+        <button class="absolute left-4 text-white text-6xl hover:text-blue-400 select-none">&lsaquo;</button>
+        <div id="modal-content" class="w-full max-w-4xl p-4 flex flex-col items-center">
+            <!-- 这里根据点击展示大图或 YouTube -->
+            <div class="w-full aspect-video bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden">
+                <iframe id="youtube-frame" width="100%" height="100%" src="" frameborder="0" allowfullscreen class="hidden"></iframe>
+                <img id="modal-img" src="" class="max-h-full">
+            </div>
+            <div class="mt-6 text-white text-center">
+                <h2 id="modal-title" class="text-2xl font-bold">Product Name</h2>
+                <p id="modal-desc" class="opacity-70">Material: Aluminum | MOQ: 500</p>
+            </div>
+        </div>
+        <button class="absolute right-4 text-white text-6xl hover:text-blue-400 select-none">&rsaquo;</button>
+    </div>
+
+    <script>
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function openModal(type) {
+            const modal = document.getElementById('media-modal');
+            const img = document.getElementById('modal-img');
+            const yt = document.getElementById('youtube-frame');
+            
+            modal.classList.remove('hidden');
+            
+            if(type === 'video') {
+                img.classList.add('hidden');
+                yt.classList.remove('hidden');
+                yt.src = "https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1";
+            } else {
+                yt.classList.add('hidden');
+                img.classList.remove('hidden');
+                img.src = "https://via.placeholder.com/800x600";
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('media-modal');
+            const yt = document.getElementById('youtube-frame');
+            modal.classList.add('hidden');
+            yt.src = ""; // 停止视频播放
+        }
+        
+        function openFull3D() {
+            // 这里可以跳转到一个专门的满屏3D预览页或放大当前模型
+            alert("Entering Fullscreen 3D Mode...");
+        }
+    </script>
+</body>
+</html>
