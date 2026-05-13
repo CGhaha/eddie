@@ -74,12 +74,10 @@
         const API = 'https://mamba-api.mfgift.workers.dev/api/products';
         let allProducts = [];
 
-        // 确保文件路径正确指向 GitHub 主分支
         function fixUrl(path) {
             if (!path) return '';
             if (path.startsWith('http')) return path;
             const cleanPath = path.replace(/^\//, '');
-            // 通过 jsDelivr CDN 加速读取 assets 文件夹下的文件
             return `https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/${cleanPath}`;
         }
 
@@ -98,12 +96,12 @@
             const videoGrid = document.getElementById('video-list');
             const threeDGrid = document.getElementById('3d-list');
 
-            // 1. Hot Sales
+            // 1. Hot Sales - 修复点：使用 object-contain 确保图片不被裁切
             const hotSales = allProducts.filter(p => p.category.includes('Hot Sales') || p.category === 'hot-sales');
             productGrid.innerHTML = hotSales.map(p => `
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 cursor-pointer group" onclick="openModal('img', ${p.id})">
-                    <div class="aspect-square bg-gray-50 rounded-lg mb-3 overflow-hidden">
-                        <img src="${fixUrl(p.file_path)}" class="w-full h-full object-cover group-hover:scale-105 transition" loading="lazy">
+                    <div class="aspect-square bg-white rounded-lg mb-3 overflow-hidden flex items-center justify-center">
+                        <img src="${fixUrl(p.file_path)}" class="w-full h-full object-contain group-hover:scale-105 transition" loading="lazy">
                     </div>
                     <h3 class="font-bold text-gray-900 truncate text-sm">${p.name}</h3>
                     <p class="text-xs text-gray-400 mt-1">MOQ: ${p.moq || 'N/A'}</p>
@@ -128,7 +126,7 @@
                 </div>`;
             }).join('');
 
-            // 3. 3D Showroom (修复缩略图的关键点)
+            // 3. 3D Showroom
             const showroom = allProducts.filter(p => p.category.includes('3D') || p.category === 'showroom-3d');
             threeDGrid.innerHTML = showroom.map(p => `
                 <div class="bg-white border border-gray-100 rounded-xl overflow-hidden model-card shadow-sm">
@@ -165,7 +163,6 @@
                 yt.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
             } else if (type === '3d') {
                 container3d.classList.remove('hidden');
-                // 弹窗内部模型也确保能正确渲染
                 container3d.innerHTML = `<model-viewer src="${fixUrl(p.file_path)}" camera-controls auto-rotate shadow-intensity="1" style="width:100%; height:100%" ar></model-viewer>`;
             } else {
                 img.classList.remove('hidden');
