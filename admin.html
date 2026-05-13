@@ -1,133 +1,181 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eddie's Management Center | V2.2 终极兼容版</title>
+    <title>Eddie's Management Center | V2.3</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loading-shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
 </head>
-<body class="bg-slate-50 min-h-screen p-4">
-    <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 mt-10">
-        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-900">
-            <h1 class="text-xl font-bold text-white">Eddie's Management Center</h1>
-            <span class="text-[10px] px-2 py-1 bg-blue-500 text-white rounded">V2.2 兼容版</span>
+<body class="bg-slate-100 min-h-screen py-10 px-4">
+
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden mb-8">
+            <div class="bg-slate-900 p-6 flex justify-between items-center">
+                <h1 class="text-white text-xl font-bold">Eddie's Management Center</h1>
+                <span class="bg-blue-500 text-white text-[10px] px-2 py-1 rounded">V2.3 管理版</span>
+            </div>
+
+            <form id="uploadForm" class="p-8 space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Product Name 产品名称</label>
+                    <input type="text" id="name" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Material 材质</label>
+                        <input type="text" id="material" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">MOQ 起订量</label>
+                        <input type="text" id="moq" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Category 分类</label>
+                    <select id="category" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white">
+                        <option value="hot-sales">Hot Sales 热销商品</option>
+                        <option value="videos">Videos 产品视频</option>
+                        <option value="showroom-3d">3D Showroom 虚拟展厅</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Upload File (图片或 GLB)</label>
+                    <input type="file" id="fileInput" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">YouTube URL</label>
+                    <input type="url" id="yt_url" placeholder="https://..." class="w-full px-4 py-3 rounded-xl border border-gray-200">
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                    <span>🚀 SAVE & SYNC TO CLOUD</span>
+                </button>
+            </form>
         </div>
 
-        <form id="uploadForm" class="p-6 space-y-4">
-            <div>
-                <label class="block text-sm font-bold text-slate-700">Product Name 产品名称</label>
-                <input type="text" id="name" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+        <div class="bg-white rounded-3xl shadow-xl p-6">
+            <h2 class="text-lg font-bold mb-4 text-gray-800 border-b pb-2">Inventory Management (已上传产品)</h2>
+            <div id="productList" class="space-y-3">
+                <div class="loading-shimmer h-12 rounded-xl"></div>
             </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700">Material 材质</label>
-                    <input type="text" id="material" class="w-full px-4 py-2 border rounded-lg">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700">MOQ 起订量</label>
-                    <input type="text" id="moq" class="w-full px-4 py-2 border rounded-lg">
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-bold text-slate-700">Category 分类</label>
-                <select id="category" class="w-full px-4 py-2 border rounded-lg bg-white">
-                    <option value="hot-sales">Hot Sales 热销商品</option>
-                    <option value="videos">Videos 视频</option>
-                    <option value="showroom-3d">3D Showroom 3D 展厅</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-sm font-bold text-slate-700">Upload File (图片或 GLB)</label>
-                <input type="file" id="file" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700">
-            </div>
-
-            <div>
-                <label class="block text-sm font-bold text-slate-700">YouTube URL</label>
-                <input type="url" id="yt_url" placeholder="https://..." class="w-full px-4 py-2 border rounded-lg">
-            </div>
-
-            <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all">
-                <span id="btnText">🚀 SAVE & SYNC TO CLOUD</span>
-            </button>
-        </form>
-
-        <div id="status" class="px-6 pb-6 hidden">
-            <div id="statusContent" class="p-4 rounded-xl text-sm font-medium border"></div>
         </div>
     </div>
 
     <script>
-        const API_BASE = 'https://mamba-api.mfgift.workers.dev/api/upload';
+        const API_URL = 'https://mamba-api.mfgift.workers.dev/api/products';
+        const GITHUB_API = 'https://api.github.com/repos/CGhaha/eddie/contents/assets/';
+        const TOKEN = '你的_GITHUB_TOKEN'; // 请务必替换为你自己的 Token
 
+        // 1. 初始化加载产品列表
+        async function loadProducts() {
+            const container = document.getElementById('productList');
+            try {
+                const res = await fetch(API_URL);
+                const products = await res.json();
+                
+                if (products.length === 0) {
+                    container.innerHTML = `<p class="text-center text-gray-400 py-4">No products found.</p>`;
+                    return;
+                }
+
+                container.innerHTML = products.map(p => `
+                    <div class="flex justify-between items-center p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition">
+                        <div class="overflow-hidden">
+                            <p class="font-bold text-slate-800 truncate">${p.name}</p>
+                            <p class="text-[10px] text-slate-400 uppercase tracking-widest">${p.category}</p>
+                        </div>
+                        <button onclick="deleteProduct(${p.id})" class="bg-red-50 text-red-500 px-4 py-2 rounded-lg text-xs font-bold hover:bg-red-500 hover:text-white transition">
+                            DELETE
+                        </button>
+                    </div>
+                `).join('');
+            } catch (err) {
+                container.innerHTML = `<p class="text-red-500 text-sm text-center">Load failed.</p>`;
+            }
+        }
+
+        // 2. 删除功能
+        async function deleteProduct(id) {
+            if (!confirm("确定要删除吗？前端页面将不再显示此产品。")) return;
+            
+            try {
+                const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    alert("Deleted successfully!");
+                    loadProducts(); // 刷新列表
+                }
+            } catch (err) {
+                alert("Delete failed: " + err);
+            }
+        }
+
+        // 3. 上传逻辑 (保持你原有的逻辑，仅在完成后刷新列表)
         document.getElementById('uploadForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            const btnText = document.getElementById('btnText');
-            const statusDiv = document.getElementById('status');
-            const statusContent = document.getElementById('statusContent');
-            const fileInput = document.getElementById('file');
-
-            // UI 锁定
             btn.disabled = true;
-            btnText.innerText = "⏳ PROCESSING...";
-            statusDiv.classList.remove('hidden');
-            statusContent.className = "p-4 rounded-xl text-sm bg-blue-50 text-blue-700 border-blue-100";
-            statusContent.innerHTML = "Reading file and connecting to Cloudflare...<br>正在读取文件并建立连接...";
+            btn.innerText = "UPLOADING...";
 
             try {
-                const file = fileInput.files[0];
-                let fileData = null;
-                let fileName = "";
+                const file = document.getElementById('fileInput').files[0];
+                let filePath = "";
 
                 if (file) {
-                    // 兼容性修正：安全获取文件名
-                    fileName = file.name ? String(file.name) : "unknown_file";
-                    
-                    // 读取文件
-                    fileData = await new Promise((resolve, reject) => {
-                        const reader = new FileReader();
+                    const reader = new FileReader();
+                    const base64Promise = new Promise(resolve => {
                         reader.onload = () => resolve(reader.result.split(',')[1]);
-                        reader.onerror = () => reject(new Error("文件读取失败"));
                         reader.readAsDataURL(file);
                     });
+                    const content = await base64Promise;
+                    const fileName = Date.now() + "-" + file.name;
+
+                    const ghRes = await fetch(GITHUB_API + fileName, {
+                        method: 'PUT',
+                        headers: { 'Authorization': `token ${TOKEN}`, 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: `upload ${fileName}`, content })
+                    });
+                    if (!ghRes.ok) throw new Error("GitHub Upload Failed");
+                    filePath = "assets/" + fileName;
                 }
 
-                const payload = {
+                const productData = {
                     name: document.getElementById('name').value,
                     material: document.getElementById('material').value,
                     moq: document.getElementById('moq').value,
                     category: document.getElementById('category').value,
-                    yt_url: document.getElementById('yt_url').value,
-                    fileName: fileName,
-                    fileData: fileData
+                    file_path: filePath,
+                    yt_url: document.getElementById('yt_url').value
                 };
 
-                const res = await fetch(API_BASE, {
+                const dbRes = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(productData)
                 });
 
-                if (!res.ok) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.error || `Server Error (${res.status})`);
+                if (dbRes.ok) {
+                    alert("SUCCESS!");
+                    document.getElementById('uploadForm').reset();
+                    loadProducts(); // 刷新列表
                 }
-
-                statusContent.className = "p-4 rounded-xl text-sm bg-green-50 text-green-700 border-green-100";
-                statusContent.innerHTML = "✅ SYNC SUCCESS!<br>同步成功！请等待 GitHub 部署（约 1 分钟）。";
-                document.getElementById('uploadForm').reset();
-
             } catch (err) {
-                statusContent.className = "p-4 rounded-xl text-sm bg-red-50 text-red-700 border-red-100";
-                statusContent.innerHTML = "❌ ERROR: " + err.message + "<br>建议：检查网络或确认 GitHub 上的 assets 文件已删除。";
+                alert("Error: " + err.message);
             } finally {
                 btn.disabled = false;
-                btnText.innerText = "🚀 SAVE & SYNC TO CLOUD";
+                btn.innerText = "🚀 SAVE & SYNC TO CLOUD";
             }
         };
+
+        // 启动加载
+        loadProducts();
     </script>
 </body>
 </html>
