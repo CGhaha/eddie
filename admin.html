@@ -8,7 +8,6 @@
     <style>
         .loading-shimmer { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        /* 强制表格和按钮不换行 */
         .no-wrap { white-space: nowrap; }
     </style>
 </head>
@@ -28,12 +27,50 @@
                         <input type="text" id="name" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition bg-gray-50">
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Category 分类</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">Display Page 展示页面</label>
                         <select id="category" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 outline-none">
                             <option value="hot-sales">Hot Sales 热销商品</option>
                             <option value="videos">Videos 产品视频</option>
                             <option value="showroom-3d">3D Showroom 虚拟展厅</option>
                         </select>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                    <label class="block text-sm font-bold text-gray-700 mb-3">Product Categories 细分标签 (Multi-select)</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="tag-container">
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" name="tags" value="Apparel" class="w-4 h-4 rounded text-blue-600">
+                            <span class="text-xs text-gray-600 group-hover:text-blue-600">Apparel</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" name="tags" value="Drinkware" class="w-4 h-4 rounded text-blue-600">
+                            <span class="text-xs text-gray-600 group-hover:text-blue-600">Drinkware</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" name="tags" value="Bags" class="w-4 h-4 rounded text-blue-600">
+                            <span class="text-xs text-gray-600 group-hover:text-blue-600">Bags</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" name="tags" value="Office" class="w-4 h-4 rounded text-blue-600">
+                            <span class="text-xs text-gray-600 group-hover:text-blue-600">Office</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" name="tags" value="Tech" class="w-4 h-4 rounded text-blue-600">
+                            <span class="text-xs text-gray-600 group-hover:text-blue-600">Tech</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" name="tags" value="Wellness" class="w-4 h-4 rounded text-blue-600">
+                            <span class="text-xs text-gray-600 group-hover:text-blue-600">Wellness</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" name="tags" value="Fun" class="w-4 h-4 rounded text-blue-600">
+                            <span class="text-xs text-gray-600 group-hover:text-blue-600">Fun</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="checkbox" name="tags" value="Pet" class="w-4 h-4 rounded text-blue-600">
+                            <span class="text-xs text-gray-600 group-hover:text-blue-600">Pet</span>
+                        </label>
                     </div>
                 </div>
 
@@ -89,20 +126,17 @@
     <script>
         const API_URL = 'https://mamba-api.mfgift.workers.dev/api/products';
         const GITHUB_API = 'https://api.github.com/repos/CGhaha/eddie/contents/assets/';
-        const TOKEN = 'YOUR_GITHUB_TOKEN'; // 必须替换为你真实的 Token
+        const TOKEN = 'YOUR_GITHUB_TOKEN'; // 请务必替换
 
-        // 1. 加载并渲染产品列表
         async function loadProducts() {
             const container = document.getElementById('productList');
             try {
                 const res = await fetch(API_URL);
                 const products = await res.json();
-                
                 if (products.length === 0) {
                     container.innerHTML = `<tr><td colspan="3" class="px-6 py-10 text-center text-gray-400">No products in database.</td></tr>`;
                     return;
                 }
-
                 container.innerHTML = products.map(p => `
                     <tr class="hover:bg-blue-50/30 transition">
                         <td class="px-6 py-4">
@@ -114,7 +148,7 @@
                         </td>
                         <td class="px-6 py-4 text-right">
                             <button onclick="deleteProduct(${p.id}, this)" 
-                                class="bg-red-50 text-red-500 px-4 py-2 rounded-lg text-[10px] font-black hover:bg-red-500 hover:text-white transition duration-200 delete-btn">
+                                class="bg-red-50 text-red-500 px-4 py-2 rounded-lg text-[10px] font-black hover:bg-red-500 hover:text-white transition duration-200">
                                 DELETE
                             </button>
                         </td>
@@ -125,55 +159,26 @@
             }
         }
 
-        // 2. 修复后的删除功能（支持连续点击）
         async function deleteProduct(id, btnElement) {
-            if (!confirm("Confirm to delete? This will remove it from the website.")) return;
-            
-            // 锁定当前按钮状态
-            const originalText = btnElement.innerText;
+            if (!confirm("Confirm to delete?")) return;
             btnElement.disabled = true;
             btnElement.innerText = "WAIT...";
-            btnElement.classList.add('opacity-50', 'cursor-not-allowed');
-
             try {
-                const res = await fetch(`${API_URL}/${id}`, { 
-                    method: 'DELETE',
-                    mode: 'cors'
-                });
-                
-                const result = await res.json();
-                
-                if (res.ok && result.success) {
-                    // 删除成功，直接从 DOM 中移除这一行（用户体验更好）
-                    btnElement.closest('tr').style.opacity = '0';
-                    setTimeout(() => {
-                        loadProducts(); // 重新加载列表同步状态
-                    }, 400);
-                } else {
-                    throw new Error(result.message || "Server Error");
-                }
-            } catch (err) {
-                console.error("Delete Error:", err);
-                alert("Error: " + err.message);
-                // 恢复按钮状态
-                btnElement.disabled = false;
-                btnElement.innerText = originalText;
-                btnElement.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
+                const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                if (res.ok) loadProducts();
+            } catch (err) { alert("Delete failed: " + err.message); }
         }
 
-        // 3. 上传表单逻辑
         document.getElementById('uploadForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
             btn.disabled = true;
-            btn.innerHTML = `<span>⏳ SYNCING ASSETS...</span>`;
+            btn.innerHTML = `<span>⏳ SYNCING...</span>`;
 
             try {
                 const file = document.getElementById('fileInput').files[0];
                 let filePath = "";
 
-                // 如果有文件，先传 GitHub
                 if (file) {
                     const reader = new FileReader();
                     const base64Promise = new Promise(resolve => {
@@ -182,22 +187,25 @@
                     });
                     const content = await base64Promise;
                     const fileName = Date.now() + "-" + file.name;
-
                     const ghRes = await fetch(GITHUB_API + fileName, {
                         method: 'PUT',
                         headers: { 'Authorization': `token ${TOKEN}`, 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: `admin_upload ${fileName}`, content })
+                        body: JSON.stringify({ message: `upload ${fileName}`, content })
                     });
-                    if (!ghRes.ok) throw new Error("GitHub logic failed. Check Token.");
+                    if (!ghRes.ok) throw new Error("GitHub Upload Failed");
                     filePath = "assets/" + fileName;
                 }
 
-                // 同步到 Workers 数据库
+                // 获取多选标签
+                const selectedTags = Array.from(document.querySelectorAll('input[name="tags"]:checked')).map(cb => cb.value);
+                // 合并页面类别和细分标签
+                const finalCategory = [document.getElementById('category').value, ...selectedTags].join(', ');
+
                 const productData = {
                     name: document.getElementById('name').value,
                     material: document.getElementById('material').value,
                     moq: document.getElementById('moq').value,
-                    category: document.getElementById('category').value,
+                    category: finalCategory,
                     file_path: filePath,
                     yt_url: document.getElementById('yt_url').value
                 };
@@ -208,20 +216,19 @@
                     body: JSON.stringify(productData)
                 });
 
-                if (!dbRes.ok) throw new Error("Database sync failed.");
+                if (!dbRes.ok) throw new Error("Database Sync Failed");
 
-                alert("SYNC SUCCESSFUL!");
+                alert("SUCCESS!");
                 document.getElementById('uploadForm').reset();
                 loadProducts();
             } catch (err) {
-                alert("CRITICAL ERROR: " + err.message);
+                alert("ERROR: " + err.message);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<span>🚀 SAVE & SYNC TO CLOUD</span>`;
+                btn.innerHTML = `<span>🚀 Sync to Cloud & Website</span>`;
             }
         };
 
-        // 页面初始化加载
         loadProducts();
     </script>
 </body>
