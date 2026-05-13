@@ -1,98 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>Mamba Admin | Eddie's Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eddie's Management Center | V2.1 修复版</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-100 p-8">
-    <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md">
-        <div class="flex justify-between items-center mb-6 border-b pb-2">
-            <h1 class="text-2xl font-bold text-slate-800">Eddie's Management Center</h1>
-            <span class="text-sm bg-green-100 text-green-700 px-2 py-1 rounded">V2.0 安全版</span>
-        </div>
-        
-        <div class="flex gap-4 mb-8">
-            <button type="button" onclick="switchTab('hot-sales')" id="btn-hot" class="tab-btn bg-blue-600 text-white px-4 py-2 rounded shadow">Hot Sales</button>
-            <button type="button" onclick="switchTab('videos')" id="btn-vid" class="tab-btn bg-gray-200 px-4 py-2 rounded">Videos</button>
-            <button type="button" onclick="switchTab('showroom-3d')" id="btn-3d" class="tab-btn bg-gray-200 px-4 py-2 rounded">3D Showroom</button>
+<body class="bg-slate-50 min-h-screen p-4 md:p-8">
+    <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-slate-800">Eddie's Management Center</h1>
+            <span class="text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded">V2.1 稳定版</span>
         </div>
 
-        <form id="uploadForm" class="space-y-4">
-            <input type="hidden" id="category" value="hot-sales">
-            
+        <form id="uploadForm" class="p-6 space-y-5">
             <div>
-                <label class="block font-bold text-sm text-gray-700">Product Name 产品名称</label>
-                <input type="text" id="name" placeholder="例如: Custom Stress Ball" class="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" required>
+                <label class="block text-sm font-bold text-slate-700 mb-1">Product Name 产品名称</label>
+                <input type="text" id="name" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
 
-            <div id="info-fields" class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block font-bold text-sm text-gray-700">Material 材质</label>
-                    <input type="text" id="material" placeholder="PU / Plastic" class="w-full border p-2 rounded">
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Material 材质</label>
+                    <input type="text" id="material" placeholder="e.g. PU" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
                 <div>
-                    <label class="block font-bold text-sm text-gray-700">MOQ 起订量</label>
-                    <input type="text" id="moq" placeholder="1000" class="w-full border p-2 rounded">
+                    <label class="block text-sm font-bold text-slate-700 mb-1">MOQ 起订量</label>
+                    <input type="text" id="moq" placeholder="e.g. 500" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
                 </div>
             </div>
 
-            <div id="file-selector">
-                <label class="block font-bold text-sm text-gray-700">Upload File 上传文件 (图片或GLB)</label>
-                <input type="file" id="mainFile" class="w-full border p-2 rounded bg-gray-50 cursor-pointer">
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1">Category 分类</label>
+                <select id="category" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                    <option value="hot-sales">Hot Sales 热销商品</option>
+                    <option value="videos">Videos 视频</option>
+                    <option value="showroom-3d">3D Showroom 3D 展厅</option>
+                </select>
             </div>
 
             <div>
-                <label class="block font-bold text-sm text-gray-700">YouTube URL (视频链接)</label>
-                <input type="url" id="yt_url" placeholder="https://youtube.com/watch?v=..." class="w-full border p-2 rounded">
+                <label class="block text-sm font-bold text-slate-700 mb-1">Upload File 上传文件 (图片或GLB)</label>
+                <input type="file" id="file" accept=".jpg,.jpeg,.png,.gif,.glb" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
             </div>
 
-            <button type="submit" id="submitBtn" class="w-full bg-slate-900 text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg active:scale-95 mt-6">
-                🚀 SAVE & SYNC TO CLOUD
+            <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1">YouTube URL (视频链接)</label>
+                <input type="url" id="yt_url" placeholder="https://youtube.com/watch?v=..." class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+
+            <button type="submit" id="submitBtn" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all flex flex-col items-center justify-center space-y-1">
+                <span id="btnText">🚀 SAVE & SYNC TO CLOUD</span>
+                <span class="text-[10px] opacity-60">保存并同步到云端</span>
             </button>
         </form>
-        
-        <div id="statusBox" class="mt-6 p-4 rounded text-center font-bold hidden border"></div>
+
+        <div id="status" class="px-6 pb-6 hidden">
+            <div id="statusContent" class="p-4 rounded-xl text-sm font-medium flex flex-col items-center text-center"></div>
+        </div>
     </div>
 
     <script>
-        // 这是你的 Cloudflare Worker 地址
+        // 核心配置：务必确认你的 Worker 地址是这个
         const API_BASE = 'https://mamba-api.mfgift.workers.dev/api/upload';
-
-        function switchTab(cat) {
-            document.getElementById('category').value = cat;
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                b.classList.remove('bg-blue-600', 'text-white', 'shadow');
-                b.classList.add('bg-gray-200');
-            });
-            const activeBtn = document.getElementById(cat === 'hot-sales' ? 'btn-hot' : (cat === 'videos' ? 'btn-vid' : 'btn-3d'));
-            activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow');
-            document.getElementById('info-fields').style.display = (cat === 'showroom-3d') ? 'none' : 'grid';
-        }
 
         document.getElementById('uploadForm').onsubmit = async (e) => {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
-            const status = document.getElementById('statusBox');
-            const fileInput = document.getElementById('mainFile');
-            
+            const btnText = document.getElementById('btnText');
+            const statusDiv = document.getElementById('status');
+            const statusContent = document.getElementById('statusContent');
+            const fileInput = document.getElementById('file');
+
+            // UI 状态切换
             btn.disabled = true;
-            btn.innerText = "⏳ 正在同步到云端...";
-            status.classList.remove('hidden');
-            status.innerText = "正在读取文件并提交...";
-            status.className = "mt-6 p-4 bg-blue-50 text-blue-700 border-blue-200 rounded text-center font-bold";
+            btnText.innerText = "⏳ SYNCING TO CLOUD... (正在同步)";
+            statusDiv.classList.remove('hidden');
+            statusContent.className = "p-4 rounded-xl text-sm font-medium bg-blue-50 text-blue-700 border border-blue-100";
+            statusContent.innerHTML = "Processing data and assets...<br>正在读取文件并提交...";
 
             try {
-                let fileBase64 = "";
+                const file = fileInput.files[0];
+                let fileData = null;
                 let fileName = "";
-                
-                if (fileInput.files.length > 0) {
-                    const file = fileInput.files[0];
+
+                if (file) {
                     fileName = file.name;
-                    fileBase64 = await new Promise((resolve, reject) => {
+                    fileData = await new Promise((resolve) => {
                         const reader = new FileReader();
                         reader.onload = () => resolve(reader.result.split(',')[1]);
-                        reader.onerror = reject;
                         reader.readAsDataURL(file);
                     });
                 }
@@ -103,8 +99,8 @@
                     moq: document.getElementById('moq').value,
                     category: document.getElementById('category').value,
                     yt_url: document.getElementById('yt_url').value,
-                    file_content: fileBase64,
-                    file_name: fileName
+                    fileName: fileName,
+                    fileData: fileData
                 };
 
                 const res = await fetch(API_BASE, {
@@ -113,21 +109,22 @@
                     body: JSON.stringify(payload)
                 });
 
+                const result = await res.json();
+
                 if (res.ok) {
-                    status.innerText = "✅ 同步成功！产品已录入数据库。";
-                    status.className = "mt-6 p-4 bg-green-50 text-green-700 border-green-200 rounded text-center font-bold";
-                    e.target.reset();
+                    statusContent.className = "p-4 rounded-xl text-sm font-medium bg-green-50 text-green-700 border border-green-100";
+                    statusContent.innerHTML = "✅ SUCCESS! Data saved and GitHub assets updated.<br>同步成功！产品已入库并上传至 GitHub。";
+                    document.getElementById('uploadForm').reset();
                 } else {
-                    const err = await res.json();
-                    throw new Error(err.error || '服务器响应错误');
+                    throw new Error(result.error || 'Server Error');
                 }
+
             } catch (err) {
-                console.error(err);
-                status.innerText = "❌ 失败: " + err.message;
-                status.className = "mt-6 p-4 bg-red-50 text-red-700 border-red-200 rounded text-center font-bold";
+                statusContent.className = "p-4 rounded-xl text-sm font-medium bg-red-50 text-red-700 border border-red-100";
+                statusContent.innerHTML = "❌ FAILED: " + err.message + "<br>失败原因：" + (err.message.includes('fetch') ? '网络连接失败' : err.message);
             } finally {
                 btn.disabled = false;
-                btn.innerText = "🚀 SAVE & SYNC TO CLOUD";
+                btnText.innerText = "🚀 SAVE & SYNC TO CLOUD";
             }
         };
     </script>
