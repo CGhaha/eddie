@@ -2,55 +2,66 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Mamba Admin | Dashboard</title>
+    <title>Mamba Admin | Eddie's Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-100 p-8">
     <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-md">
-        <h1 class="text-2xl font-bold mb-6 border-b pb-2">Eddie's Management Center</h1>
+        <h1 class="text-2xl font-bold mb-6 border-b pb-2 text-slate-800">Eddie's Management Center</h1>
         
-        <!-- 分类选择 -->
         <div class="flex gap-4 mb-8">
-            <button onclick="switchTab('hot-sales')" class="tab-btn bg-blue-600 text-white px-4 py-2 rounded">Hot Sales</button>
-            <button onclick="switchTab('videos')" class="tab-btn bg-gray-200 px-4 py-2 rounded">Videos</button>
-            <button onclick="switchTab('showroom-3d')" class="tab-btn bg-gray-200 px-4 py-2 rounded">3D Showroom</button>
+            <button onclick="switchTab('hot-sales')" id="btn-hot" class="tab-btn bg-blue-600 text-white px-4 py-2 rounded">Hot Sales</button>
+            <button onclick="switchTab('videos')" id="btn-vid" class="tab-btn bg-gray-200 px-4 py-2 rounded">Videos</button>
+            <button onclick="switchTab('showroom-3d')" id="btn-3d" class="tab-btn bg-gray-200 px-4 py-2 rounded">3D Showroom</button>
         </div>
 
         <form id="uploadForm" class="space-y-4">
             <input type="hidden" id="category" value="hot-sales">
             
             <div>
-                <label class="block font-medium">Product Name</label>
-                <input type="text" id="name" class="w-full border p-2 rounded" required>
+                <label class="block font-bold text-sm text-gray-700">Product Name 产品名称</label>
+                <input type="text" id="name" class="w-full border p-2 rounded outline-none focus:ring-2 focus:ring-blue-500" required>
             </div>
 
             <div id="info-fields" class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block font-medium">Material</label>
+                    <label class="block font-bold text-sm text-gray-700">Material 材质</label>
                     <input type="text" id="material" class="w-full border p-2 rounded">
                 </div>
                 <div>
-                    <label class="block font-medium">MOQ</label>
+                    <label class="block font-bold text-sm text-gray-700">MOQ 起订量</label>
                     <input type="text" id="moq" class="w-full border p-2 rounded">
                 </div>
             </div>
 
-            <div id="media-fields">
-                <label class="block font-medium">Upload File (Image/GLB)</label>
-                <input type="file" id="mainFile" class="w-full border p-2 rounded">
-                <p class="text-xs text-gray-400 mt-1">* Hot Sales/3D: Upload Images or GLB files.</p>
+            <div id="file-selector">
+                <label class="block font-bold text-sm text-gray-700">Upload File 上传文件</label>
+                <input type="file" id="mainFile" class="w-full border p-2 rounded bg-gray-50">
             </div>
 
             <div>
-                <label class="block font-medium">YouTube URL (Video Link)</label>
+                <label class="block font-bold text-sm text-gray-700">YouTube URL (视频链接)</label>
                 <input type="url" id="yt_url" placeholder="https://youtube.com/..." class="w-full border p-2 rounded">
             </div>
 
-            <button type="submit" class="w-full bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">🚀 SAVE & SYNC TO CLOUD</button>
+            <button type="submit" id="submitBtn" class="w-full bg-slate-900 text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg active:scale-95">
+                🚀 SAVE & SYNC TO CLOUD
+            </button>
         </form>
+        
+        <div id="statusBox" class="mt-4 p-3 rounded text-center font-bold hidden"></div>
     </div>
 
     <script>
+        // ======= 🛠️ 必须修改这里 =======
+        const GITHUB_CONFIG = {
+            token: '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', // 填入你的 GitHub Token
+            owner: 'CGhaha',        
+            repo: 'eddie',        
+            path: 'assets'            // 文件存储的文件夹
+        };
+        // ===============================
+
         function switchTab(cat) {
             document.getElementById('category').value = cat;
             document.querySelectorAll('.tab-btn').forEach(b => {
@@ -58,13 +69,79 @@
                 b.classList.add('bg-gray-200');
             });
             event.target.classList.add('bg-blue-600', 'text-white');
-            
-            // 针对3D模式隐藏部分字段
-            const infoFields = document.getElementById('info-fields');
-            infoFields.style.display = (cat === 'showroom-3d') ? 'none' : 'grid';
+            document.getElementById('info-fields').style.display = (cat === 'showroom-3d') ? 'none' : 'grid';
         }
 
-        // 这里集成之前的 GitHub 上传逻辑和 API 提交逻辑即可...
+        async function uploadFileToGithub(file) {
+            const fileName = Date.now() + '-' + file.name;
+            const content = await new Promise(r => {
+                const reader = new FileReader();
+                reader.onload = () => r(reader.result.split(',')[1]);
+                reader.readAsDataURL(file);
+            });
+
+            const res = await fetch(`https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}/${fileName}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${GITHUB_CONFIG.token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message: "upload from admin", content })
+            });
+
+            if (!res.ok) throw new Error('GitHub 上传失败，请检查 Token 和配置');
+            return `https://raw.githubusercontent.com/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/main/${GITHUB_CONFIG.path}/${fileName}`;
+        }
+
+        document.getElementById('uploadForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('statusBox');
+            const fileInput = document.getElementById('mainFile');
+            
+            btn.disabled = true;
+            btn.innerText = "⏳ 同步中...";
+            status.classList.remove('hidden');
+            status.innerText = "正在上传文件到 GitHub...";
+            status.className = "mt-4 p-3 bg-blue-50 text-blue-700 rounded text-center font-bold";
+
+            try {
+                let finalPath = "";
+                if (fileInput.files.length > 0) {
+                    finalPath = await uploadFileToGithub(fileInput.files[0]);
+                }
+
+                const payload = {
+                    name: document.getElementById('name').value,
+                    material: document.getElementById('material').value,
+                    moq: document.getElementById('moq').value,
+                    category: document.getElementById('category').value,
+                    yt_url: document.getElementById('yt_url').value,
+                    file_path: finalPath
+                };
+
+                const dbRes = await fetch('https://mamba-api.mfgift.workers.dev/api/upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (dbRes.ok) {
+                    status.innerText = "✅ 成功！数据已存入数据库并同步。";
+                    status.className = "mt-4 p-3 bg-green-100 text-green-700 rounded text-center font-bold";
+                    e.target.reset();
+                } else {
+                    const err = await dbRes.json();
+                    throw new Error(err.error || '写入数据库失败');
+                }
+            } catch (err) {
+                status.innerText = "❌ 失败: " + err.message;
+                status.className = "mt-4 p-3 bg-red-100 text-red-700 rounded text-center font-bold";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "🚀 SAVE & SYNC TO CLOUD";
+            }
+        };
     </script>
 </body>
 </html>
