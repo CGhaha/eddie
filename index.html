@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mamba Promo | SAGE A+ Supplier</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
@@ -11,75 +11,72 @@
         .page.active { display: block; }
         .model-card model-viewer {
             width: 100%;
-            height: 150px;
+            height: 180px;
             --poster-color: transparent;
+            background-color: #f8fafc;
         }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800 antialiased">
 
-    <!-- 全局导航栏 -->
-    <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 flex justify-center gap-6 shadow-lg">
-        <button onclick="showPage('home')" class="hover:text-blue-400 font-medium">Home</button>
-        <button onclick="showPage('hot-sales')" class="hover:text-blue-400 font-medium">Hot Sales</button>
-        <button onclick="showPage('videos')" class="hover:text-blue-400 font-medium">Videos</button>
-        <button onclick="showPage('3d-view')" class="hover:text-blue-400 font-medium">3D Showroom</button>
+    <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 flex justify-center gap-4 md:gap-8 shadow-lg overflow-x-auto whitespace-nowrap">
+        <button onclick="showPage('home')" class="hover:text-blue-400 font-medium transition">Home</button>
+        <button onclick="showPage('hot-sales')" class="hover:text-blue-400 font-medium transition">Hot Sales</button>
+        <button onclick="showPage('videos')" class="hover:text-blue-400 font-medium transition">Videos</button>
+        <button onclick="showPage('3d-view')" class="hover:text-blue-400 font-medium transition">3D Showroom</button>
     </nav>
 
-    <!-- 1. 首页 -->
     <div id="home" class="page active">
-        <div class="h-80 flex flex-col justify-center items-center bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-600 text-white text-center px-4">
-            <h1 class="text-4xl md:text-5xl font-bold mb-4 italic">Mamba Promotional Gifts</h1>
-            <p class="text-lg opacity-90 max-w-2xl">Expert SAGE & ASI Supplier. Premium Custom Solutions Delivered Worldwide.</p>
+        <div class="h-[60vh] flex flex-col justify-center items-center bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-600 text-white text-center px-4">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 italic tracking-tight">Mamba Promotional Gifts</h1>
+            <p class="text-lg md:text-xl opacity-90 max-w-2xl">Premium SAGE A+ Supplier. Professional Custom Solutions for US Distributors.</p>
+            <button onclick="showPage('hot-sales')" class="mt-8 bg-white text-blue-900 px-8 py-3 rounded-full font-bold hover:bg-blue-50 transition shadow-lg">View Our Catalog</button>
         </div>
     </div>
 
-    <!-- 2. 热销产品 (实时读取) -->
     <div id="hot-sales" class="page container mx-auto py-12 px-4">
-        <div class="flex justify-between items-end mb-8 border-b pb-4">
-            <h2 class="text-3xl font-bold">Hot Sales</h2>
-            <span class="text-gray-400 text-sm">Top Trending Items</span>
-        </div>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="product-list">
-            <!-- 自动填充 -->
-        </div>
+        <h2 class="text-3xl font-bold mb-8 border-b pb-4">Hot Sales</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6" id="product-list"></div>
     </div>
 
-    <!-- 3. 视频展示 (实时读取) -->
     <div id="videos" class="page container mx-auto py-12 px-4">
         <h2 class="text-3xl font-bold mb-8 border-b pb-4">Product Videos</h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="video-list">
-            <!-- 自动填充 -->
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8" id="video-list"></div>
     </div>
 
-    <!-- 4. 三维展示 (实时读取) -->
     <div id="3d-view" class="page container mx-auto py-12 px-4">
         <h2 class="text-3xl font-bold mb-8 border-b pb-4">3D Virtual Showroom</h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4" id="3d-list">
-            <!-- 自动填充 -->
-        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6" id="3d-list"></div>
     </div>
 
-    <!-- 弹窗 -->
-    <div id="media-modal" class="fixed inset-0 bg-black/95 z-[60] hidden flex items-center justify-center">
-        <button onclick="closeModal()" class="absolute top-6 right-6 text-white text-4xl">&times;</button>
-        <div id="modal-content" class="w-full max-w-4xl p-4 flex flex-col items-center">
-            <div class="w-full aspect-video bg-gray-800 rounded-lg flex items-center justify-center overflow-hidden relative">
-                <iframe id="youtube-frame" width="100%" height="100%" src="" frameborder="0" allowfullscreen class="hidden"></iframe>
-                <img id="modal-img" src="" class="max-h-full">
+    <div id="media-modal" class="fixed inset-0 bg-black/95 z-[60] hidden flex items-center justify-center p-4">
+        <button onclick="closeModal()" class="absolute top-6 right-6 text-white text-4xl hover:text-gray-300 z-[70]">&times;</button>
+        <div id="modal-content" class="w-full max-w-5xl flex flex-col items-center">
+            <div class="w-full aspect-video bg-gray-800 rounded-xl flex items-center justify-center overflow-hidden relative shadow-2xl">
+                <iframe id="youtube-frame" width="100%" height="100%" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen class="hidden"></iframe>
+                <img id="modal-img" src="" class="max-h-full hidden">
+                <div id="modal-3d-container" class="hidden w-full h-full"></div>
             </div>
             <div class="mt-6 text-white text-center">
                 <h2 id="modal-title" class="text-2xl font-bold"></h2>
-                <p id="modal-desc" class="opacity-70"></p>
+                <p id="modal-desc" class="opacity-70 mt-2 text-sm"></p>
             </div>
         </div>
     </div>
 
     <script>
-        // 【配置区】记得改成你刚改好的新 API 地址
         const API = 'https://mamba-api.mfgift.workers.dev/api/products';
         let allProducts = [];
+
+        // 【加速核心 1】使用 CDN 加速节点替代原始 GitHub 链接
+        function fixUrl(path) {
+            if (!path) return '';
+            if (path.startsWith('http')) return path;
+            const cleanPath = path.replace(/^\//, '');
+            // 使用 jsDelivr 加速：cdn.jsdelivr.net/gh/用户名/仓库名@分支/路径
+            return `https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/${cleanPath}`;
+        }
 
         async function init() {
             try {
@@ -87,7 +84,7 @@
                 allProducts = await res.json();
                 renderAll();
             } catch (e) {
-                console.error("Data Load Error", e);
+                console.error("Load Error:", e);
             }
         }
 
@@ -96,38 +93,41 @@
             const videoGrid = document.getElementById('video-list');
             const threeDGrid = document.getElementById('3d-list');
 
-            // 1. 渲染热销 (Hot Sales - 展示图片类)
-            productGrid.innerHTML = allProducts.filter(p => !p.file_path.endsWith('.glb')).map(p => `
-                <div class="bg-white rounded-lg shadow-sm border hover:shadow-md transition cursor-pointer p-2" onclick="openModal('img', ${p.id})">
-                    <div class="aspect-square bg-gray-100 rounded mb-2 overflow-hidden">
-                        <img src="${p.file_path}" class="w-full h-full object-cover">
+            const hotSales = allProducts.filter(p => p.category === 'hot-sales' || p.category === 'Hot Sales 热销商品');
+            productGrid.innerHTML = hotSales.map(p => `
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 cursor-pointer group" onclick="openModal('img', ${p.id})">
+                    <div class="aspect-square bg-gray-50 rounded-lg mb-3 overflow-hidden">
+                        <img src="${fixUrl(p.file_path)}" class="w-full h-full object-cover group-hover:scale-105 transition" loading="lazy">
                     </div>
-                    <h3 class="font-bold text-sm truncate">${p.name}</h3>
-                    <p class="text-xs text-gray-500">MOQ: ${p.moq}</p>
+                    <h3 class="font-bold text-gray-900 truncate text-sm">${p.name}</h3>
+                    <p class="text-xs text-gray-500 mt-1">MOQ: ${p.moq || 'N/A'}</p>
                 </div>
             `).join('');
 
-            // 2. 渲染视频 (Videos - 只要有视频链接的都显示)
-            videoGrid.innerHTML = allProducts.filter(p => p.yt_url).map(p => {
-                const vid = p.yt_url.split('v=')[1] || p.yt_url.split('/').pop();
+            const videos = allProducts.filter(p => p.category === 'videos' || p.category === 'Videos 产品视频');
+            videoGrid.innerHTML = videos.map(p => {
+                const videoId = p.yt_url?.split('v=')[1]?.split('&')[0] || p.yt_url?.split('/').pop();
                 return `
-                <div class="group relative cursor-pointer" onclick="openModal('video', ${p.id})">
-                    <div class="aspect-video bg-black rounded-lg overflow-hidden flex items-center justify-center shadow">
-                        <img src="https://img.youtube.com/vi/${vid}/0.jpg" class="w-full opacity-60 group-hover:scale-110 transition">
+                <div class="group relative cursor-pointer overflow-hidden rounded-xl bg-black shadow-md" onclick="openModal('video', ${p.id})">
+                    <div class="aspect-video relative">
+                        <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" class="w-full h-full object-cover opacity-80" loading="lazy">
                         <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white pl-1 shadow-xl">▶</div>
+                            <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white">
+                                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
                         </div>
                     </div>
-                    <p class="mt-2 text-sm font-medium truncate text-center">${p.name}</p>
+                    <div class="p-3 bg-slate-900 text-white text-xs font-bold truncate">${p.name}</div>
                 </div>`;
             }).join('');
 
-            // 3. 渲染3D (3D Showroom - 只有 .glb 文件显示)
-            threeDGrid.innerHTML = allProducts.filter(p => p.file_path.endsWith('.glb')).map(p => `
-                <div class="bg-white border rounded-xl overflow-hidden hover:border-blue-500 transition model-card shadow-sm">
-                    <model-viewer src="${p.file_path}" auto-rotate camera-controls disable-zoom></model-viewer>
-                    <div class="p-3 bg-gray-50 border-t text-center">
-                        <button onclick="openModal('3d', ${p.id})" class="text-xs font-bold text-blue-600">VIEW FULLSCREEN</button>
+            const showroom = allProducts.filter(p => p.category === 'showroom-3d' || p.category === '3D Showroom 虚拟展厅');
+            threeDGrid.innerHTML = showroom.map(p => `
+                <div class="bg-white border border-gray-100 rounded-xl overflow-hidden model-card shadow-sm hover:shadow-md transition">
+                    <model-viewer src="${fixUrl(p.file_path)}" auto-rotate camera-controls interaction-prompt="none" loading="lazy" reveal="manual"></model-viewer>
+                    <div class="p-3 text-center border-t border-gray-50">
+                        <h3 class="font-bold text-xs mb-2 truncate text-gray-700">${p.name}</h3>
+                        <button onclick="openModal('3d', ${p.id})" class="w-full py-2 text-[10px] font-black bg-blue-600 text-white rounded-lg uppercase tracking-wider">View 3D</button>
                     </div>
                 </div>
             `).join('');
@@ -140,37 +140,49 @@
             const modal = document.getElementById('media-modal');
             const img = document.getElementById('modal-img');
             const yt = document.getElementById('youtube-frame');
+            const container3d = document.getElementById('modal-3d-container');
             
             document.getElementById('modal-title').innerText = p.name;
-            document.getElementById('modal-desc').innerText = `Material: ${p.material} | MOQ: ${p.moq}`;
+            document.getElementById('modal-desc').innerText = `Material: ${p.material || 'Standard'} | MOQ: ${p.moq || 'N/A'}`;
             
             modal.classList.remove('hidden');
+            [img, yt, container3d].forEach(el => el.classList.add('hidden'));
             
             if(type === 'video' && p.yt_url) {
-                const vid = p.yt_url.split('v=')[1] || p.yt_url.split('/').pop();
-                img.classList.add('hidden');
+                const videoId = p.yt_url.split('v=')[1]?.split('&')[0] || p.yt_url.split('/').pop();
                 yt.classList.remove('hidden');
-                yt.src = `https://www.youtube.com/embed/${vid}?autoplay=1`;
+                yt.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+            } else if (type === '3d') {
+                container3d.classList.remove('hidden');
+                // 【加速核心 2】强制从加速节点拉取并即时显示
+                container3d.innerHTML = `
+                    <model-viewer src="${fixUrl(p.file_path)}" 
+                        camera-controls auto-rotate shadow-intensity="1" 
+                        style="width:100%; height:100%" 
+                        ar ar-modes="webxr scene-viewer"
+                        loading="eager" 
+                        reveal="auto">
+                        <div slot="progress-bar" class="text-white text-sm">Lightning Loading...</div>
+                    </model-viewer>`;
             } else {
-                yt.classList.add('hidden');
                 img.classList.remove('hidden');
-                img.src = p.file_path;
-                yt.src = "";
+                img.src = fixUrl(p.file_path);
             }
         }
 
         function closeModal() {
             document.getElementById('media-modal').classList.add('hidden');
             document.getElementById('youtube-frame').src = "";
+            document.getElementById('modal-3d-container').innerHTML = "";
         }
 
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            window.scrollTo(0,0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        init(); // 页面加载后立即启动
+        init();
     </script>
 </body>
 </html>
