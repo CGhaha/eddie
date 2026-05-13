@@ -9,7 +9,7 @@
     <style>
         .page { display: none; }
         .page.active { display: block; }
-        /* 3D卡片基础比例 */
+        /* 3D/图片卡片基础比例 1.1:1 */
         .model-card {
             display: flex;
             flex-direction: column;
@@ -60,7 +60,7 @@
             </div>
             <div class="mt-6 text-white text-center w-full px-4">
                 <h2 id="modal-title" class="text-2xl font-bold"></h2>
-                <p id="modal-desc" class="opacity-70 mt-2 text-sm"></p>
+                <div id="modal-details" class="opacity-70 mt-2 text-sm space-y-1"></div>
                 <div class="mt-8 flex flex-wrap justify-center gap-4">
                     <button id="inquiry-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full font-black uppercase tracking-widest transition shadow-xl px-6 py-2">Inquiry</button>
                     <button id="whatsapp-btn" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full font-black uppercase tracking-widest transition shadow-xl px-6 py-2">WhatsApp</button>
@@ -143,9 +143,20 @@
                     </div>`;
                 if (type === 'video') {
                     const vId = p.yt_url?.split('v=')[1]?.split('&')[0] || p.yt_url?.split('/').pop();
-                    return `<div class="group relative cursor-pointer overflow-hidden rounded-xl bg-black flex flex-col" style="aspect-ratio: 4 / 3" onclick="openModal('video', ${p.id})">
-                        <div class="flex-1 relative"><img src="https://img.youtube.com/vi/${vId}/hqdefault.jpg" class="w-full h-full object-cover opacity-70 group-hover:scale-105 transition"></div>
-                        <div class="p-2 bg-slate-900 text-white text-[10px] font-bold truncate">${p.name}</div>
+                    return `<div class="group cursor-pointer overflow-hidden rounded-xl bg-white border border-gray-100 shadow-sm flex flex-col" style="aspect-ratio: 4 / 3" onclick="openModal('video', ${p.id})">
+                        <div class="bg-black relative overflow-hidden" style="aspect-ratio: 1.7 / 1">
+                            <!-- 修改点：使用 object-cover 并填充满左右，无留白 -->
+                            <img src="https://img.youtube.com/vi/${vId}/hqdefault.jpg" class="w-full h-full object-cover group-hover:scale-105 transition">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                                    <div class="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white border-b-[6px] border-b-transparent ml-1"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 修改点：外面只显示名称，材质和MOQ隐藏 -->
+                        <div class="flex-1 p-2 bg-slate-900 text-white flex flex-col justify-center">
+                            <h3 class="font-bold text-[11px] text-center px-1 break-words line-clamp-2">${p.name}</h3>
+                        </div>
                     </div>`;
                 }
                 return `
@@ -165,7 +176,14 @@
             const modal = document.getElementById('media-modal');
             modal.classList.remove('hidden');
             document.getElementById('modal-title').innerText = p.name;
-            document.getElementById('modal-desc').innerText = `MOQ: ${p.moq || 'N/A'}`;
+            
+            // 修改点：在详情弹窗中显示材质和MOQ
+            const detailsHtml = `
+                <p>Material: ${p.material || 'N/A'}</p>
+                <p>MOQ: ${p.moq || 'N/A'}</p>
+            `;
+            document.getElementById('modal-details').innerHTML = detailsHtml;
+
             const img = document.getElementById('modal-img'), yt = document.getElementById('youtube-frame'), c3d = document.getElementById('modal-3d-container');
             [img, yt, c3d].forEach(el => el.classList.add('hidden'));
             if(type === 'video') { yt.classList.remove('hidden'); yt.src = `https://www.youtube.com/embed/${p.yt_url.split('v=')[1] || p.yt_url.split('/').pop()}?autoplay=1`; }
