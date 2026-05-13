@@ -3,144 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eddie's Admin | V2.3 强固版</title>
+    <title>Mamba Admin | V2.5 宽屏增强版</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 min-h-screen p-4">
-    <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 mt-10">
-        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-900">
-            <h1 class="text-xl font-bold text-white">Eddie's Management Center</h1>
-            <span class="text-[10px] px-2 py-1 bg-green-500 text-white rounded">V2.3 稳定版</span>
+<body class="bg-slate-50 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-1 bg-white rounded-2xl shadow-xl border border-slate-100 p-6 h-fit sticky top-6">
+            <h1 id="formTitle" class="text-xl font-bold mb-4">Add Product</h1>
+            <form id="uploadForm" class="space-y-4" onsubmit="return false;">
+                <input type="hidden" id="editId">
+                <input type="hidden" id="existingPath">
+                <input type="text" id="name" placeholder="Product Name" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" required>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="material" placeholder="Material" class="w-full px-4 py-2 border rounded-lg">
+                    <input type="text" id="moq" placeholder="MOQ" class="w-full px-4 py-2 border rounded-lg">
+                </div>
+                <select id="category" class="w-full px-4 py-2 border rounded-lg bg-white font-bold">
+                    <option value="hot-sales">Hot Sales</option>
+                    <option value="videos">Videos</option>
+                    <option value="showroom-3d">3D Showroom</option>
+                </select>
+                <div class="p-3 bg-slate-50 rounded-lg border text-[11px]">
+                    <p class="font-bold mb-2">Sub-Categories (Multi-Select):</p>
+                    <div id="tagOptions" class="grid grid-cols-2 gap-1 overflow-y-auto max-h-40"></div>
+                </div>
+                <input type="file" id="file" class="text-xs w-full">
+                <input type="url" id="yt_url" placeholder="YouTube URL" class="w-full px-4 py-2 border rounded-lg">
+                <button id="submitBtn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">SAVE TO CLOUD</button>
+                <button type="button" id="cancelBtn" onclick="resetForm()" class="w-full hidden text-gray-500 text-xs">Cancel Edit</button>
+            </form>
+            <div id="status" class="mt-4 text-xs font-bold p-2 hidden rounded"></div>
         </div>
 
-        <form id="uploadForm" class="p-6 space-y-4" onsubmit="return false;">
-            <div>
-                <label class="block text-sm font-bold text-slate-700">Product Name 产品名称</label>
-                <input type="text" id="name" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+        <div class="md:col-span-2 bg-white rounded-2xl shadow-xl border border-slate-100 p-6">
+            <h2 class="font-bold mb-4">Inventory List</h2>
+            <div class="overflow-hidden rounded-lg border border-slate-50">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-900 text-white text-[10px]">
+                        <tr><th class="p-3">Product</th><th class="p-3">Category</th><th class="p-3 text-right">Actions</th></tr>
+                    </thead>
+                    <tbody id="inventoryList" class="divide-y divide-slate-100"></tbody>
+                </table>
             </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700">Material 材质</label>
-                    <input type="text" id="material" class="w-full px-4 py-2 border rounded-lg">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700">MOQ 起订量</label>
-                    <input type="text" id="moq" class="w-full px-4 py-2 border rounded-lg">
-                </div>
-            </div>
-
-            <div>
-                <label class="block text-sm font-bold text-slate-700">Category 分类</label>
-                <select id="category" class="w-full px-4 py-2 border rounded-lg bg-white">
-                    <option value="hot-sales">Hot Sales 热销商品</option>
-                    <option value="videos">Videos 视频</option>
-                    <option value="showroom-3d">3D Showroom 3D 展厅</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-sm font-bold text-slate-700">Upload File (图片或 GLB)</label>
-                <input type="file" id="file" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700">
-            </div>
-
-            <div>
-                <label class="block text-sm font-bold text-slate-700">YouTube URL (可选)</label>
-                <input type="url" id="yt_url" placeholder="https://..." class="w-full px-4 py-2 border rounded-lg">
-            </div>
-
-            <button type="button" id="submitBtn" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all shadow-lg active:scale-95">
-                <span id="btnText">🚀 SAVE & SYNC TO CLOUD</span>
-            </button>
-        </form>
-
-        <div id="status" class="px-6 pb-6 hidden">
-            <div id="statusContent" class="p-4 rounded-xl text-sm font-medium border leading-relaxed"></div>
         </div>
     </div>
 
     <script>
-        const API_BASE = 'https://mamba-api.mfgift.workers.dev/api/upload';
+        const API_BASE = 'https://mamba-api.mfgift.workers.dev/api';
+        const CATS = ["Apparel", "Printing", "Bags", "Trade Show", "Tools & Hardware", "Caps & Headwear", "Travel Items", "Outdoor & Leisure", "Face mask", "Technology Items", "Mugs & Drinkware", "Bar Items", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports Items", "Offices & Desks", "Jewelry & Giveaways", "Holiday Gifts", "Toys & Fun"];
+        let products = [];
 
-        document.getElementById('submitBtn').addEventListener('click', async (e) => {
-            // 关键：阻止事件冒泡，防止浏览器插件劫持
-            e.preventDefault();
-            e.stopPropagation();
+        // 初始化标签
+        document.getElementById('tagOptions').innerHTML = CATS.map(c => `<label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="tag" value="${c}"> ${c}</label>`).join('');
 
-            const btn = document.getElementById('submitBtn');
-            const btnText = document.getElementById('btnText');
-            const statusDiv = document.getElementById('status');
-            const statusContent = document.getElementById('statusContent');
-            const fileInput = document.getElementById('file');
+        async function load() {
+            const res = await fetch(`${API_BASE}/products`);
+            products = await res.json();
+            document.getElementById('inventoryList').innerHTML = products.map(p => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-bold">${p.name}</td>
+                    <td class="p-3 text-[10px] text-gray-400 uppercase">${p.category}</td>
+                    <td class="p-3 text-right space-x-2">
+                        <button onclick="editP(${p.id})" class="text-blue-600 font-bold">EDIT</button>
+                        <button onclick="delP(${p.id})" class="text-red-400">DEL</button>
+                    </td>
+                </tr>`).join('');
+        }
 
-            // 基础校验
-            const nameValue = document.getElementById('name').value.trim();
-            if(!nameValue) { alert("Please enter product name"); return; }
+        function editP(id) {
+            const p = products.find(x => x.id === id);
+            document.getElementById('editId').value = p.id;
+            document.getElementById('name').value = p.name;
+            document.getElementById('material').value = p.material;
+            document.getElementById('moq').value = p.moq;
+            document.getElementById('category').value = p.category;
+            document.getElementById('yt_url').value = p.yt_url;
+            document.getElementById('existingPath').value = p.file_path;
+            const tags = (p.tags || "").split(',');
+            document.querySelectorAll('input[name="tag"]').forEach(ck => ck.checked = tags.includes(ck.value));
+            document.getElementById('formTitle').innerText = "Edit Mode";
+            document.getElementById('cancelBtn').classList.remove('hidden');
+        }
 
-            // UI 锁定
-            btn.disabled = true;
-            btnText.innerText = "⏳ PROCESSING...";
-            statusDiv.classList.remove('hidden');
-            statusContent.className = "p-4 rounded-xl text-sm bg-blue-50 text-blue-700 border-blue-100";
-            statusContent.innerHTML = "Preparing secure connection...<br>正在建立安全连接...";
+        function resetForm() {
+            document.getElementById('uploadForm').reset();
+            document.getElementById('editId').value = "";
+            document.getElementById('formTitle').innerText = "Add Product";
+            document.getElementById('cancelBtn').classList.add('hidden');
+        }
 
-            try {
-                const file = fileInput.files[0];
-                let fileData = null;
-                let fileName = "no_file";
-
-                if (file) {
-                    // 安全转换文件名，防止插件读取报错
-                    fileName = String(file.name || "unnamed").replace(/[^\w.-]/g, '_');
-                    
-                    statusContent.innerHTML = `Reading file: ${fileName}...<br>正在读取文件数据...`;
-                    
-                    fileData = await new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = () => resolve(reader.result.split(',')[1]);
-                        reader.onerror = () => reject(new Error("File Read Failed"));
-                        reader.readAsDataURL(file);
-                    });
-                }
-
-                const payload = {
-                    name: String(nameValue),
-                    material: String(document.getElementById('material').value || ""),
-                    moq: String(document.getElementById('moq').value || ""),
-                    category: String(document.getElementById('category').value),
-                    yt_url: String(document.getElementById('yt_url').value || ""),
-                    fileName: fileName,
-                    fileData: fileData
-                };
-
-                statusContent.innerHTML = "Uploading to Cloudflare...<br>正在上传至云端，请勿关闭页面...";
-
-                const res = await fetch(API_BASE, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await res.json();
-
-                if (!res.ok) {
-                    throw new Error(result.error || `Upload Failed (${res.status})`);
-                }
-
-                statusContent.className = "p-4 rounded-xl text-sm bg-green-50 text-green-700 border-green-100";
-                statusContent.innerHTML = "✅ SUCCESS!<br>同步成功！GitHub 正在刷新，1分钟后首页可见。";
-                document.getElementById('uploadForm').reset();
-
-            } catch (err) {
-                console.error("Upload Error:", err);
-                statusContent.className = "p-4 rounded-xl text-sm bg-red-50 text-red-700 border-red-100";
-                statusContent.innerHTML = `❌ Error: ${err.message}<br>请尝试关闭浏览器的“翻译”插件后重试。`;
-            } finally {
-                btn.disabled = false;
-                btnText.innerText = "🚀 SAVE & SYNC TO CLOUD";
+        async function delP(id) {
+            if(confirm('Delete it?')) {
+                await fetch(`${API_BASE}/products/${id}`, { method: 'DELETE' });
+                load();
             }
-        });
+        }
+
+        document.getElementById('submitBtn').onclick = async () => {
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('status');
+            btn.disabled = true; status.classList.remove('hidden');
+            status.innerHTML = "Syncing...";
+
+            const file = document.getElementById('file').files[0];
+            let fileData = null;
+            if (file) {
+                fileData = await new Promise(r => {
+                    const reader = new FileReader();
+                    reader.onload = () => r(reader.result.split(',')[1]);
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            const payload = {
+                id: document.getElementById('editId').value,
+                name: document.getElementById('name').value,
+                material: document.getElementById('material').value,
+                moq: document.getElementById('moq').value,
+                category: document.getElementById('category').value,
+                yt_url: document.getElementById('yt_url').value,
+                existingPath: document.getElementById('existingPath').value,
+                tags: Array.from(document.querySelectorAll('input[name="tag"]:checked')).map(i=>i.value).join(','),
+                fileName: file ? file.name : "no_file",
+                fileData: fileData
+            };
+
+            const res = await fetch(`${API_BASE}/upload`, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            if(res.ok) {
+                status.innerHTML = "✅ Success!";
+                resetForm(); load();
+            }
+            btn.disabled = false;
+        };
+
+        load();
     </script>
 </body>
 </html>
