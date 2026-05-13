@@ -3,36 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eddie's Management Center | V2.1 修复版</title>
+    <title>Eddie's Management Center | V2.2 终极兼容版</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 min-h-screen p-4 md:p-8">
-    <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
-        <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-            <h1 class="text-xl font-bold text-slate-800">Eddie's Management Center</h1>
-            <span class="text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded">V2.1 稳定版</span>
+<body class="bg-slate-50 min-h-screen p-4">
+    <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 mt-10">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-900">
+            <h1 class="text-xl font-bold text-white">Eddie's Management Center</h1>
+            <span class="text-[10px] px-2 py-1 bg-blue-500 text-white rounded">V2.2 兼容版</span>
         </div>
 
-        <form id="uploadForm" class="p-6 space-y-5">
+        <form id="uploadForm" class="p-6 space-y-4">
             <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1">Product Name 产品名称</label>
-                <input type="text" id="name" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <label class="block text-sm font-bold text-slate-700">Product Name 产品名称</label>
+                <input type="text" id="name" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Material 材质</label>
-                    <input type="text" id="material" placeholder="e.g. PU" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <label class="block text-sm font-bold text-slate-700">Material 材质</label>
+                    <input type="text" id="material" class="w-full px-4 py-2 border rounded-lg">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">MOQ 起订量</label>
-                    <input type="text" id="moq" placeholder="e.g. 500" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <label class="block text-sm font-bold text-slate-700">MOQ 起订量</label>
+                    <input type="text" id="moq" class="w-full px-4 py-2 border rounded-lg">
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1">Category 分类</label>
-                <select id="category" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                <label class="block text-sm font-bold text-slate-700">Category 分类</label>
+                <select id="category" class="w-full px-4 py-2 border rounded-lg bg-white">
                     <option value="hot-sales">Hot Sales 热销商品</option>
                     <option value="videos">Videos 视频</option>
                     <option value="showroom-3d">3D Showroom 3D 展厅</option>
@@ -40,28 +40,26 @@
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1">Upload File 上传文件 (图片或GLB)</label>
-                <input type="file" id="file" accept=".jpg,.jpeg,.png,.gif,.glb" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                <label class="block text-sm font-bold text-slate-700">Upload File (图片或 GLB)</label>
+                <input type="file" id="file" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700">
             </div>
 
             <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1">YouTube URL (视频链接)</label>
-                <input type="url" id="yt_url" placeholder="https://youtube.com/watch?v=..." class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <label class="block text-sm font-bold text-slate-700">YouTube URL</label>
+                <input type="url" id="yt_url" placeholder="https://..." class="w-full px-4 py-2 border rounded-lg">
             </div>
 
-            <button type="submit" id="submitBtn" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all flex flex-col items-center justify-center space-y-1">
+            <button type="submit" id="submitBtn" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-all">
                 <span id="btnText">🚀 SAVE & SYNC TO CLOUD</span>
-                <span class="text-[10px] opacity-60">保存并同步到云端</span>
             </button>
         </form>
 
         <div id="status" class="px-6 pb-6 hidden">
-            <div id="statusContent" class="p-4 rounded-xl text-sm font-medium flex flex-col items-center text-center"></div>
+            <div id="statusContent" class="p-4 rounded-xl text-sm font-medium border"></div>
         </div>
     </div>
 
     <script>
-        // 核心配置：务必确认你的 Worker 地址是这个
         const API_BASE = 'https://mamba-api.mfgift.workers.dev/api/upload';
 
         document.getElementById('uploadForm').onsubmit = async (e) => {
@@ -72,12 +70,12 @@
             const statusContent = document.getElementById('statusContent');
             const fileInput = document.getElementById('file');
 
-            // UI 状态切换
+            // UI 锁定
             btn.disabled = true;
-            btnText.innerText = "⏳ SYNCING TO CLOUD... (正在同步)";
+            btnText.innerText = "⏳ PROCESSING...";
             statusDiv.classList.remove('hidden');
-            statusContent.className = "p-4 rounded-xl text-sm font-medium bg-blue-50 text-blue-700 border border-blue-100";
-            statusContent.innerHTML = "Processing data and assets...<br>正在读取文件并提交...";
+            statusContent.className = "p-4 rounded-xl text-sm bg-blue-50 text-blue-700 border-blue-100";
+            statusContent.innerHTML = "Reading file and connecting to Cloudflare...<br>正在读取文件并建立连接...";
 
             try {
                 const file = fileInput.files[0];
@@ -85,10 +83,14 @@
                 let fileName = "";
 
                 if (file) {
-                    fileName = file.name;
-                    fileData = await new Promise((resolve) => {
+                    // 兼容性修正：安全获取文件名
+                    fileName = file.name ? String(file.name) : "unknown_file";
+                    
+                    // 读取文件
+                    fileData = await new Promise((resolve, reject) => {
                         const reader = new FileReader();
                         reader.onload = () => resolve(reader.result.split(',')[1]);
+                        reader.onerror = () => reject(new Error("文件读取失败"));
                         reader.readAsDataURL(file);
                     });
                 }
@@ -109,19 +111,18 @@
                     body: JSON.stringify(payload)
                 });
 
-                const result = await res.json();
-
-                if (res.ok) {
-                    statusContent.className = "p-4 rounded-xl text-sm font-medium bg-green-50 text-green-700 border border-green-100";
-                    statusContent.innerHTML = "✅ SUCCESS! Data saved and GitHub assets updated.<br>同步成功！产品已入库并上传至 GitHub。";
-                    document.getElementById('uploadForm').reset();
-                } else {
-                    throw new Error(result.error || 'Server Error');
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.error || `Server Error (${res.status})`);
                 }
 
+                statusContent.className = "p-4 rounded-xl text-sm bg-green-50 text-green-700 border-green-100";
+                statusContent.innerHTML = "✅ SYNC SUCCESS!<br>同步成功！请等待 GitHub 部署（约 1 分钟）。";
+                document.getElementById('uploadForm').reset();
+
             } catch (err) {
-                statusContent.className = "p-4 rounded-xl text-sm font-medium bg-red-50 text-red-700 border border-red-100";
-                statusContent.innerHTML = "❌ FAILED: " + err.message + "<br>失败原因：" + (err.message.includes('fetch') ? '网络连接失败' : err.message);
+                statusContent.className = "p-4 rounded-xl text-sm bg-red-50 text-red-700 border-red-100";
+                statusContent.innerHTML = "❌ ERROR: " + err.message + "<br>建议：检查网络或确认 GitHub 上的 assets 文件已删除。";
             } finally {
                 btn.disabled = false;
                 btnText.innerText = "🚀 SAVE & SYNC TO CLOUD";
