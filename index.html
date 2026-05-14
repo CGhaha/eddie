@@ -20,6 +20,10 @@
         #modal-content {
             max-height: calc(100vh - 40px);
         }
+        /* 优化：增加图片淡入效果，看起来更丝滑 */
+        img { transition: opacity 0.3s; }
+        img[loading] { opacity: 0; }
+        img.loaded { opacity: 1; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
@@ -99,10 +103,7 @@
                 const res = await fetch(API);
                 allProducts = await res.json();
                 renderTags();
-                
-                // 核心修改：检测 URL 里的页面和产品ID
                 handleDeepLink();
-                
                 setupButtons();
             } catch (e) { console.error(e); }
         }
@@ -111,21 +112,19 @@
             const fullHash = window.location.hash.replace('#', '');
             const [pageId, productId] = fullHash.split('!');
             
-            // 切换到对应页面
             if (pageId && ['home', 'hot-sales', 'videos', '3d-view'].includes(pageId)) {
                 showPage(pageId);
             } else {
                 renderAll();
             }
 
-            // 如果有产品ID，自动弹开
             if (productId) {
                 const p = allProducts.find(x => x.id == productId);
                 if (p) {
                     let type = 'img';
                     if(p.category === 'videos') type = 'video';
                     if(p.category === 'showroom-3d') type = '3d';
-                    openModal(type, p.id, true); // true 表示是由 URL 触发的，不重复写 Hash
+                    openModal(type, p.id, true);
                 }
             }
         }
@@ -157,10 +156,7 @@
 
         function showPage(id) {
             currentPage = id;
-            // 仅在手动切换页面且弹窗关闭时更新 Hash
-            if (!document.getElementById('media-modal').classList.contains('hidden')) {
-                // 如果弹窗开着，保持 ID
-            } else {
+            if (document.getElementById('media-modal').classList.contains('hidden')) {
                 window.location.hash = id;
             }
             
@@ -202,24 +198,39 @@
         function renderGrid(containerId, items, type) {
             const grid = document.getElementById(containerId);
             if (!grid) return;
-            grid.innerHTML = items.map(p => {
+
+            // 优化：使用数组 join 提高渲染效率
+            const html = items.map(p => {
                 if (type === 'img') {
+                    // 优化：使用 loading="lazy" 进行图片懒加载
                     return `<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 cursor-pointer group" onclick="openModal('img', ${p.id})">
                         <div class="aspect-square bg-white rounded-lg mb-3 overflow-hidden flex items-center justify-center">
-                            <img src="${fixUrl(p.file_path)}" class="w-full h-full object-contain group-hover:scale-105 transition" loading="lazy">
+                            <img src="${fixUrl(p.file_path)}" class="w-full h-full object-contain group-hover:scale-105 transition" loading="lazy" onload="this.classList.add('loaded')">
                         </div>
                         <h3 class="font-bold text-gray-900 truncate text-sm">${p.name}</h3>
                         <p class="text-xs text-gray-400 mt-1">MOQ: ${p.moq || 'N/A'}</p>
                     </div>`;
                 } else if (type === 'video') {
-                    const videoId = p.yt_url?.split('v=')[1]?.split('&')[0] || p.yt_url?.split('/').pop();
+                    let videoId = '';
+                    if (p.yt_url) {
+                        if (p.yt_url.includes('v=')) videoId = p.yt_url.split('v=')[1].split('&')[0];
+                        else if (p.yt_url.includes('youtu.be/')) videoId = p.yt_url.split('youtu.be/')[1].split('?')[0];
+                        else videoId = p.yt_url.split('/').pop();
+                    }
+                    const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://placehold.co/600x400?text=No+Video';
                     return `<div class="group relative cursor-pointer overflow-hidden rounded-xl bg-black" onclick="openModal('video', ${p.id})">
-                        <div class="aspect-video relative"><img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" class="w-full h-full object-cover opacity-70"><div class="absolute inset-0 flex items-center justify-center"><div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl">▶</div></div></div>
+                        <div class="aspect-video relative">
+                            <img src="${thumbUrl}" class="w-full h-full object-cover opacity-70 group-hover:scale-105 transition duration-500" loading="lazy" onload="this.classList.add('loaded')">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl group-hover:bg-blue-500 transition">▶</div>
+                            </div>
+                        </div>
                         <div class="p-3 bg-slate-900 text-white text-xs font-bold truncate">${p.name}</div>
                     </div>`;
                 } else if (type === '3d') {
+                    // 优化：3D 模型原本就是按需加载的
                     return `<div class="bg-white border border-gray-100 rounded-xl overflow-hidden model-card shadow-sm">
-                        <model-viewer src="${fixUrl(p.file_path)}" auto-rotate camera-controls interaction-prompt="none"></model-viewer>
+                        <model-viewer src="${fixUrl(p.file_path)}" auto-rotate camera-controls interaction-prompt="none" loading="lazy"></model-viewer>
                         <div class="p-3 text-center border-t">
                             <h3 class="font-bold text-xs mb-2 truncate">${p.name}</h3>
                             <button onclick="openModal('3d', ${p.id})" class="w-full py-2 text-[10px] font-black bg-blue-600 text-white rounded-lg uppercase">View 3D</button>
@@ -227,13 +238,14 @@
                     </div>`;
                 }
             }).join('');
+            
+            grid.innerHTML = html;
         }
 
         function openModal(type, id, isDeepLink = false) {
             const p = allProducts.find(x => x.id === id);
             if(!p) return;
             
-            // 核心修改：打开弹窗时更新 URL，增加 !ID
             if (!isDeepLink) {
                 window.location.hash = `${currentPage}!${id}`;
             }
@@ -264,8 +276,6 @@
             document.getElementById('media-modal').classList.add('hidden');
             document.getElementById('youtube-frame').src = "";
             document.getElementById('modal-3d-container').innerHTML = "";
-            
-            // 核心修改：关闭弹窗后，网址恢复成单纯的页面路径
             window.location.hash = currentPage;
         }
 
