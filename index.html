@@ -37,7 +37,7 @@
         </div>
     </div>
 
-    <div id="main-content" class="container mx-auto py-12 px-4">
+    <div id="main-content" class="max-w-[1920px] mx-auto py-12 px-4 md:px-10">
         <div class="flex flex-col md:flex-row gap-8">
             <aside id="category-sidebar" class="w-full md:w-64 flex-shrink-0 hidden">
                 <div class="sticky top-24">
@@ -54,7 +54,7 @@
                         <h2 class="text-3xl font-bold text-nowrap">Hot Sales</h2>
                         <input type="text" oninput="searchItems(this.value)" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm focus:ring-2 focus:ring-blue-500">
                     </div>
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="product-list"></div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6" id="product-list"></div>
                 </div>
 
                 <div id="videos" class="page">
@@ -62,7 +62,7 @@
                         <h2 class="text-3xl font-bold text-nowrap">Videos</h2>
                         <input type="text" oninput="searchItems(this.value)" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm focus:ring-2 focus:ring-blue-500">
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" id="video-list"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8" id="video-list"></div>
                 </div>
 
                 <div id="3d-view" class="page">
@@ -70,7 +70,7 @@
                         <h2 class="text-3xl font-bold text-nowrap">3D Showroom</h2>
                         <input type="text" oninput="searchItems(this.value)" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm focus:ring-2 focus:ring-blue-500">
                     </div>
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="3d-list"></div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6" id="3d-list"></div>
                 </div>
             </div>
         </div>
@@ -103,11 +103,10 @@
         let currentPage = 'home';
 
         const CATEGORIES = [
-            "Apparel", "Printing", "Bags", "Trade Show", "Tools & Hardware", 
-            "Caps & Headwear", "Travel Items", "Outdoor & Leisure", "Face mask", 
-            "Technology Items", "Mugs & Drinkware", "Bar Items", "Automotive", 
-            "Home & Kitchen", "Wellness & Health", "Sports Items", 
-            "Offices & Desks", "Jewelry & Giveaways", "Holiday Gifts", "Toys & Fun"
+            "Apparel", "Bags", "Trade Show", "Caps", "Outdoor & Leisure", 
+            "Technology", "Mugs & Drinkware", "Bar", "Automotive", 
+            "Home & Kitchen", "Wellness & Health", "Sports", 
+            "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"
         ];
 
         function fixUrl(path) {
@@ -139,7 +138,6 @@
             const target = document.getElementById(id);
             if(target) target.classList.add('active');
             
-            // 只有 Home 不显示侧边栏
             document.getElementById('category-sidebar').style.display = (id === 'home') ? 'none' : 'block';
             
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -161,31 +159,25 @@
 
         function renderAll() {
             if(currentPage === 'home') return;
-
             let items = allProducts;
             
-            // 1. 先按一级页面分类 (Hot Sales / Video / 3D)
             if (currentPage === 'hot-sales') items = items.filter(p => p.category === 'hot-sales');
             if (currentPage === 'videos') items = items.filter(p => p.category === 'videos');
             if (currentPage === '3d-view') items = items.filter(p => p.category === 'showroom-3d');
 
-            // 2. 按左侧红框多选标签筛选
             if (currentTag !== 'All') {
                 items = items.filter(p => p.tags && p.tags.includes(currentTag));
             }
 
-            // 3. 按关键词搜索
             if (currentSearch) {
                 items = items.filter(p => p.name.toLowerCase().includes(currentSearch));
             }
 
-            // 4. 渲染
             if (currentPage === 'hot-sales') renderGrid('product-list', items, 'img');
             if (currentPage === 'videos') renderGrid('video-list', items, 'video');
             if (currentPage === '3d-view') renderGrid('3d-list', items, '3d');
         }
 
-        // renderGrid, openModal, closeModal 函数保持与你之前一致，只需注意 tags 数据的读取即可...
         function renderGrid(containerId, items, type) {
             const grid = document.getElementById(containerId);
             if (type === 'img') {
@@ -225,7 +217,6 @@
             }
         }
 
-        // openModal 内部逻辑不变...
         function openModal(type, id) {
             const p = allProducts.find(x => x.id === id);
             if(!p) return;
