@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mamba Admin | V2.5 宽屏增强版</title>
+    <title>Mamba Admin | V2.1 多选增强版</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 min-h-screen p-6">
@@ -13,36 +13,49 @@
             <form id="uploadForm" class="space-y-4" onsubmit="return false;">
                 <input type="hidden" id="editId">
                 <input type="hidden" id="existingPath">
+                
                 <input type="text" id="name" placeholder="Product Name" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" required>
+                
                 <div class="grid grid-cols-2 gap-2">
                     <input type="text" id="material" placeholder="Material" class="w-full px-4 py-2 border rounded-lg">
                     <input type="text" id="moq" placeholder="MOQ" class="w-full px-4 py-2 border rounded-lg">
                 </div>
-                <select id="category" class="w-full px-4 py-2 border rounded-lg bg-white font-bold">
-                    <option value="hot-sales">Hot Sales</option>
-                    <option value="videos">Videos</option>
+
+                <select id="category" class="w-full px-4 py-2 border rounded-lg bg-white">
+                    <option value="hot-sales">Hot Sales (Home)</option>
+                    <option value="videos">Videos Section</option>
                     <option value="showroom-3d">3D Showroom</option>
                 </select>
-                <div class="p-3 bg-slate-50 rounded-lg border text-[11px]">
-                    <p class="font-bold mb-2">Sub-Categories (Multi-Select):</p>
-                    <div id="tagOptions" class="grid grid-cols-2 gap-1 overflow-y-auto max-h-40"></div>
+
+                <input type="text" id="yt_url" placeholder="YouTube URL (Optional)" class="w-full px-4 py-2 border rounded-lg">
+
+                <div class="p-3 bg-gray-50 rounded-lg">
+                    <p class="text-xs font-bold mb-2 text-gray-500 uppercase">Category Tags</p>
+                    <div class="grid grid-cols-2 gap-1 text-[10px]" id="tagGroup">
+                        </div>
                 </div>
-                <input type="file" id="file" class="text-xs w-full">
-                <input type="url" id="yt_url" placeholder="YouTube URL" class="w-full px-4 py-2 border rounded-lg">
-                <button id="submitBtn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">SAVE TO CLOUD</button>
-                <button type="button" id="cancelBtn" onclick="resetForm()" class="w-full hidden text-gray-500 text-xs">Cancel Edit</button>
+
+                <div class="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center">
+                    <input type="file" id="file" class="text-xs w-full" multiple>
+                    <p class="text-[10px] text-gray-400 mt-2 text-left leading-tight">Note: Current system saves the first file to cloud by default.</p>
+                </div>
+
+                <button id="submitBtn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">SAVE TO CLOUD</button>
+                <div id="status" class="hidden p-3 rounded-lg text-xs font-medium"></div>
             </form>
-            <div id="status" class="mt-4 text-xs font-bold p-2 hidden rounded"></div>
         </div>
 
-        <div class="md:col-span-2 bg-white rounded-2xl shadow-xl border border-slate-100 p-6">
-            <h2 class="font-bold mb-4">Inventory List</h2>
-            <div class="overflow-hidden rounded-lg border border-slate-50">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-slate-900 text-white text-[10px]">
-                        <tr><th class="p-3">Product</th><th class="p-3">Category</th><th class="p-3 text-right">Actions</th></tr>
+        <div class="md:col-span-2">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 border-b border-slate-100">
+                        <tr>
+                            <th class="p-4 text-xs font-bold text-slate-500 uppercase">Product</th>
+                            <th class="p-4 text-xs font-bold text-slate-500 uppercase">Category</th>
+                            <th class="p-4 text-xs font-bold text-slate-500 uppercase text-right">Action</th>
+                        </tr>
                     </thead>
-                    <tbody id="inventoryList" class="divide-y divide-slate-100"></tbody>
+                    <tbody id="list" class="divide-y divide-slate-50"></tbody>
                 </table>
             </div>
         </div>
@@ -50,112 +63,121 @@
 
     <script>
         const API_BASE = 'https://mamba-api.mfgift.workers.dev/api';
-        
-        // 已更新为与首页一致的 15 个分类
-        const CATS = [
-            "Apparel", 
-            "Bags", 
-            "Trade Show", 
-            "Caps", 
-            "Outdoor & Leisure", 
-            "Technology", 
-            "Mugs & Drinkware", 
-            "Bar", 
-            "Automotive", 
-            "Home & Kitchen", 
-            "Wellness & Health", 
-            "Sports", 
-            "Offices & Desks", 
-            "Jewelry & Giveaways", 
-            "Toys & Fun"
-        ];
-        
-        let products = [];
+        const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Caps", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
 
         // 初始化标签
-        document.getElementById('tagOptions').innerHTML = CATS.map(c => `<label class="flex items-center gap-1 cursor-pointer"><input type="checkbox" name="tag" value="${c}"> ${c}</label>`).join('');
+        const tagGroup = document.getElementById('tagGroup');
+        tagGroup.innerHTML = CATEGORIES.map(c => `
+            <label class="flex items-center gap-1 hover:bg-white p-1 rounded cursor-pointer">
+                <input type="checkbox" name="tag" value="${c}"> ${c}
+            </label>
+        `).join('');
 
         async function load() {
             const res = await fetch(`${API_BASE}/products`);
-            products = await res.json();
-            document.getElementById('inventoryList').innerHTML = products.map(p => `
-                <tr class="hover:bg-slate-50">
-                    <td class="p-3 font-bold">${p.name}</td>
-                    <td class="p-3 text-[10px] text-gray-400 uppercase">${p.category}</td>
-                    <td class="p-3 text-right space-x-2">
-                        <button onclick="editP(${p.id})" class="text-blue-600 font-bold">EDIT</button>
-                        <button onclick="delP(${p.id})" class="text-red-400">DEL</button>
+            const data = await res.json();
+            const list = document.getElementById('list');
+            list.innerHTML = data.map(p => `
+                <tr class="hover:bg-slate-50/50 transition">
+                    <td class="p-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${p.file_path || ''}" class="w-10 h-10 rounded shadow-sm object-cover bg-gray-100" onerror="this.src='https://placehold.co/40x40?text=No+Img'">
+                            <span class="font-medium text-slate-700 text-sm">${p.name}</span>
+                        </div>
                     </td>
-                </tr>`).join('');
+                    <td class="p-4"><span class="px-2 py-1 bg-slate-100 rounded text-[10px] text-slate-500 font-bold uppercase">${p.category}</span></td>
+                    <td class="p-4 text-right">
+                        <button onclick='edit(${JSON.stringify(p)})' class="text-blue-600 hover:bg-blue-50 px-3 py-1 rounded text-xs font-bold">Edit</button>
+                    </td>
+                </tr>
+            `).join('');
         }
 
-        function editP(id) {
-            const p = products.find(x => x.id === id);
+        function edit(p) {
+            document.getElementById('formTitle').innerText = "Edit Product";
             document.getElementById('editId').value = p.id;
             document.getElementById('name').value = p.name;
-            document.getElementById('material').value = p.material;
-            document.getElementById('moq').value = p.moq;
+            document.getElementById('material').value = p.material || '';
+            document.getElementById('moq').value = p.moq || '';
             document.getElementById('category').value = p.category;
-            document.getElementById('yt_url').value = p.yt_url;
-            document.getElementById('existingPath').value = p.file_path;
-            const tags = (p.tags || "").split(',');
-            document.querySelectorAll('input[name="tag"]').forEach(ck => ck.checked = tags.includes(ck.value));
-            document.getElementById('formTitle').innerText = "Edit Mode";
-            document.getElementById('cancelBtn').classList.remove('hidden');
+            document.getElementById('yt_url').value = p.yt_url || '';
+            document.getElementById('existingPath').value = p.file_path || '';
+            
+            const tags = p.tags ? p.tags.split(',') : [];
+            document.querySelectorAll('input[name="tag"]').forEach(ck => {
+                ck.checked = tags.includes(ck.value);
+            });
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function resetForm() {
-            document.getElementById('uploadForm').reset();
-            document.getElementById('editId').value = "";
             document.getElementById('formTitle').innerText = "Add Product";
-            document.getElementById('cancelBtn').classList.add('hidden');
-        }
-
-        async function delP(id) {
-            if(confirm('Delete it?')) {
-                await fetch(`${API_BASE}/products/${id}`, { method: 'DELETE' });
-                load();
-            }
+            document.getElementById('uploadForm').reset();
+            document.getElementById('editId').value = '';
+            document.getElementById('existingPath').value = '';
         }
 
         document.getElementById('submitBtn').onclick = async () => {
             const btn = document.getElementById('submitBtn');
             const status = document.getElementById('status');
-            btn.disabled = true; status.classList.remove('hidden');
-            status.innerHTML = "Syncing...";
+            btn.disabled = true;
+            status.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700');
+            status.classList.add('bg-blue-50', 'text-blue-700');
+            
+            try {
+                // Step 1: 读取本地文件 (默认取第一个文件以保持 V2.1 逻辑稳定)
+                status.innerHTML = "Step 1: Reading file...";
+                const files = document.getElementById('file').files;
+                let fileData = null;
+                let fileName = "no_file";
 
-            const file = document.getElementById('file').files[0];
-            let fileData = null;
-            if (file) {
-                fileData = await new Promise(r => {
-                    const reader = new FileReader();
-                    reader.onload = () => r(reader.result.split(',')[1]);
-                    reader.readAsDataURL(file);
+                if (files.length > 0) {
+                    const file = files[0];
+                    fileName = file.name;
+                    fileData = await new Promise(r => {
+                        const reader = new FileReader();
+                        reader.onload = () => r(reader.result.split(',')[1]);
+                        reader.readAsDataURL(file);
+                    });
+                }
+
+                // Step 2: 发送请求
+                status.innerHTML = "Step 2: Syncing to cloud...";
+                const payload = {
+                    id: document.getElementById('editId').value,
+                    name: document.getElementById('name').value,
+                    material: document.getElementById('material').value,
+                    moq: document.getElementById('moq').value,
+                    category: document.getElementById('category').value,
+                    yt_url: document.getElementById('yt_url').value,
+                    existingPath: document.getElementById('existingPath').value,
+                    tags: Array.from(document.querySelectorAll('input[name="tag"]:checked')).map(i=>i.value).join(','),
+                    fileName: fileName,
+                    fileData: fileData
+                };
+
+                const res = await fetch(`${API_BASE}/upload`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
-            }
 
-            const payload = {
-                id: document.getElementById('editId').value,
-                name: document.getElementById('name').value,
-                material: document.getElementById('material').value,
-                moq: document.getElementById('moq').value,
-                category: document.getElementById('category').value,
-                yt_url: document.getElementById('yt_url').value,
-                existingPath: document.getElementById('existingPath').value,
-                tags: Array.from(document.querySelectorAll('input[name="tag"]:checked')).map(i=>i.value).join(','),
-                fileName: file ? file.name : "no_file",
-                fileData: fileData
-            };
+                const result = await res.json();
+                if (!res.ok) throw new Error(result.error || "Server Error");
 
-            const res = await fetch(`${API_BASE}/upload`, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-            if(res.ok) {
-                status.innerHTML = "✅ Success!";
+                // Step 3: 完成
+                status.innerHTML = "✅ Success! All data synced.";
+                status.classList.replace('bg-blue-50', 'bg-green-50');
+                status.classList.replace('text-blue-700', 'text-green-700');
+                
                 resetForm(); load();
+            } catch (err) {
+                status.innerHTML = `❌ Failed!<br>${err.message}`;
+                status.classList.replace('bg-blue-50', 'bg-red-50');
+                status.classList.replace('text-blue-700', 'text-red-700');
+            } finally {
+                btn.disabled = false;
             }
-            btn.disabled = false;
         };
 
         load();
