@@ -49,7 +49,7 @@
         <div class="md:col-span-2">
             <div class="mb-4 flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                 <span class="text-sm font-bold text-slate-700">Filter by Category:</span>
-                <select id="filterCategory" onchange="renderTable()" class="text-sm border rounded-lg px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500">
+                <select id="filterCategory" onchange="currentPage=1; renderTable()" class="text-sm border rounded-lg px-3 py-1 outline-none focus:ring-2 focus:ring-blue-500">
                     <option value="all">All Categories</option>
                     <option value="hot-sales">Hot Sales</option>
                     <option value="videos">Videos</option>
@@ -68,6 +68,7 @@
                     </thead>
                     <tbody id="list" class="divide-y divide-slate-50"></tbody>
                 </table>
+                <div id="pagination" class="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs"></div>
             </div>
         </div>
     </div>
@@ -76,8 +77,9 @@
         const API_BASE = 'https://mamba-api.mfgift.workers.dev/api';
         const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Caps", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
         let rawData = [];
+        let currentPage = 1;
+        const pageSize = 15;
 
-        // 初始化标签
         const tagGroup = document.getElementById('tagGroup');
         tagGroup.innerHTML = CATEGORIES.map(c => `
             <label class="flex items-center gap-1 hover:bg-white p-1 rounded cursor-pointer">
@@ -85,12 +87,10 @@
             </label>
         `).join('');
 
-        // --- 新增：粘贴和拖拽处理逻辑 ---
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('file');
         const filePreview = document.getElementById('filePreview');
 
-        // 1. 处理粘贴事件 (Ctrl+V)
         window.addEventListener('paste', (e) => {
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
             for (let item of items) {
@@ -104,17 +104,8 @@
             }
         });
 
-        // 2. 处理拖拽进入
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('bg-blue-100', 'border-blue-500');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('bg-blue-100', 'border-blue-500');
-        });
-
-        // 3. 处理放下文件
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('bg-blue-100', 'border-blue-500'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('bg-blue-100', 'border-blue-500'); });
         dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
             dropZone.classList.remove('bg-blue-100', 'border-blue-500');
@@ -124,13 +115,9 @@
             }
         });
 
-        // 更新文件选择预览
         fileInput.addEventListener('change', () => {
-            if(fileInput.files.length > 0) {
-                filePreview.innerText = "Selected: " + fileInput.files[0].name;
-            }
+            if(fileInput.files.length > 0) filePreview.innerText = "Selected: " + fileInput.files[0].name;
         });
-        // --- 结束新增功能 ---
 
         async function load() {
             const res = await fetch(`${API_BASE}/products`);
@@ -141,12 +128,19 @@
         function renderTable() {
             const filterValue = document.getElementById('filterCategory').value;
             const list = document.getElementById('list');
+            const pagination = document.getElementById('pagination');
             
-            const filteredData = filterValue === 'all' 
-                ? rawData 
-                : rawData.filter(p => p.category === filterValue);
+            const filteredData = filterValue === 'all' ? rawData : rawData.filter(p => p.category === filterValue);
+            
+            // 分页逻辑
+            const totalItems = filteredData.length;
+            const totalPages = Math.ceil(totalItems / pageSize) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            
+            const startIndex = (currentPage - 1) * pageSize;
+            const paginatedData = filteredData.slice(startIndex, startIndex + pageSize);
 
-            list.innerHTML = filteredData.map(p => `
+            list.innerHTML = paginatedData.map(p => `
                 <tr class="hover:bg-slate-50/50 transition">
                     <td class="p-4">
                         <div class="flex items-center gap-3">
@@ -161,6 +155,21 @@
                     </td>
                 </tr>
             `).join('');
+
+            // 渲染分页控件
+            pagination.innerHTML = `
+                <span class="text-slate-500 font-medium">Total ${totalItems} items | Page ${currentPage}/${totalPages}</span>
+                <div class="flex gap-2">
+                    <button onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-1 bg-white border rounded shadow-sm disabled:opacity-50 font-bold">Prev</button>
+                    <button onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''} class="px-3 py-1 bg-white border rounded shadow-sm disabled:opacity-50 font-bold">Next</button>
+                </div>
+            `;
+        }
+
+        function changePage(dir) {
+            currentPage += dir;
+            renderTable();
+            window.scrollTo({ top: document.querySelector('.md\\:col-span-2').offsetTop, behavior: 'smooth' });
         }
 
         async function delProduct(id, name) {
@@ -171,16 +180,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id })
                 });
-                if (res.ok) {
-                    alert("Deleted successfully!");
-                    load(); 
-                } else {
-                    const err = await res.json();
-                    throw new Error(err.error || "Delete failed");
-                }
-            } catch (e) {
-                alert("Error: " + e.message);
-            }
+                if (res.ok) { alert("Deleted successfully!"); load(); }
+            } catch (e) { alert("Error: " + e.message); }
         }
 
         function edit(p) {
@@ -193,11 +194,8 @@
             document.getElementById('yt_url').value = p.yt_url || '';
             document.getElementById('existingPath').value = p.file_path || '';
             filePreview.innerText = "";
-            
             const tags = p.tags ? p.tags.split(',') : [];
-            document.querySelectorAll('input[name="tag"]').forEach(ck => {
-                ck.checked = tags.includes(ck.value);
-            });
+            document.querySelectorAll('input[name="tag"]').forEach(ck => { ck.checked = tags.includes(ck.value); });
             window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
@@ -215,13 +213,10 @@
             btn.disabled = true;
             status.classList.remove('hidden', 'bg-red-50', 'text-red-700', 'bg-green-50', 'text-green-700');
             status.classList.add('bg-blue-50', 'text-blue-700');
-            
             try {
                 status.innerHTML = "Step 1: Reading file...";
                 const files = document.getElementById('file').files;
-                let fileData = null;
-                let fileName = "no_file";
-
+                let fileData = null, fileName = "no_file";
                 if (files.length > 0) {
                     const file = files[0];
                     fileName = file.name;
@@ -231,8 +226,7 @@
                         reader.readAsDataURL(file);
                     });
                 }
-
-                status.innerHTML = "Step 2: Syncing to cloud...";
+                status.innerHTML = "Step 2: Syncing...";
                 const payload = {
                     id: document.getElementById('editId').value,
                     name: document.getElementById('name').value,
@@ -245,28 +239,9 @@
                     fileName: fileName,
                     fileData: fileData
                 };
-
-                const res = await fetch(`${API_BASE}/upload`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await res.json();
-                if (!res.ok) throw new Error(result.error || "Server Error");
-
-                status.innerHTML = "✅ Success! All data synced.";
-                status.classList.replace('bg-blue-50', 'bg-green-50');
-                status.classList.replace('text-blue-700', 'text-green-700');
-                
-                resetForm(); load();
-            } catch (err) {
-                status.innerHTML = `❌ Failed!<br>${err.message}`;
-                status.classList.replace('bg-blue-50', 'bg-red-50');
-                status.classList.replace('text-blue-700', 'text-red-700');
-            } finally {
-                btn.disabled = false;
-            }
+                const res = await fetch(`${API_BASE}/upload`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (res.ok) { status.innerHTML = "✅ Success!"; resetForm(); load(); }
+            } catch (err) { status.innerHTML = `❌ Failed!<br>${err.message}`; } finally { btn.disabled = false; }
         };
 
         load();
