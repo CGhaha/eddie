@@ -17,10 +17,8 @@
         }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         .sidebar-item.active { background-color: #2563eb; color: white; }
-        #modal-content {
-            max-height: calc(100vh - 40px);
-        }
-        /* 优化：增加图片淡入效果，看起来更丝滑 */
+        /* 优化：弹窗内容高度调整 */
+        #modal-content { max-height: 95vh; }
         img { transition: opacity 0.3s; }
         img[loading] { opacity: 0; }
         img.loaded { opacity: 1; }
@@ -55,29 +53,54 @@
             </aside>
 
             <div class="flex-1">
-                <div id="hot-sales" class="page"><div class="flex justify-between items-center mb-8 border-b pb-4"><h2 class="text-3xl font-bold">Hot Sales</h2><input type="text" oninput="searchItems(this.value)" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm"></div><div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6" id="product-list"></div></div>
-                <div id="videos" class="page"><div class="flex justify-between items-center mb-8 border-b pb-4"><h2 class="text-3xl font-bold">Videos</h2><input type="text" oninput="searchItems(this.value)" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm"></div><div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8" id="video-list"></div></div>
-                <div id="3d-view" class="page"><div class="flex justify-between items-center mb-8 border-b pb-4"><h2 class="text-3xl font-bold">3D Showroom</h2><input type="text" oninput="searchItems(this.value)" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm"></div><div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6" id="3d-list"></div></div>
+                <div id="hot-sales" class="page">
+                    <div class="flex justify-between items-center mb-8 border-b pb-4">
+                        <h2 class="text-3xl font-bold">Hot Sales</h2>
+                        <input type="text" oninput="searchItems(this.value)" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6" id="product-list"></div>
+                </div>
+                
+                <div id="videos" class="page">
+                    <div class="flex justify-between items-center mb-8 border-b pb-4">
+                        <h2 class="text-3xl font-bold">Videos</h2>
+                        <input type="text" oninput="searchItems(this.value)" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8" id="video-list"></div>
+                </div>
+
+                <div id="3d-view" class="page">
+                    <div class="flex justify-between items-center mb-8 border-b pb-4">
+                        <h2 class="text-3xl font-bold">3D Showroom</h2>
+                        <input type="text" oninput="searchItems(this.value)" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6" id="3d-list"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="media-modal" class="fixed inset-0 bg-black/95 z-[60] hidden flex items-center justify-center p-2 md:p-6">
+    <div id="media-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] hidden flex items-center justify-center p-2 md:p-6">
         <button onclick="closeModal()" class="absolute top-4 right-4 z-[70] text-white text-3xl md:text-5xl hover:text-gray-300">&times;</button>
         
-        <div id="modal-content" class="w-full max-w-5xl max-h-full flex flex-col items-center overflow-y-auto">
-            <div class="w-full aspect-video bg-gray-900 rounded-xl flex items-center justify-center overflow-hidden relative shadow-2xl flex-shrink-1">
+        <div id="modal-content" class="w-full max-w-6xl max-h-full flex flex-col items-center overflow-y-auto">
+            <div class="w-full aspect-[16/10] md:aspect-video bg-gray-900 rounded-xl flex items-center justify-center overflow-hidden relative shadow-2xl flex-shrink-1">
                 <iframe id="youtube-frame" width="100%" height="100%" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen class="hidden"></iframe>
+                
+                <button id="prevBtn" onclick="moveImg(-1)" class="absolute left-0 h-full px-6 text-white/50 text-5xl z-10 hidden hover:text-white hover:bg-black/20 transition-all duration-300">❮</button>
                 <img id="modal-img" src="" class="max-h-full max-w-full object-contain hidden">
+                <button id="nextBtn" onclick="moveImg(1)" class="absolute right-0 h-full px-6 text-white/50 text-5xl z-10 hidden hover:text-white hover:bg-black/20 transition-all duration-300">❯</button>
+                
                 <div id="modal-3d-container" class="hidden w-full h-full"></div>
+                <div id="thumb-bar" class="absolute bottom-4 flex gap-2 hidden"></div>
             </div>
 
-            <div class="py-4 md:py-8 text-white text-center w-full px-4 shrink-0">
-                <h2 id="modal-title" class="text-xl md:text-3xl font-bold"></h2>
-                <p id="modal-desc" class="opacity-70 mt-1 md:mt-2 text-xs md:text-sm"></p>
-                <div class="mt-4 md:mt-8 flex flex-wrap justify-center gap-3 md:gap-4 pb-4">
-                    <button id="inquiry-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 md:px-10 py-2 md:py-4 rounded-full font-black uppercase tracking-widest transition shadow-xl text-sm md:text-base">Inquiry</button>
-                    <button id="whatsapp-btn" class="bg-green-500 hover:bg-green-600 text-white px-6 md:px-10 py-2 md:py-4 rounded-full font-black uppercase tracking-widest transition shadow-xl text-sm md:text-base">WhatsApp</button>
+            <div class="py-6 md:py-10 text-white text-center w-full px-4 shrink-0">
+                <h2 id="modal-title" class="text-2xl md:text-4xl font-bold"></h2>
+                <p id="modal-desc" class="opacity-70 mt-2 md:mt-4 text-sm md:text-lg"></p>
+                <div class="mt-6 md:mt-10 flex flex-wrap justify-center gap-3 md:gap-4 pb-6">
+                    <button id="inquiry-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 md:px-12 py-3 md:py-5 rounded-full font-black uppercase tracking-widest transition shadow-xl text-sm md:text-base">Inquiry</button>
+                    <button id="whatsapp-btn" class="bg-green-500 hover:bg-green-600 text-white px-8 md:px-12 py-3 md:py-5 rounded-full font-black uppercase tracking-widest transition shadow-xl text-sm md:text-base">WhatsApp</button>
                 </div>
             </div>
         </div>
@@ -85,17 +108,14 @@
 
     <script>
         const API = 'https://mamba-api.mfgift.workers.dev/api/products';
-        let allProducts = [];
-        let currentTag = 'All';
-        let currentSearch = '';
-        let currentPage = 'home';
+        let allProducts = [], currentImgs = [], currentIndex = 0;
+        let currentTag = 'All', currentSearch = '', currentPage = 'home';
 
         const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Caps", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
 
         function fixUrl(path) {
             if (!path) return '';
-            if (path.startsWith('http')) return path;
-            return `https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/${path.replace(/^\//, '')}`;
+            return path.startsWith('http') ? path : `https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/${path.replace(/^\//, '')}`;
         }
 
         async function init() {
@@ -111,126 +131,96 @@
         function handleDeepLink() {
             const fullHash = window.location.hash.replace('#', '');
             const [pageId, productId] = fullHash.split('!');
-            
-            if (pageId && ['home', 'hot-sales', 'videos', '3d-view'].includes(pageId)) {
-                showPage(pageId);
-            } else {
-                renderAll();
-            }
-
+            if (pageId && ['home', 'hot-sales', 'videos', '3d-view'].includes(pageId)) showPage(pageId);
+            else renderAll();
             if (productId) {
                 const p = allProducts.find(x => x.id == productId);
-                if (p) {
-                    let type = 'img';
-                    if(p.category === 'videos') type = 'video';
-                    if(p.category === 'showroom-3d') type = '3d';
-                    openModal(type, p.id, true);
-                }
+                if (p) openModal(p.category === 'videos' ? 'video' : (p.category === 'showroom-3d' ? '3d' : 'img'), p.id, true);
             }
         }
 
-        window.addEventListener('hashchange', () => {
-            handleDeepLink();
-        });
+        window.addEventListener('hashchange', handleDeepLink);
 
         function setupButtons() {
             document.getElementById('inquiry-btn').onclick = () => {
                 const title = document.getElementById('modal-title').innerText;
-                window.location.href = `mailto:zhanglonghaha001@gmail.com?subject=Inquiry: ${title}&body=Hi Eddie, I'm interested in this product: ${title}. Please provide more details.`;
+                window.location.href = `mailto:zhanglonghaha001@gmail.com?subject=Inquiry: ${title}`;
             };
             document.getElementById('whatsapp-btn').onclick = () => {
-                const title = document.getElementById('modal-title').innerText;
-                const msg = encodeURIComponent(`Hi Eddie, I'm interested in: ${title}`);
-                window.open(`https://wa.me/8613323604265?text=${msg}`, '_blank');
+                window.open(`https://wa.me/8613323604265?text=Hi Eddie, I'm interested in: ${document.getElementById('modal-title').innerText}`, '_blank');
             };
         }
 
         function renderTags() {
             const tagContainer = document.getElementById('tag-list');
             if(!tagContainer) return;
-            const allBtn = tagContainer.firstElementChild.outerHTML;
-            tagContainer.innerHTML = allBtn + CATEGORIES.map(cat => `
-                <button onclick="filterByTag('${cat}')" class="sidebar-item px-3 py-2 rounded-lg text-left text-sm font-medium hover:bg-gray-100 transition">${cat}</button>
-            `).join('');
+            tagContainer.innerHTML = `<button onclick="filterByTag('All')" class="sidebar-item active px-3 py-2 rounded-lg text-left text-sm font-medium hover:bg-gray-100 transition">All Items</button>` + 
+                CATEGORIES.map(cat => `<button onclick="filterByTag('${cat}')" class="sidebar-item px-3 py-2 rounded-lg text-left text-sm font-medium hover:bg-gray-100 transition">${cat}</button>`).join('');
         }
 
         function showPage(id) {
             currentPage = id;
-            if (document.getElementById('media-modal').classList.contains('hidden')) {
-                window.location.hash = id;
-            }
-            
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const target = document.getElementById(id);
-            if(target) target.classList.add('active');
+            if (document.getElementById('media-modal').classList.contains('hidden')) window.location.hash = id;
+            document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
             document.getElementById('category-sidebar').style.display = (id === 'home') ? 'none' : 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
             renderAll();
         }
 
         function filterByTag(tag) {
             currentTag = tag;
-            document.querySelectorAll('.sidebar-item').forEach(btn => {
-                btn.classList.toggle('active', btn.innerText === tag || (tag === 'All' && btn.innerText === 'All Items'));
-            });
+            document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.toggle('active', btn.innerText === tag || (tag === 'All' && btn.innerText === 'All Items')));
             renderAll();
         }
 
-        function searchItems(val) {
-            currentSearch = val.toLowerCase();
-            renderAll();
-        }
+        function searchItems(val) { currentSearch = val.toLowerCase(); renderAll(); }
 
         function renderAll() {
             if(currentPage === 'home') return;
-            let items = allProducts;
-            if (currentPage === 'hot-sales') items = items.filter(p => p.category === 'hot-sales');
-            if (currentPage === 'videos') items = items.filter(p => p.category === 'videos');
-            if (currentPage === '3d-view') items = items.filter(p => p.category === 'showroom-3d');
+            let items = allProducts.filter(p => 
+                (currentPage === 'hot-sales' && p.category === 'hot-sales') ||
+                (currentPage === 'videos' && p.category === 'videos') ||
+                (currentPage === '3d-view' && p.category === 'showroom-3d')
+            );
             if (currentTag !== 'All') items = items.filter(p => p.tags && p.tags.includes(currentTag));
             if (currentSearch) items = items.filter(p => p.name.toLowerCase().includes(currentSearch));
 
-            if (currentPage === 'hot-sales') renderGrid('product-list', items, 'img');
-            if (currentPage === 'videos') renderGrid('video-list', items, 'video');
-            if (currentPage === '3d-view') renderGrid('3d-list', items, '3d');
+            const containerId = currentPage === 'hot-sales' ? 'product-list' : (currentPage === 'videos' ? 'video-list' : '3d-list');
+            renderGrid(containerId, items, currentPage === 'hot-sales' ? 'img' : (currentPage === 'videos' ? 'video' : '3d'));
+        }
+
+        function getYTId(url) {
+            if (!url) return '';
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
         }
 
         function renderGrid(containerId, items, type) {
             const grid = document.getElementById(containerId);
             if (!grid) return;
-
-            // 优化：使用数组 join 提高渲染效率
-            const html = items.map(p => {
+            grid.innerHTML = items.map(p => {
                 if (type === 'img') {
-                    // 优化：使用 loading="lazy" 进行图片懒加载
+                    const firstImg = p.file_path ? p.file_path.split(',')[0] : '';
                     return `<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 cursor-pointer group" onclick="openModal('img', ${p.id})">
-                        <div class="aspect-square bg-white rounded-lg mb-3 overflow-hidden flex items-center justify-center">
-                            <img src="${fixUrl(p.file_path)}" class="w-full h-full object-contain group-hover:scale-105 transition" loading="lazy" onload="this.classList.add('loaded')">
+                        <div class="aspect-square mb-3 overflow-hidden flex items-center justify-center">
+                            <img src="${fixUrl(firstImg)}" class="w-full h-full object-contain group-hover:scale-105 transition" loading="lazy" decoding="async" onload="this.classList.add('loaded')">
                         </div>
                         <h3 class="font-bold text-gray-900 truncate text-sm">${p.name}</h3>
                         <p class="text-xs text-gray-400 mt-1">MOQ: ${p.moq || 'N/A'}</p>
                     </div>`;
                 } else if (type === 'video') {
-                    let videoId = '';
-                    if (p.yt_url) {
-                        if (p.yt_url.includes('v=')) videoId = p.yt_url.split('v=')[1].split('&')[0];
-                        else if (p.yt_url.includes('youtu.be/')) videoId = p.yt_url.split('youtu.be/')[1].split('?')[0];
-                        else videoId = p.yt_url.split('/').pop();
-                    }
-                    const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : 'https://placehold.co/600x400?text=No+Video';
+                    const vid = getYTId(p.yt_url);
+                    const thumb = vid ? `https://i3.ytimg.com/vi/${vid}/hqdefault.jpg` : 'https://placehold.co/600x400?text=No+Video';
                     return `<div class="group relative cursor-pointer overflow-hidden rounded-xl bg-black" onclick="openModal('video', ${p.id})">
                         <div class="aspect-video relative">
-                            <img src="${thumbUrl}" class="w-full h-full object-cover opacity-70 group-hover:scale-105 transition duration-500" loading="lazy" onload="this.classList.add('loaded')">
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl group-hover:bg-blue-500 transition">▶</div>
-                            </div>
+                            <img src="${thumb}" class="w-full h-full object-cover opacity-70 group-hover:scale-105 transition duration-500" loading="lazy" decoding="async" onload="this.classList.add('loaded')">
+                            <div class="absolute inset-0 flex items-center justify-center"><div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl">▶</div></div>
                         </div>
                         <div class="p-3 bg-slate-900 text-white text-xs font-bold truncate">${p.name}</div>
                     </div>`;
                 } else if (type === '3d') {
-                    // 优化：3D 模型原本就是按需加载的
                     return `<div class="bg-white border border-gray-100 rounded-xl overflow-hidden model-card shadow-sm">
-                        <model-viewer src="${fixUrl(p.file_path)}" auto-rotate camera-controls interaction-prompt="none" loading="lazy"></model-viewer>
+                        <model-viewer src="${fixUrl(p.file_path)}" auto-rotate camera-controls loading="lazy" decoding="async"></model-viewer>
                         <div class="p-3 text-center border-t">
                             <h3 class="font-bold text-xs mb-2 truncate">${p.name}</h3>
                             <button onclick="openModal('3d', ${p.id})" class="w-full py-2 text-[10px] font-black bg-blue-600 text-white rounded-lg uppercase">View 3D</button>
@@ -238,38 +228,43 @@
                     </div>`;
                 }
             }).join('');
-            
-            grid.innerHTML = html;
         }
 
         function openModal(type, id, isDeepLink = false) {
-            const p = allProducts.find(x => x.id === id);
-            if(!p) return;
+            const p = allProducts.find(x => x.id === id); if(!p) return;
+            if (!isDeepLink) window.location.hash = `${currentPage}!${id}`;
+            const modal = document.getElementById('media-modal'), img = document.getElementById('modal-img'), yt = document.getElementById('youtube-frame'), container3d = document.getElementById('modal-3d-container');
+            const thumbs = document.getElementById('thumb-bar'), pBtn = document.getElementById('prevBtn'), nBtn = document.getElementById('nextBtn');
             
-            if (!isDeepLink) {
-                window.location.hash = `${currentPage}!${id}`;
-            }
-
-            const modal = document.getElementById('media-modal');
-            const img = document.getElementById('modal-img');
-            const yt = document.getElementById('youtube-frame');
-            const container3d = document.getElementById('modal-3d-container');
             document.getElementById('modal-title').innerText = p.name;
             document.getElementById('modal-desc').innerText = `Material: ${p.material || 'Standard'} | MOQ: ${p.moq || 'N/A'}`;
             modal.classList.remove('hidden');
-            [img, yt, container3d].forEach(el => el.classList.add('hidden'));
+            [img, yt, container3d, thumbs, pBtn, nBtn].forEach(el => el.classList.add('hidden'));
             
             if(type === 'video' && p.yt_url) {
-                const videoId = p.yt_url.split('v=')[1]?.split('&')[0] || p.yt_url.split('/').pop();
-                yt.classList.remove('hidden');
-                yt.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+                const vid = getYTId(p.yt_url);
+                yt.classList.remove('hidden'); yt.src = `https://www.youtube.com/embed/${vid}?autoplay=1`;
             } else if (type === '3d') {
                 container3d.classList.remove('hidden');
                 container3d.innerHTML = `<model-viewer src="${fixUrl(p.file_path)}" camera-controls auto-rotate style="width:100%; height:100%"></model-viewer>`;
             } else {
                 img.classList.remove('hidden');
-                img.src = fixUrl(p.file_path);
+                currentImgs = p.file_path ? p.file_path.split(',') : []; currentIndex = 0;
+                img.src = fixUrl(currentImgs[0]);
+                if(currentImgs.length > 1) { [thumbs, pBtn, nBtn].forEach(el => el.classList.remove('hidden')); renderThumbs(); }
             }
+        }
+
+        function moveImg(dir) {
+            currentIndex = (currentIndex + dir + currentImgs.length) % currentImgs.length;
+            document.getElementById('modal-img').src = fixUrl(currentImgs[currentIndex]);
+            renderThumbs();
+        }
+
+        function renderThumbs() {
+            document.getElementById('thumb-bar').innerHTML = currentImgs.map((src, i) => `
+                <div onclick="currentIndex=${i};moveImg(0)" class="w-2 h-2 rounded-full cursor-pointer transition-all ${i===currentIndex?'bg-white scale-125 shadow-lg':'bg-white/30'}"></div>
+            `).join('');
         }
 
         function closeModal() {
