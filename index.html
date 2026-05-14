@@ -99,10 +99,40 @@
                 const res = await fetch(API);
                 allProducts = await res.json();
                 renderTags();
-                renderAll();
+                
+                // 核心修改：检测 URL 里的页面和产品ID
+                handleDeepLink();
+                
                 setupButtons();
             } catch (e) { console.error(e); }
         }
+
+        function handleDeepLink() {
+            const fullHash = window.location.hash.replace('#', '');
+            const [pageId, productId] = fullHash.split('!');
+            
+            // 切换到对应页面
+            if (pageId && ['home', 'hot-sales', 'videos', '3d-view'].includes(pageId)) {
+                showPage(pageId);
+            } else {
+                renderAll();
+            }
+
+            // 如果有产品ID，自动弹开
+            if (productId) {
+                const p = allProducts.find(x => x.id == productId);
+                if (p) {
+                    let type = 'img';
+                    if(p.category === 'videos') type = 'video';
+                    if(p.category === 'showroom-3d') type = '3d';
+                    openModal(type, p.id, true); // true 表示是由 URL 触发的，不重复写 Hash
+                }
+            }
+        }
+
+        window.addEventListener('hashchange', () => {
+            handleDeepLink();
+        });
 
         function setupButtons() {
             document.getElementById('inquiry-btn').onclick = () => {
@@ -118,6 +148,7 @@
 
         function renderTags() {
             const tagContainer = document.getElementById('tag-list');
+            if(!tagContainer) return;
             const allBtn = tagContainer.firstElementChild.outerHTML;
             tagContainer.innerHTML = allBtn + CATEGORIES.map(cat => `
                 <button onclick="filterByTag('${cat}')" class="sidebar-item px-3 py-2 rounded-lg text-left text-sm font-medium hover:bg-gray-100 transition">${cat}</button>
@@ -126,6 +157,13 @@
 
         function showPage(id) {
             currentPage = id;
+            // 仅在手动切换页面且弹窗关闭时更新 Hash
+            if (!document.getElementById('media-modal').classList.contains('hidden')) {
+                // 如果弹窗开着，保持 ID
+            } else {
+                window.location.hash = id;
+            }
+            
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             const target = document.getElementById(id);
             if(target) target.classList.add('active');
@@ -163,39 +201,43 @@
 
         function renderGrid(containerId, items, type) {
             const grid = document.getElementById(containerId);
-            if (type === 'img') {
-                grid.innerHTML = items.map(p => `
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 cursor-pointer group" onclick="openModal('img', ${p.id})">
+            if (!grid) return;
+            grid.innerHTML = items.map(p => {
+                if (type === 'img') {
+                    return `<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 cursor-pointer group" onclick="openModal('img', ${p.id})">
                         <div class="aspect-square bg-white rounded-lg mb-3 overflow-hidden flex items-center justify-center">
                             <img src="${fixUrl(p.file_path)}" class="w-full h-full object-contain group-hover:scale-105 transition" loading="lazy">
                         </div>
                         <h3 class="font-bold text-gray-900 truncate text-sm">${p.name}</h3>
                         <p class="text-xs text-gray-400 mt-1">MOQ: ${p.moq || 'N/A'}</p>
-                    </div>`).join('');
-            } else if (type === 'video') {
-                grid.innerHTML = items.map(p => {
+                    </div>`;
+                } else if (type === 'video') {
                     const videoId = p.yt_url?.split('v=')[1]?.split('&')[0] || p.yt_url?.split('/').pop();
-                    return `
-                    <div class="group relative cursor-pointer overflow-hidden rounded-xl bg-black" onclick="openModal('video', ${p.id})">
+                    return `<div class="group relative cursor-pointer overflow-hidden rounded-xl bg-black" onclick="openModal('video', ${p.id})">
                         <div class="aspect-video relative"><img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" class="w-full h-full object-cover opacity-70"><div class="absolute inset-0 flex items-center justify-center"><div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl">▶</div></div></div>
                         <div class="p-3 bg-slate-900 text-white text-xs font-bold truncate">${p.name}</div>
                     </div>`;
-                }).join('');
-            } else if (type === '3d') {
-                grid.innerHTML = items.map(p => `
-                    <div class="bg-white border border-gray-100 rounded-xl overflow-hidden model-card shadow-sm">
+                } else if (type === '3d') {
+                    return `<div class="bg-white border border-gray-100 rounded-xl overflow-hidden model-card shadow-sm">
                         <model-viewer src="${fixUrl(p.file_path)}" auto-rotate camera-controls interaction-prompt="none"></model-viewer>
                         <div class="p-3 text-center border-t">
                             <h3 class="font-bold text-xs mb-2 truncate">${p.name}</h3>
                             <button onclick="openModal('3d', ${p.id})" class="w-full py-2 text-[10px] font-black bg-blue-600 text-white rounded-lg uppercase">View 3D</button>
                         </div>
-                    </div>`).join('');
-            }
+                    </div>`;
+                }
+            }).join('');
         }
 
-        function openModal(type, id) {
+        function openModal(type, id, isDeepLink = false) {
             const p = allProducts.find(x => x.id === id);
             if(!p) return;
+            
+            // 核心修改：打开弹窗时更新 URL，增加 !ID
+            if (!isDeepLink) {
+                window.location.hash = `${currentPage}!${id}`;
+            }
+
             const modal = document.getElementById('media-modal');
             const img = document.getElementById('modal-img');
             const yt = document.getElementById('youtube-frame');
@@ -204,6 +246,7 @@
             document.getElementById('modal-desc').innerText = `Material: ${p.material || 'Standard'} | MOQ: ${p.moq || 'N/A'}`;
             modal.classList.remove('hidden');
             [img, yt, container3d].forEach(el => el.classList.add('hidden'));
+            
             if(type === 'video' && p.yt_url) {
                 const videoId = p.yt_url.split('v=')[1]?.split('&')[0] || p.yt_url.split('/').pop();
                 yt.classList.remove('hidden');
@@ -221,6 +264,9 @@
             document.getElementById('media-modal').classList.add('hidden');
             document.getElementById('youtube-frame').src = "";
             document.getElementById('modal-3d-container').innerHTML = "";
+            
+            // 核心修改：关闭弹窗后，网址恢复成单纯的页面路径
+            window.location.hash = currentPage;
         }
 
         init();
