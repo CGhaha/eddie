@@ -5,6 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mamba Admin | Multi-Upload & Pagination</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .thumb-preview {
+            position: relative;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .thumb-preview.is-first {
+            border-color: #2563eb;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
+        }
+        .first-badge {
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            background: #2563eb;
+            color: white;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            z-index: 10;
+            font-weight: bold;
+        }
+        .delete-thumb {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #ef4444;
+            color: white;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            cursor: pointer;
+            z-index: 11;
+        }
+    </style>
 </head>
 <body class="bg-slate-50 min-h-screen p-6 text-sm">
     <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -12,7 +51,6 @@
             <h1 id="formTitle" class="text-xl font-bold mb-4">Add Product</h1>
             <form id="uploadForm" class="space-y-4" onsubmit="return false;">
                 <input type="hidden" id="editId">
-                <input type="hidden" id="existingPath">
                 <input type="text" id="name" placeholder="Product Name" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" required>
                 <div class="grid grid-cols-2 gap-2">
                     <input type="text" id="material" placeholder="Material" class="px-4 py-2 border rounded-lg">
@@ -33,11 +71,10 @@
                 <div id="dropZone" class="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
                     <input type="file" id="file" class="hidden" multiple>
                     <p class="text-gray-400">Click to Select or Drop Multi-Files</p>
-                    <p id="filePreview" class="text-blue-500 mt-1 font-bold truncate"></p>
+                    <div id="thumbContainer" class="flex flex-wrap gap-3 mt-4 justify-center"></div>
                 </div>
 
                 <button id="submitBtn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition">SAVE TO CLOUD</button>
-                
                 <div id="status" class="hidden p-3 rounded-lg text-xs font-medium"></div>
             </form>
         </div>
@@ -69,22 +106,59 @@
     <script>
         const API_BASE = 'https://mamba-api.mfgift.workers.dev/api';
         const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Caps", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
-        let rawData = [], uploadedFiles = [], currentPage = 1, pageSize = 15;
+        
+        let rawData = [], currentPage = 1, pageSize = 15;
+        // 存储文件对象的数组：{ name, data, isExisting, previewUrl }
+        let uploadedFiles = []; 
 
-        // 初始化标签
         document.getElementById('tagGroup').innerHTML = CATEGORIES.map(c => `<label class="flex items-center gap-1"><input type="checkbox" name="tag" value="${c}"> ${c}</label>`).join('');
 
-        const dropZone = document.getElementById('dropZone'), fileInput = document.getElementById('file'), filePreview = document.getElementById('filePreview');
-        dropZone.onclick = () => fileInput.click();
+        const dropZone = document.getElementById('dropZone'), fileInput = document.getElementById('file');
+        dropZone.onclick = (e) => { if(e.target === dropZone || e.target.tagName === 'P') fileInput.click(); };
         
-        const handleFiles = (files) => {
-            uploadedFiles = Array.from(files);
-            filePreview.innerText = uploadedFiles.length > 0 ? `${uploadedFiles.length} files selected` : "";
+        const handleFiles = async (files) => {
+            for (let file of files) {
+                const base64 = await new Promise(r => {
+                    const rd = new FileReader(); 
+                    rd.onload = () => r(rd.result.split(',')[1]); 
+                    rd.readAsDataURL(file);
+                });
+                uploadedFiles.push({
+                    name: file.name,
+                    data: base64,
+                    isExisting: false,
+                    previewUrl: URL.createObjectURL(file)
+                });
+            }
+            renderThumbs();
         };
 
         fileInput.onchange = () => handleFiles(fileInput.files);
         dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('bg-blue-50'); };
         dropZone.ondrop = (e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); };
+
+        function renderThumbs() {
+            const container = document.getElementById('thumbContainer');
+            container.innerHTML = uploadedFiles.map((file, index) => `
+                <div class="thumb-preview w-16 h-16 rounded-lg overflow-hidden cursor-pointer ${index === 0 ? 'is-first' : 'opacity-60'}" onclick="setAsFirst(${index})">
+                    ${index === 0 ? '<span class="first-badge">COVER</span>' : ''}
+                    <div class="delete-thumb" onclick="event.stopPropagation(); removeThumb(${index})">×</div>
+                    <img src="${file.previewUrl}" class="w-full h-full object-cover">
+                </div>
+            `).join('');
+        }
+
+        function setAsFirst(index) {
+            if (index === 0) return;
+            const item = uploadedFiles.splice(index, 1)[0];
+            uploadedFiles.unshift(item);
+            renderThumbs();
+        }
+
+        function removeThumb(index) {
+            uploadedFiles.splice(index, 1);
+            renderThumbs();
+        }
 
         async function load() {
             const res = await fetch(`${API_BASE}/products`);
@@ -128,6 +202,7 @@
         }
 
         function edit(p) {
+            resetForm();
             document.getElementById('formTitle').innerText = "Edit Product";
             document.getElementById('editId').value = p.id;
             document.getElementById('name').value = p.name;
@@ -135,8 +210,18 @@
             document.getElementById('moq').value = p.moq || '';
             document.getElementById('category').value = p.category;
             document.getElementById('yt_url').value = p.yt_url || '';
-            document.getElementById('existingPath').value = p.file_path || '';
-            filePreview.innerText = "Current has file(s)";
+            
+            if(p.file_path) {
+                p.file_path.split(',').forEach(path => {
+                    uploadedFiles.push({
+                        name: path.split('/').pop(),
+                        data: null, 
+                        isExisting: true,
+                        previewUrl: path
+                    });
+                });
+            }
+            renderThumbs();
             const tags = p.tags ? p.tags.split(',') : [];
             document.querySelectorAll('input[name="tag"]').forEach(ck => ck.checked = tags.includes(ck.value));
             window.scrollTo({top: 0, behavior: 'smooth'});
@@ -145,10 +230,9 @@
         function resetForm() {
             document.getElementById('uploadForm').reset();
             document.getElementById('editId').value = "";
-            document.getElementById('existingPath').value = "";
             document.getElementById('formTitle').innerText = "Add Product";
-            filePreview.innerText = "";
             uploadedFiles = [];
+            document.getElementById('thumbContainer').innerHTML = "";
         }
 
         document.getElementById('submitBtn').onclick = async () => {
@@ -158,24 +242,22 @@
             status.classList.add('bg-blue-50', 'text-blue-700');
             
             try {
-                // Step 1: 处理本地文件
                 status.innerHTML = "Step 1: Processing files...";
-                let fileNames = [], fileDatas = [];
                 
-                if (uploadedFiles.length > 0) {
-                    for (let file of uploadedFiles) {
-                        fileNames.push(file.name);
-                        const base64 = await new Promise(r => {
-                            const rd = new FileReader(); 
-                            rd.onload = () => r(rd.result.split(',')[1]); 
-                            rd.readAsDataURL(file);
-                        });
-                        fileDatas.push(base64);
-                    }
-                }
+                let existingPaths = [];
+                let newNames = [];
+                let newData = [];
 
-                // Step 2: 同步到云端
-                status.innerHTML = "Step 2: Syncing to Cloud...";
+                // 按照当前 uploadedFiles 数组的顺序整理图片
+                uploadedFiles.forEach(file => {
+                    if(file.isExisting) {
+                        existingPaths.push(file.previewUrl);
+                    } else {
+                        newNames.push(file.name);
+                        newData.push(file.data);
+                    }
+                });
+
                 const payload = {
                     id: document.getElementById('editId').value,
                     name: document.getElementById('name').value,
@@ -183,10 +265,10 @@
                     moq: document.getElementById('moq').value,
                     category: document.getElementById('category').value,
                     yt_url: document.getElementById('yt_url').value,
-                    existingPath: document.getElementById('existingPath').value,
+                    existingPath: existingPaths.join(','), 
                     tags: Array.from(document.querySelectorAll('input[name="tag"]:checked')).map(i=>i.value).join(','),
-                    fileName: fileNames.length > 0 ? fileNames.join('|') : "no_file", 
-                    fileData: fileDatas.length > 0 ? fileDatas.join('|') : ""
+                    fileName: newNames.length > 0 ? newNames.join('|') : "no_file", 
+                    fileData: newData.length > 0 ? newData.join('|') : ""
                 };
 
                 const res = await fetch(`${API_BASE}/upload`, { 
@@ -198,19 +280,13 @@
                 if (res.ok) { 
                     status.innerHTML = "✅ Success! All data synced."; 
                     status.classList.replace('bg-blue-50', 'bg-green-50');
-                    status.classList.replace('text-blue-700', 'text-green-700');
                     resetForm(); 
                     load(); 
-                } else {
-                    throw new Error("Server responded with error");
-                }
+                } else { throw new Error("Upload failed"); }
             } catch (err) { 
                 status.innerHTML = "❌ Error: " + err.message; 
                 status.classList.replace('bg-blue-50', 'bg-red-50');
-                status.classList.replace('text-blue-700', 'text-red-700');
-            } finally { 
-                btn.disabled = false; 
-            }
+            } finally { btn.disabled = false; }
         };
 
         load();
