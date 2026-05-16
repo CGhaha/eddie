@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MFM TEAM | SAGE A+ Supplier</title>
-    <link rel="icon" type="image/png" href="https://i.ibb.co/nssG1495/web.png">
+    <link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/assets/web0101.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
@@ -30,7 +30,7 @@
 
     <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 flex justify-center items-center shadow-lg relative">
         <div class="absolute left-4 md:left-10 flex items-center h-full top-0 cursor-pointer" onclick="showPage('home')">
-            <img id="nav-logo" src="https://i.ibb.co/8gdvt8Bq/web.png" alt="Logo" class="h-11 md:h-14 w-auto object-contain transition-opacity duration-300">
+            <img id="nav-logo" src="https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/assets/web002.png" alt="Logo" class="h-11 md:h-14 w-auto object-contain transition-opacity duration-300">
         </div>
         
         <div class="flex gap-4 md:gap-8 overflow-x-auto whitespace-nowrap px-4 pl-16 md:pl-0">
@@ -151,7 +151,7 @@
                 renderTags();
                 handleDeepLink();
                 setupButtons();
-                setupZoomFeature(); // 完美的纯动态注入，不破坏任何原有 HTML 排版
+                setupZoomFeature(); 
             } catch (e) { console.error(e); }
         }
 
@@ -415,12 +415,11 @@
             window.location.hash = currentPage;
         }
 
-        // ================= 完美数学重构：消除变形，限制放大视窗为 360px 精致正方形 =================
+        // ================= 【保持原样，绝不动它】：完美的第一版放大镜随动逻辑 =================
         function setupZoomFeature() {
             const container = document.getElementById('modal-media-container');
             const img = document.getElementById('modal-img');
 
-            // 1. 创建随动小镜片
             let lens = document.getElementById('global-zoom-lens');
             if (!lens) {
                 lens = document.createElement('div');
@@ -429,7 +428,6 @@
                 container.appendChild(lens);
             }
 
-            // 2. 创建固定的 360x360 放大结果框（直接浮动在中央黑框的左侧外边线）
             let result = document.getElementById('global-zoom-result');
             if (!result) {
                 result = document.createElement('div');
@@ -443,17 +441,14 @@
 
                 const rect = container.getBoundingClientRect();
                 
-                // 让 360px 的精致视窗始终靠在中央大黑框的左边线外侧（间距 16px）
                 result.style.top = (rect.top + (rect.height - 360) / 2) + 'px';
                 result.style.left = (rect.left - 360 - 16) + 'px';
 
-                // 获取鼠标相对黑框的坐标
                 const pageX = e.touches ? e.touches[0].pageX : e.pageX;
                 const pageY = e.touches ? e.touches[0].pageY : e.pageY;
                 let x = pageX - rect.left - window.pageXOffset;
                 let y = pageY - rect.top - window.pageYOffset;
 
-                // 边界死守限制
                 if (x < lens.offsetWidth / 2) x = lens.offsetWidth / 2;
                 if (x > container.offsetWidth - lens.offsetWidth / 2) x = container.offsetWidth - lens.offsetWidth / 2;
                 if (y < lens.offsetHeight / 2) y = lens.offsetHeight / 2;
@@ -462,24 +457,18 @@
                 lens.style.left = (x - lens.offsetWidth / 2) + "px";
                 lens.style.top = (y - lens.offsetHeight / 2) + "px";
 
-                // 【解决图片变形的核心算法】：
-                // 必须获取 object-contain 下图片的实际物理渲染宽高与实际偏移位置
                 const imgWidth = img.clientWidth;
                 const imgHeight = img.clientHeight;
                 const imgLeft = (container.offsetWidth - imgWidth) / 2;
                 const imgTop = (container.offsetHeight - imgHeight) / 2;
 
-                // 鼠标映射到那张“真实图片区域”内部的相对坐标
                 const targetX = x - imgLeft;
                 const targetY = y - imgTop;
 
-                // 严格遵守 2 倍等比例放大
                 const scale = 2; 
 
                 result.style.backgroundImage = `url('${img.src}')`;
-                // 放大后的背景图尺寸必须精确等于：实图渲染宽高 * 2
                 result.style.backgroundSize = (imgWidth * scale) + "px " + (imgHeight * scale) + "px";
-                // 修正中心偏移量，使其完美对齐
                 const bgX = -(targetX * scale - result.offsetWidth / 2);
                 const bgY = -(targetY * scale - result.offsetHeight / 2);
                 result.style.backgroundPosition = `${bgX}px ${bgY}px`;
