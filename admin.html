@@ -63,6 +63,8 @@
                 </select>
                 <input type="text" id="yt_url" placeholder="YouTube URL (Optional)" class="w-full px-4 py-2 border rounded-lg">
                 
+                <textarea id="description" placeholder="Product Description (Optional)" rows="3" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+
                 <div class="p-3 bg-gray-50 rounded-lg">
                     <p class="text-[10px] font-bold mb-2 text-gray-500 uppercase">Category Tags</p>
                     <div class="grid grid-cols-2 gap-1 text-[10px]" id="tagGroup"></div>
@@ -108,7 +110,6 @@
         const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Caps", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
         
         let rawData = [], currentPage = 1, pageSize = 15;
-        // 存储文件对象的数组：{ name, data, isExisting, previewUrl }
         let uploadedFiles = []; 
 
         document.getElementById('tagGroup').innerHTML = CATEGORIES.map(c => `<label class="flex items-center gap-1"><input type="checkbox" name="tag" value="${c}"> ${c}</label>`).join('');
@@ -211,6 +212,9 @@
             document.getElementById('category').value = p.category;
             document.getElementById('yt_url').value = p.yt_url || '';
             
+            // 【编辑回显描述】
+            document.getElementById('description').value = p.description || '';
+            
             if(p.file_path) {
                 p.file_path.split(',').forEach(path => {
                     uploadedFiles.push({
@@ -248,7 +252,6 @@
                 let newNames = [];
                 let newData = [];
 
-                // 按照当前 uploadedFiles 数组的顺序整理图片
                 uploadedFiles.forEach(file => {
                     if(file.isExisting) {
                         existingPaths.push(file.previewUrl);
@@ -265,6 +268,10 @@
                     moq: document.getElementById('moq').value,
                     category: document.getElementById('category').value,
                     yt_url: document.getElementById('yt_url').value,
+                    
+                    // 【将描述加入上传负荷】
+                    description: document.getElementById('description').value,
+                    
                     existingPath: existingPaths.join(','), 
                     tags: Array.from(document.querySelectorAll('input[name="tag"]:checked')).map(i=>i.value).join(','),
                     fileName: newNames.length > 0 ? newNames.join('|') : "no_file", 

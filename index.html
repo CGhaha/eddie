@@ -98,6 +98,9 @@
             <div class="py-6 md:py-10 text-white text-center w-full px-4 shrink-0">
                 <h2 id="modal-title" class="text-2xl md:text-4xl font-bold"></h2>
                 <p id="modal-desc" class="opacity-70 mt-2 md:mt-4 text-sm md:text-lg"></p>
+                
+                <p id="modal-custom-desc" class="mt-4 max-w-3xl mx-auto text-sm text-gray-300 hidden text-center whitespace-pre-wrap leading-relaxed opacity-90"></p>
+
                 <div class="mt-6 md:mt-10 flex flex-wrap justify-center gap-3 md:gap-4 pb-6">
                     <button id="inquiry-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 md:px-12 py-3 md:py-5 rounded-full font-black uppercase tracking-widest transition shadow-xl text-sm md:text-base">Inquiry</button>
                     <button id="whatsapp-btn" class="bg-green-500 hover:bg-green-600 text-white px-8 md:px-12 py-3 md:py-5 rounded-full font-black uppercase tracking-widest transition shadow-xl text-sm md:text-base">WhatsApp</button>
@@ -121,7 +124,17 @@
         async function init() {
             try {
                 const res = await fetch(API);
-                allProducts = await res.json();
+                let data = await res.json();
+                
+                allProducts = data.sort((a, b) => {
+                    const clicksA = parseInt(a.clicks) || 0;
+                    const clicksB = parseInt(b.clicks) || 0;
+                    if (clicksB !== clicksA) {
+                        return clicksB - clicksA;
+                    }
+                    return b.id - a.id;
+                });
+
                 renderTags();
                 handleDeepLink();
                 setupButtons();
@@ -141,13 +154,19 @@
 
         window.addEventListener('hashchange', handleDeepLink);
 
+        // 【已更新】：重新配置按钮跳转，带入指定的主题及产品询问话术
         function setupButtons() {
             document.getElementById('inquiry-btn').onclick = () => {
                 const title = document.getElementById('modal-title').innerText;
-                window.location.href = `mailto:zhanglonghaha001@gmail.com?subject=Inquiry: ${title}`;
+                const subject = encodeURIComponent(`Quote for ${title}`);
+                const body = encodeURIComponent(`Hi All, I am very interested in the ${title} product on your website. Can you please provide more information about it?`);
+                window.location.href = `mailto:zhanglonghaha001@gmail.com?subject=${subject}&body=${body}`;
             };
+            
             document.getElementById('whatsapp-btn').onclick = () => {
-                window.open(`https://wa.me/8613323604265?text=Hi Eddie, I'm interested in: ${document.getElementById('modal-title').innerText}`, '_blank');
+                const title = document.getElementById('modal-title').innerText;
+                const text = encodeURIComponent(`Hi All, I am very interested in the ${title} product on your website. Can you please provide more information about it?`);
+                window.open(`https://wa.me/8613323604265?text=${text}`, '_blank');
             };
         }
 
@@ -238,6 +257,16 @@
             
             document.getElementById('modal-title').innerText = p.name;
             document.getElementById('modal-desc').innerText = `Material: ${p.material || 'Standard'} | MOQ: ${p.moq || 'N/A'}`;
+            
+            const customDescEl = document.getElementById('modal-custom-desc');
+            if (p.description && p.description.trim() !== "") {
+                customDescEl.innerText = p.description;
+                customDescEl.classList.remove('hidden');
+            } else {
+                customDescEl.innerText = "";
+                customDescEl.classList.add('hidden');
+            }
+
             modal.classList.remove('hidden');
             [img, yt, container3d, thumbs, pBtn, nBtn].forEach(el => el.classList.add('hidden'));
             
