@@ -95,7 +95,7 @@
         <button onclick="closeModal()" class="absolute top-4 right-4 z-[70] text-white text-3xl md:text-5xl hover:text-gray-300">&times;</button>
         
         <div id="modal-content" class="w-full max-w-6xl max-h-full flex flex-col items-center overflow-y-auto">
-            <div class="w-full aspect-[16/10] md:aspect-video bg-gray-900 rounded-xl flex items-center justify-center overflow-hidden relative shadow-2xl flex-shrink-1">
+            <div id="modal-media-container" class="w-full aspect-[16/10] md:aspect-video bg-gray-900 rounded-xl flex items-center justify-center overflow-hidden relative shadow-2xl flex-shrink-1">
                 <iframe id="youtube-frame" width="100%" height="100%" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen class="hidden"></iframe>
                 
                 <button id="prevBtn" onclick="moveImg(-1)" class="absolute left-0 h-full px-6 text-white/50 text-5xl z-10 hidden hover:text-white hover:bg-black/20 transition-all duration-300">❮</button>
@@ -125,7 +125,6 @@
         let allProducts = [], currentImgs = [], currentIndex = 0;
         let currentTag = 'All', currentSearch = '', currentPage = 'home';
 
-        // 针对每个功能页面的独立当前页码记录
         const pageStates = { 'hot-sales': 1, 'videos': 1, '3d-view': 1 };
 
         const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Caps", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
@@ -152,6 +151,7 @@
                 renderTags();
                 handleDeepLink();
                 setupButtons();
+                setupZoomFeature(); // 完美的纯动态注入，不破坏任何原有 HTML 排版
             } catch (e) { console.error(e); }
         }
 
@@ -195,26 +195,19 @@
             if (document.getElementById('media-modal').classList.contains('hidden')) window.location.hash = id;
             document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
             document.getElementById('category-sidebar').style.display = (id === 'home') ? 'none' : 'block';
-            
-            // 切换页面或标签时，把当前大页面的页码重置为第1页
             if(pageStates[id]) pageStates[id] = 1;
-            
             renderAll();
         }
 
         function filterByTag(tag) {
             currentTag = tag;
             document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.toggle('active', btn.innerText === tag || (tag === 'All' && btn.innerText === 'All Items')));
-            
-            // 切换标签分类时，重置当前页面码为第一页
             if(pageStates[currentPage]) pageStates[currentPage] = 1;
-            
             renderAll();
         }
 
         function searchItems(val) { 
             currentSearch = val.toLowerCase(); 
-            // 搜索时，重置当前页面码为第一页
             if(pageStates[currentPage]) pageStates[currentPage] = 1;
             renderAll(); 
         }
@@ -229,8 +222,7 @@
             if (currentTag !== 'All') items = items.filter(p => p.tags && p.tags.includes(currentTag));
             if (currentSearch) items = items.filter(p => p.name.toLowerCase().includes(currentSearch));
 
-            // 【核心计算】：依据 3 行的排版逻辑，动态确定每页显示的总个数
-            let itemsPerPage = 12; // 默认备用值
+            let itemsPerPage = 12;
             if (currentPage === 'hot-sales' || currentPage === '3d-view') {
                 itemsPerPage = window.innerWidth >= 1024 ? 18 : (window.innerWidth >= 768 ? 12 : 6); 
             } else if (currentPage === 'videos') {
@@ -240,7 +232,6 @@
             const totalItems = items.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
             
-            // 安全边界校验
             if (pageStates[currentPage] > totalPages) pageStates[currentPage] = totalPages;
             if (pageStates[currentPage] < 1) pageStates[currentPage] = 1;
 
@@ -251,11 +242,9 @@
             const containerId = currentPage === 'hot-sales' ? 'product-list' : (currentPage === 'videos' ? 'video-list' : '3d-list');
             renderGrid(containerId, paginatedItems, currentPage === 'hot-sales' ? 'img' : (currentPage === 'videos' ? 'video' : '3d'));
 
-            // 渲染与之对应的底部分页控制器
             renderPaginationControls(currentPage, totalPages);
         }
 
-        // 构建带前后3页数字及直跳页码输入框的分页器HTML
         function renderPaginationControls(pageId, totalPages) {
             const container = document.getElementById(`${pageId}-pagination`);
             if (!container) return;
@@ -269,14 +258,12 @@
             const curr = pageStates[pageId];
             let html = `<div class="flex items-center gap-2">`;
 
-            // 上一页按钮
             if (curr > 1) {
                 html += `<button onclick="changePage('${pageId}', ${curr - 1})" class="px-3 py-1.5 border rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition font-medium">Prev</button>`;
             } else {
                 html += `<button class="px-3 py-1.5 border rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed font-medium" disabled>Prev</button>`;
             }
 
-            // 计算显示的前后 3 页范围
             const startNum = Math.max(1, curr - 3);
             const endNum = Math.min(totalPages, curr + 3);
 
@@ -288,7 +275,6 @@
                 }
             }
 
-            // 下一页按钮
             if (curr < totalPages) {
                 html += `<button onclick="changePage('${pageId}', ${curr + 1})" class="px-3 py-1.5 border rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition font-medium">Next</button>`;
             } else {
@@ -297,7 +283,6 @@
 
             html += `</div>`;
 
-            // 直接输入框快捷跳转结构
             html += `
                 <div class="flex items-center gap-2 text-gray-500">
                     <span>Page</span>
@@ -310,14 +295,12 @@
             container.innerHTML = html;
         }
 
-        // 点击数字、左右页码切换控制
         function changePage(pageId, targetPage) {
             pageStates[pageId] = targetPage;
             renderAll();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // 支持直接输入页码快捷直跳
         function jumpToPage(pageId, maxPage) {
             const input = document.getElementById(`${pageId}-jump-input`);
             if(!input) return;
@@ -423,7 +406,96 @@
             document.getElementById('media-modal').classList.add('hidden');
             document.getElementById('youtube-frame').src = "";
             document.getElementById('modal-3d-container').innerHTML = "";
+            
+            const lens = document.getElementById('global-zoom-lens');
+            const result = document.getElementById('global-zoom-result');
+            if(lens) lens.style.display = 'none';
+            if(result) result.style.display = 'none';
+
             window.location.hash = currentPage;
+        }
+
+        // ================= 完美数学重构：消除变形，限制放大视窗为 360px 精致正方形 =================
+        function setupZoomFeature() {
+            const container = document.getElementById('modal-media-container');
+            const img = document.getElementById('modal-img');
+
+            // 1. 创建随动小镜片
+            let lens = document.getElementById('global-zoom-lens');
+            if (!lens) {
+                lens = document.createElement('div');
+                lens.id = 'global-zoom-lens';
+                lens.style.cssText = 'position:absolute; border:1px solid #94a3b8; background:rgba(255,255,255,0.3); cursor:crosshair; width:100px; height:100px; display:none; pointer-events:none; z-index:20; border-radius:4px;';
+                container.appendChild(lens);
+            }
+
+            // 2. 创建固定的 360x360 放大结果框（直接浮动在中央黑框的左侧外边线）
+            let result = document.getElementById('global-zoom-result');
+            if (!result) {
+                result = document.createElement('div');
+                result.id = 'global-zoom-result';
+                result.style.cssText = 'position:fixed; width:360px; height:360px; background-color:#0f172a; background-repeat:no-repeat; display:none; z-index:100; border-radius:12px; border:1px solid rgba(255,255,255,0.15); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); pointer-events:none;';
+                document.getElementById('modal-content').appendChild(result);
+            }
+
+            function moveLens(e) {
+                if (img.classList.contains('hidden') || !img.complete) return;
+
+                const rect = container.getBoundingClientRect();
+                
+                // 让 360px 的精致视窗始终靠在中央大黑框的左边线外侧（间距 16px）
+                result.style.top = (rect.top + (rect.height - 360) / 2) + 'px';
+                result.style.left = (rect.left - 360 - 16) + 'px';
+
+                // 获取鼠标相对黑框的坐标
+                const pageX = e.touches ? e.touches[0].pageX : e.pageX;
+                const pageY = e.touches ? e.touches[0].pageY : e.pageY;
+                let x = pageX - rect.left - window.pageXOffset;
+                let y = pageY - rect.top - window.pageYOffset;
+
+                // 边界死守限制
+                if (x < lens.offsetWidth / 2) x = lens.offsetWidth / 2;
+                if (x > container.offsetWidth - lens.offsetWidth / 2) x = container.offsetWidth - lens.offsetWidth / 2;
+                if (y < lens.offsetHeight / 2) y = lens.offsetHeight / 2;
+                if (y > container.offsetHeight - lens.offsetHeight / 2) y = container.offsetHeight - lens.offsetHeight / 2;
+
+                lens.style.left = (x - lens.offsetWidth / 2) + "px";
+                lens.style.top = (y - lens.offsetHeight / 2) + "px";
+
+                // 【解决图片变形的核心算法】：
+                // 必须获取 object-contain 下图片的实际物理渲染宽高与实际偏移位置
+                const imgWidth = img.clientWidth;
+                const imgHeight = img.clientHeight;
+                const imgLeft = (container.offsetWidth - imgWidth) / 2;
+                const imgTop = (container.offsetHeight - imgHeight) / 2;
+
+                // 鼠标映射到那张“真实图片区域”内部的相对坐标
+                const targetX = x - imgLeft;
+                const targetY = y - imgTop;
+
+                // 严格遵守 2 倍等比例放大
+                const scale = 2; 
+
+                result.style.backgroundImage = `url('${img.src}')`;
+                // 放大后的背景图尺寸必须精确等于：实图渲染宽高 * 2
+                result.style.backgroundSize = (imgWidth * scale) + "px " + (imgHeight * scale) + "px";
+                // 修正中心偏移量，使其完美对齐
+                const bgX = -(targetX * scale - result.offsetWidth / 2);
+                const bgY = -(targetY * scale - result.offsetHeight / 2);
+                result.style.backgroundPosition = `${bgX}px ${bgY}px`;
+            }
+
+            container.addEventListener('mouseenter', () => { 
+                if (!img.classList.contains('hidden')) { lens.style.display = 'block'; result.style.display = 'block'; } 
+            });
+            container.addEventListener('mouseleave', () => { lens.style.display = 'none'; result.style.display = 'none'; });
+            container.addEventListener('mousemove', moveLens);
+
+            container.addEventListener('touchstart', (e) => { 
+                if (!img.classList.contains('hidden')) { lens.style.display = 'block'; result.style.display = 'block'; moveLens(e); } 
+            }, {passive: true});
+            container.addEventListener('touchend', () => { lens.style.display = 'none'; result.style.display = 'none'; });
+            container.addEventListener('touchmove', moveLens, {passive: true});
         }
 
         init();
