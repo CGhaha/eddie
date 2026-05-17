@@ -18,10 +18,8 @@
         }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         .sidebar-item.active { background-color: #2563eb; color: white; }
-        /* 优化：弹窗内容高度调整 */
         #modal-content { max-height: 95vh; }
         img { transition: opacity 0.3s; }
-        /* 【保持原样】：仅对带有 lazy 属性的产品图片进行加载状态遮罩，不干扰系统 Logo */
         img[loading="lazy"] { opacity: 0; }
         img.loaded { opacity: 1; }
     </style>
@@ -124,6 +122,7 @@
         const API = 'https://mamba-api.mfgift.workers.dev/api/products';
         let allProducts = [], currentImgs = [], currentIndex = 0;
         let currentTag = 'All', currentSearch = '', currentPage = 'home';
+        let currentMediaTypes = []; 
 
         const pageStates = { 'hot-sales': 1, 'videos': 1, '3d-view': 1 };
 
@@ -324,8 +323,10 @@
             const grid = document.getElementById(containerId);
             if (!grid) return;
             grid.innerHTML = items.map(p => {
+                const paths = p.file_path ? p.file_path.split(',').map(x=>x.trim()).filter(x=>x!=='') : [];
                 if (type === 'img') {
-                    const firstImg = p.file_path ? p.file_path.split(',')[0] : '';
+                    const imgOnly = paths.filter(path => !path.toLowerCase().endsWith('.glb'));
+                    const firstImg = imgOnly[0] || paths[0] || '';
                     return `<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-3 cursor-pointer group" onclick="openModal('img', ${p.id})">
                         <div class="aspect-square mb-3 overflow-hidden flex items-center justify-center">
                             <img src="${fixUrl(firstImg)}" class="w-full h-full object-contain group-hover:scale-105 transition" loading="lazy" decoding="async" onload="this.classList.add('loaded')">
@@ -344,8 +345,9 @@
                         <div class="p-3 bg-slate-900 text-white text-xs font-bold truncate">${p.name}</div>
                     </div>`;
                 } else if (type === '3d') {
+                    const glbPath = paths.find(path => path.toLowerCase().endsWith('.glb')) || paths[0] || '';
                     return `<div class="bg-white border border-gray-100 rounded-xl overflow-hidden model-card shadow-sm">
-                        <model-viewer src="${fixUrl(p.file_path)}" auto-rotate camera-controls loading="lazy" decoding="async"></model-viewer>
+                        <model-viewer src="${fixUrl(glbPath)}" auto-rotate camera-controls loading="lazy" decoding="async"></model-viewer>
                         <div class="p-3 text-center border-t">
                             <h3 class="font-bold text-xs mb-2 truncate">${p.name}</h3>
                             <button onclick="openModal('3d', ${p.id})" class="w-full py-2 text-[10px] font-black bg-blue-600 text-white rounded-lg uppercase">View 3D</button>
@@ -374,25 +376,89 @@
             }
 
             modal.classList.remove('hidden');
-            [img, yt, container3d, thumbs, pBtn, nBtn].forEach(el => el.classList.add('hidden'));
             
-            if(type === 'video' && p.yt_url) {
-                const vid = getYTId(p.yt_url);
-                yt.classList.remove('hidden'); yt.src = `https://www.youtube.com/embed/${vid}?autoplay=1`;
-            } else if (type === '3d') {
-                container3d.classList.remove('hidden');
-                container3d.innerHTML = `<model-viewer src="${fixUrl(p.file_path)}" camera-controls auto-rotate style="width:100%; height:100%"></model-viewer>`;
+            currentImgs = [];
+            currentMediaTypes = [];
+            currentIndex = 0;
+            yt.src = "";
+            container3d.innerHTML = "";
+
+            const uploadedPaths = p.file_path ? p.file_path.split(',').map(x=>x.trim()).filter(x => x !== "") : [];
+
+            if (p.category === 'showroom-3d') {
+                const glbFiles = uploadedPaths.filter(path => path.toLowerCase().endsWith('.glb'));
+                const imageFiles = uploadedPaths.filter(path => !path.toLowerCase().endsWith('.glb'));
+
+                glbFiles.forEach(glb => {
+                    currentImgs.push(glb);
+                    currentMediaTypes.push('3d');
+                });
+                imageFiles.forEach(imgFile => {
+                    currentImgs.push(imgFile);
+                    currentMediaTypes.push('img');
+                });
+            } else if (p.category === 'videos' && p.yt_url) {
+                currentImgs.push(p.yt_url); 
+                currentMediaTypes.push('video');
+                uploadedPaths.forEach(path => {
+                    currentImgs.push(path);
+                    currentMediaTypes.push('img');
+                });
             } else {
-                img.classList.remove('hidden');
-                currentImgs = p.file_path ? p.file_path.split(',') : []; currentIndex = 0;
-                img.src = fixUrl(currentImgs[0]);
-                if(currentImgs.length > 1) { [thumbs, pBtn, nBtn].forEach(el => el.classList.remove('hidden')); renderThumbs(); }
+                uploadedPaths.forEach(path => {
+                    currentImgs.push(path);
+                    currentMediaTypes.push('img');
+                });
+            }
+
+            switchActiveMedia();
+
+            if (currentImgs.length > 1) {
+                [thumbs, pBtn, nBtn].forEach(el => el.classList.remove('hidden'));
+                renderThumbs();
+            } else {
+                [thumbs, pBtn, nBtn].forEach(el => el.classList.add('hidden'));
             }
         }
 
+        function switchActiveMedia() {
+            const img = document.getElementById('modal-img'), yt = document.getElementById('youtube-frame'), container3d = document.getElementById('modal-3d-container');
+            
+            [img, yt, container3d].forEach(el => el.classList.add('hidden'));
+            
+            const mediaType = currentMediaTypes[currentIndex];
+            const mediaUrl = currentImgs[currentIndex];
+
+            if (mediaType === '3d') {
+                container3d.classList.remove('hidden');
+                container3d.innerHTML = `<model-viewer src="${fixUrl(mediaUrl)}" camera-controls auto-rotate style="width:100%; height:100%"></model-viewer>`;
+                hideGlobalZoom();
+            } else if (mediaType === 'video') {
+                yt.classList.remove('hidden');
+                const vid = getYTId(mediaUrl);
+                yt.src = `https://www.youtube.com/embed/${vid}?autoplay=1`;
+                hideGlobalZoom();
+            } else if (mediaType === 'img') {
+                img.classList.remove('hidden');
+                // 【保持原样，完美第一版逻辑】：只有纯图片加载完成后，才会重新绑定放大镜监听
+                img.onload = () => { if (!img.classList.contains('hidden')) bindZoomEvents(); };
+                img.src = fixUrl(mediaUrl);
+            }
+        }
+
+        function hideGlobalZoom() {
+            const lens = document.getElementById('global-zoom-lens');
+            const result = document.getElementById('global-zoom-result');
+            if(lens) lens.style.display = 'none';
+            if(result) result.style.display = 'none';
+        }
+
         function moveImg(dir) {
+            if (currentMediaTypes[currentIndex] === 'video') {
+                document.getElementById('youtube-frame').src = "";
+            }
             currentIndex = (currentIndex + dir + currentImgs.length) % currentImgs.length;
-            document.getElementById('modal-img').src = fixUrl(currentImgs[currentIndex]);
+            switchActiveMedia();
             renderThumbs();
         }
 
@@ -406,20 +472,16 @@
             document.getElementById('media-modal').classList.add('hidden');
             document.getElementById('youtube-frame').src = "";
             document.getElementById('modal-3d-container').innerHTML = "";
-            
-            const lens = document.getElementById('global-zoom-lens');
-            const result = document.getElementById('global-zoom-result');
-            if(lens) lens.style.display = 'none';
-            if(result) result.style.display = 'none';
-
+            hideGlobalZoom(); // 彻底清理
             window.location.hash = currentPage;
         }
 
-        // ================= 【保持原样，绝不动它】：完美的第一版放大镜随动逻辑 =================
+        // ================= 【完美修复】：放大镜逻辑完美适配动态媒体切换 =================
         function setupZoomFeature() {
             const container = document.getElementById('modal-media-container');
             const img = document.getElementById('modal-img');
 
+            // 1. 初始化 DOM 节点（保持原样，绝不动它）
             let lens = document.getElementById('global-zoom-lens');
             if (!lens) {
                 lens = document.createElement('div');
@@ -436,11 +498,10 @@
                 document.getElementById('modal-content').appendChild(result);
             }
 
-            function moveLens(e) {
+            // 2. 将核心随动逻辑封装进局部，以便图片 onload 后重复绑定（保持原样，绝不动它）
+            window.moveLens = (e) => {
                 if (img.classList.contains('hidden') || !img.complete) return;
-
                 const rect = container.getBoundingClientRect();
-                
                 result.style.top = (rect.top + (rect.height - 360) / 2) + 'px';
                 result.style.left = (rect.left - 360 - 16) + 'px';
 
@@ -461,10 +522,8 @@
                 const imgHeight = img.clientHeight;
                 const imgLeft = (container.offsetWidth - imgWidth) / 2;
                 const imgTop = (container.offsetHeight - imgHeight) / 2;
-
                 const targetX = x - imgLeft;
                 const targetY = y - imgTop;
-
                 const scale = 2; 
 
                 result.style.backgroundImage = `url('${img.src}')`;
@@ -474,17 +533,37 @@
                 result.style.backgroundPosition = `${bgX}px ${bgY}px`;
             }
 
+            // 3. 初始绑定
+            bindZoomEvents();
+        }
+
+        // 4. 【新增】：封装绑定监听器方法，在图片切换导致 onload 时重复执行，防止失效
+        function bindZoomEvents() {
+            const container = document.getElementById('modal-media-container');
+            const img = document.getElementById('modal-img');
+            const lens = document.getElementById('global-zoom-lens');
+            const result = document.getElementById('global-zoom-result');
+
+            // 移除可能存在的旧监听，防止叠加
+            container.removeEventListener('mousemove', window.moveLens);
+            container.removeEventListener('touchmove', window.moveLens);
+
+            // 重新绑定核心监听
             container.addEventListener('mouseenter', () => { 
-                if (!img.classList.contains('hidden')) { lens.style.display = 'block'; result.style.display = 'block'; } 
+                if (!img.classList.contains('hidden') && currentMediaTypes[currentIndex] === 'img') { 
+                    lens.style.display = 'block'; result.style.display = 'block'; 
+                } 
             });
             container.addEventListener('mouseleave', () => { lens.style.display = 'none'; result.style.display = 'none'; });
-            container.addEventListener('mousemove', moveLens);
+            container.addEventListener('mousemove', window.moveLens);
 
             container.addEventListener('touchstart', (e) => { 
-                if (!img.classList.contains('hidden')) { lens.style.display = 'block'; result.style.display = 'block'; moveLens(e); } 
+                if (!img.classList.contains('hidden') && currentMediaTypes[currentIndex] === 'img') { 
+                    lens.style.display = 'block'; result.style.display = 'block'; window.moveLens(e); 
+                } 
             }, {passive: true});
             container.addEventListener('touchend', () => { lens.style.display = 'none'; result.style.display = 'none'; });
-            container.addEventListener('touchmove', moveLens, {passive: true});
+            container.addEventListener('touchmove', window.moveLens, {passive: true});
         }
 
         init();
