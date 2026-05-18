@@ -93,7 +93,7 @@
         <button onclick="closeModal()" class="absolute top-4 right-4 z-[70] text-white text-3xl md:text-5xl hover:text-gray-300">&times;</button>
         
         <div id="modal-content" class="w-full max-w-6xl max-h-full flex flex-col items-center overflow-y-auto">
-            <div id="modal-media-container" class="w-full aspect-[16/10] md:aspect-video bg-gray-900 rounded-xl flex items-center justify-center overflow-hidden relative shadow-2xl flex-shrink-1">
+            <div id="modal-media-container" class="w-full max-w-full md:max-w-[70%] aspect-[16/10] md:aspect-video bg-gray-900 rounded-xl flex items-center justify-center overflow-hidden relative shadow-2xl flex-shrink-1">
                 <iframe id="youtube-frame" width="100%" height="100%" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen class="hidden"></iframe>
                 
                 <button id="prevBtn" onclick="moveImg(-1)" class="absolute left-0 h-full px-6 text-white/50 text-5xl z-10 hidden hover:text-white hover:bg-black/20 transition-all duration-300">❮</button>
@@ -171,13 +171,13 @@
             document.getElementById('inquiry-btn').onclick = () => {
                 const title = document.getElementById('modal-title').innerText;
                 const subject = encodeURIComponent(`Quote for ${title}`);
-                const body = encodeURIComponent(`Hi All, I am very interested in the ${title} product on your website. Can you please provide more information about it?`);
+                const body = encodeURIComponent(`Hi All, I'm very interested in the ${title} product on your website. Can you please provide more information about it?`);
                 window.location.href = `mailto:zhanglonghaha001@gmail.com?subject=${subject}&body=${body}`;
             };
             
             document.getElementById('whatsapp-btn').onclick = () => {
                 const title = document.getElementById('modal-title').innerText;
-                const text = encodeURIComponent(`Hi All, I am very interested in the ${title} product on your website. Can you please provide more information about it?`);
+                const text = encodeURIComponent(`Hi All, I'm very interested in the ${title} product on your website. Can you please provide more information about it?`);
                 window.open(`https://wa.me/8613323604265?text=${text}`, '_blank');
             };
         }
@@ -440,7 +440,6 @@
                 hideGlobalZoom();
             } else if (mediaType === 'img') {
                 img.classList.remove('hidden');
-                // 【保持原样，完美第一版逻辑】：只有纯图片加载完成后，才会重新绑定放大镜监听
                 img.onload = () => { if (!img.classList.contains('hidden')) bindZoomEvents(); };
                 img.src = fixUrl(mediaUrl);
             }
@@ -472,16 +471,14 @@
             document.getElementById('media-modal').classList.add('hidden');
             document.getElementById('youtube-frame').src = "";
             document.getElementById('modal-3d-container').innerHTML = "";
-            hideGlobalZoom(); // 彻底清理
+            hideGlobalZoom(); 
             window.location.hash = currentPage;
         }
 
-        // ================= 【完美修复】：放大镜逻辑完美适配动态媒体切换 =================
         function setupZoomFeature() {
             const container = document.getElementById('modal-media-container');
             const img = document.getElementById('modal-img');
 
-            // 1. 初始化 DOM 节点（保持原样，绝不动它）
             let lens = document.getElementById('global-zoom-lens');
             if (!lens) {
                 lens = document.createElement('div');
@@ -494,16 +491,17 @@
             if (!result) {
                 result = document.createElement('div');
                 result.id = 'global-zoom-result';
-                result.style.cssText = 'position:fixed; width:360px; height:360px; background-color:#0f172a; background-repeat:no-repeat; display:none; z-index:100; border-radius:12px; border:1px solid rgba(255,255,255,0.15); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); pointer-events:none;';
+                // 🛠️ 核心微调：将放大镜预览窗口尺寸由 360px 缩小至 280px，并完美适配 70% 容器布局
+                result.style.cssText = 'position:fixed; width:280px; height:280px; background-color:#0f172a; background-repeat:no-repeat; display:none; z-index:100; border-radius:12px; border:1px solid rgba(255,255,255,0.15); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); pointer-events:none;';
                 document.getElementById('modal-content').appendChild(result);
             }
 
-            // 2. 将核心随动逻辑封装进局部，以便图片 onload 后重复绑定（保持原样，绝不动它）
             window.moveLens = (e) => {
                 if (img.classList.contains('hidden') || !img.complete) return;
                 const rect = container.getBoundingClientRect();
-                result.style.top = (rect.top + (rect.height - 360) / 2) + 'px';
-                result.style.left = (rect.left - 360 - 16) + 'px';
+                // 🛠️ 配合尺寸微调定位计算：居中贴合 280px 视窗
+                result.style.top = (rect.top + (rect.height - 280) / 2) + 'px';
+                result.style.left = (rect.left - 280 - 16) + 'px';
 
                 const pageX = e.touches ? e.touches[0].pageX : e.pageX;
                 const pageY = e.touches ? e.touches[0].pageY : e.pageY;
@@ -533,22 +531,18 @@
                 result.style.backgroundPosition = `${bgX}px ${bgY}px`;
             }
 
-            // 3. 初始绑定
             bindZoomEvents();
         }
 
-        // 4. 【新增】：封装绑定监听器方法，在图片切换导致 onload 时重复执行，防止失效
         function bindZoomEvents() {
             const container = document.getElementById('modal-media-container');
             const img = document.getElementById('modal-img');
             const lens = document.getElementById('global-zoom-lens');
             const result = document.getElementById('global-zoom-result');
 
-            // 移除可能存在的旧监听，防止叠加
             container.removeEventListener('mousemove', window.moveLens);
             container.removeEventListener('touchmove', window.moveLens);
 
-            // 重新绑定核心监听
             container.addEventListener('mouseenter', () => { 
                 if (!img.classList.contains('hidden') && currentMediaTypes[currentIndex] === 'img') { 
                     lens.style.display = 'block'; result.style.display = 'block'; 
@@ -569,4 +563,4 @@
         init();
     </script>
 </body>
-</html>
+</html>.
