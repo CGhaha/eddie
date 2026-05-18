@@ -93,14 +93,21 @@
         <button onclick="closeModal()" class="absolute top-4 right-4 z-[70] text-white text-3xl md:text-5xl hover:text-gray-300">&times;</button>
         
         <div id="modal-content" class="w-full max-w-6xl max-h-full flex flex-col items-center overflow-y-auto">
-            <div id="modal-media-container" class="w-full max-w-full md:max-w-[70%] aspect-[16/10] md:aspect-video bg-gray-900 rounded-xl flex items-center justify-center overflow-hidden relative shadow-2xl flex-shrink-1">
+            <div id="modal-media-container" class="w-full max-w-full aspect-[16/10] md:aspect-video bg-gray-900 rounded-xl flex items-center justify-center overflow-hidden relative shadow-2xl flex-shrink-1">
                 <iframe id="youtube-frame" width="100%" height="100%" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen class="hidden"></iframe>
                 
                 <button id="prevBtn" onclick="moveImg(-1)" class="absolute left-0 h-full px-6 text-white/50 text-5xl z-10 hidden hover:text-white hover:bg-black/20 transition-all duration-300">❮</button>
                 <img id="modal-img" src="" class="max-h-full max-w-full object-contain hidden">
                 <button id="nextBtn" onclick="moveImg(1)" class="absolute right-0 h-full px-6 text-white/50 text-5xl z-10 hidden hover:text-white hover:bg-black/20 transition-all duration-300">❯</button>
                 
-                <div id="modal-3d-container" class="hidden w-full h-full"></div>
+                <div id="modal-3d-container" class="hidden w-full h-full relative bg-gray-900">
+                    <div id="viewer-holder" class="w-full h-full"></div>
+                    <button onclick="toggle3DFullscreen()" class="absolute bottom-4 right-4 bg-black/70 hover:bg-blue-600 text-white w-10 h-10 rounded-lg flex items-center justify-center transition shadow-lg z-30" title="Full Screen">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                        </svg>
+                    </button>
+                </div>
                 <div id="thumb-bar" class="absolute bottom-4 flex gap-2 hidden"></div>
             </div>
 
@@ -171,13 +178,13 @@
             document.getElementById('inquiry-btn').onclick = () => {
                 const title = document.getElementById('modal-title').innerText;
                 const subject = encodeURIComponent(`Quote for ${title}`);
-                const body = encodeURIComponent(`Hi All, I'm very interested in the ${title} product on your website. Can you please provide more information about it?`);
+                const body = encodeURIComponent(`Hi All, I am very interested in the ${title} product on your website. Can you please provide more information about it?`);
                 window.location.href = `mailto:zhanglonghaha001@gmail.com?subject=${subject}&body=${body}`;
             };
             
             document.getElementById('whatsapp-btn').onclick = () => {
                 const title = document.getElementById('modal-title').innerText;
-                const text = encodeURIComponent(`Hi All, I'm very interested in the ${title} product on your website. Can you please provide more information about it?`);
+                const text = encodeURIComponent(`Hi All, I am very interested in the ${title} product on your website. Can you please provide more information about it?`);
                 window.open(`https://wa.me/8613323604265?text=${text}`, '_blank');
             };
         }
@@ -362,6 +369,7 @@
             if (!isDeepLink) window.location.hash = `${currentPage}!${id}`;
             const modal = document.getElementById('media-modal'), img = document.getElementById('modal-img'), yt = document.getElementById('youtube-frame'), container3d = document.getElementById('modal-3d-container');
             const thumbs = document.getElementById('thumb-bar'), pBtn = document.getElementById('prevBtn'), nBtn = document.getElementById('nextBtn');
+            const mediaContainer = document.getElementById('modal-media-container');
             
             document.getElementById('modal-title').innerText = p.name;
             document.getElementById('modal-desc').innerText = `Material: ${p.material || 'Standard'} | MOQ: ${p.moq || 'N/A'}`;
@@ -375,13 +383,21 @@
                 customDescEl.classList.add('hidden');
             }
 
+            if (p.category === 'videos' || p.category === 'showroom-3d') {
+                mediaContainer.classList.remove('md:max-w-[70%]');
+                mediaContainer.classList.add('md:max-w-[84%]');
+            } else {
+                mediaContainer.classList.remove('md:max-w-[84%]');
+                mediaContainer.classList.add('md:max-w-[70%]');
+            }
+
             modal.classList.remove('hidden');
             
             currentImgs = [];
             currentMediaTypes = [];
             currentIndex = 0;
             yt.src = "";
-            container3d.innerHTML = "";
+            document.getElementById('viewer-holder').innerHTML = "";
 
             const uploadedPaths = p.file_path ? p.file_path.split(',').map(x=>x.trim()).filter(x => x !== "") : [];
 
@@ -423,6 +439,7 @@
 
         function switchActiveMedia() {
             const img = document.getElementById('modal-img'), yt = document.getElementById('youtube-frame'), container3d = document.getElementById('modal-3d-container');
+            const holder = document.getElementById('viewer-holder');
             
             [img, yt, container3d].forEach(el => el.classList.add('hidden'));
             
@@ -431,8 +448,9 @@
 
             if (mediaType === '3d') {
                 container3d.classList.remove('hidden');
-                container3d.innerHTML = `<model-viewer src="${fixUrl(mediaUrl)}" camera-controls auto-rotate style="width:100%; height:100%"></model-viewer>`;
-                hideGlobalZoom();
+                // 🛠️ 优化：将 model-viewer 渲染到 holder 中，按钮则保持在 container3d 级别中，避免被覆盖销毁
+                holder.innerHTML = `<model-viewer src="${fixUrl(mediaUrl)}" camera-controls auto-rotate style="width:100%; height:100%"></model-viewer>`;
+                hideGlobalZoom(); 
             } else if (mediaType === 'video') {
                 yt.classList.remove('hidden');
                 const vid = getYTId(mediaUrl);
@@ -442,6 +460,24 @@
                 img.classList.remove('hidden');
                 img.onload = () => { if (!img.classList.contains('hidden')) bindZoomEvents(); };
                 img.src = fixUrl(mediaUrl);
+            }
+        }
+
+        // 🛠️ 核心全屏修复：采用标准的浏览器全屏API作用于 3D 独立包裹层，规避移动端与桌面端的组件阻断漏洞
+        function toggle3DFullscreen() {
+            const container3d = document.getElementById('modal-3d-container');
+            if (!document.fullscreenElement) {
+                if (container3d.requestFullscreen) {
+                    container3d.requestFullscreen();
+                } else if (container3d.webkitRequestFullscreen) { /* Safari */
+                    container3d.webkitRequestFullscreen();
+                } else if (container3d.msRequestFullscreen) { /* IE11 */
+                    container3d.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
             }
         }
 
@@ -470,7 +506,7 @@
         function closeModal() {
             document.getElementById('media-modal').classList.add('hidden');
             document.getElementById('youtube-frame').src = "";
-            document.getElementById('modal-3d-container').innerHTML = "";
+            document.getElementById('viewer-holder').innerHTML = "";
             hideGlobalZoom(); 
             window.location.hash = currentPage;
         }
@@ -491,15 +527,14 @@
             if (!result) {
                 result = document.createElement('div');
                 result.id = 'global-zoom-result';
-                // 🛠️ 核心微调：将放大镜预览窗口尺寸由 360px 缩小至 280px，并完美适配 70% 容器布局
                 result.style.cssText = 'position:fixed; width:280px; height:280px; background-color:#0f172a; background-repeat:no-repeat; display:none; z-index:100; border-radius:12px; border:1px solid rgba(255,255,255,0.15); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); pointer-events:none;';
                 document.getElementById('modal-content').appendChild(result);
             }
 
             window.moveLens = (e) => {
-                if (img.classList.contains('hidden') || !img.complete) return;
+                if (img.classList.contains('hidden') || !img.complete || currentMediaTypes[currentIndex] !== 'img') return;
+                
                 const rect = container.getBoundingClientRect();
-                // 🛠️ 配合尺寸微调定位计算：居中贴合 280px 视窗
                 result.style.top = (rect.top + (rect.height - 280) / 2) + 'px';
                 result.style.left = (rect.left - 280 - 16) + 'px';
 
@@ -563,4 +598,4 @@
         init();
     </script>
 </body>
-</html>.
+</html>
