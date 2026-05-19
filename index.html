@@ -130,6 +130,7 @@
         let allProducts = [], currentImgs = [], currentIndex = 0;
         let currentTag = 'All', currentSearch = '', currentPage = 'home';
         let currentMediaTypes = []; 
+        let ignoreHashChange = false; // 【新增精准拦截锁：防止打开/关闭详情页触发无意义的重绘】
 
         const pageStates = { 'hot-sales': 1, 'videos': 1, '3d-view': 1 };
 
@@ -145,7 +146,7 @@
                 const res = await fetch(API);
                 allProducts = await res.json();
                 
-                // 【刷新时自动重排序：获取完数据，默认执行一次点击量与 ID 降序清洗】
+                // 【黄金规则：只有刷新网页时，才在这里进行重新排名】
                 allProducts.sort((a, b) => {
                     const clicksA = parseInt(a.clicks) || 0;
                     const clicksB = parseInt(b.clicks) || 0;
@@ -161,6 +162,12 @@
         }
 
         function handleDeepLink() {
+            // 【核心拦截点】：如果是由于打开详情页或关闭详情页人为改动URL引发的变更，直接拦截，绝对不重渲染页面！死守当前页码和位置！
+            if (ignoreHashChange) {
+                ignoreHashChange = false;
+                return;
+            }
+
             const fullHash = window.location.hash.replace('#', '');
             const [pageId, productId] = fullHash.split('!');
             if (pageId && ['home', 'hot-sales', 'videos', '3d-view'].includes(pageId)) showPage(pageId);
@@ -197,7 +204,10 @@
 
         function showPage(id) {
             currentPage = id;
-            if (document.getElementById('media-modal').classList.contains('hidden')) window.location.hash = id;
+            if (document.getElementById('media-modal').classList.contains('hidden')) {
+                ignoreHashChange = true; 
+                window.location.hash = id;
+            }
             document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
             document.getElementById('category-sidebar').style.display = (id === 'home') ? 'none' : 'block';
             if(pageStates[id]) pageStates[id] = 1;
@@ -226,14 +236,6 @@
             );
             if (currentTag !== 'All') items = items.filter(p => p.tags && p.tags.includes(currentTag));
             if (currentSearch) items = items.filter(p => p.name.toLowerCase().includes(currentSearch));
-
-            // 【死守核心防线：在切割分页和渲染前，在这里进行最终强力排序，确保绝对生效】
-            items.sort((a, b) => {
-                const clicksA = parseInt(a.clicks) || 0;
-                const clicksB = parseInt(b.clicks) || 0;
-                if (clicksB !== clicksA) return clicksB - clicksA;
-                return (parseInt(b.id) || 0) - (parseInt(a.id) || 0);
-            });
 
             let itemsPerPage = 12;
             if (currentPage === 'hot-sales' || currentPage === '3d-view') {
@@ -374,18 +376,21 @@
         function openModal(type, id, isDeepLink = false) {
             const p = allProducts.find(x => x.id === id); if(!p) return;
             
-            // 【精确插入点：点击打开弹窗详情时，立即异步向后端发送 +1 请求】
             try {
                 fetch('https://mamba-api.mfgift.workers.dev/api/products/click', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: p.id })
                 });
-                // 内存同步自增，保证在不重新请求整表的情况下本地排序状态最新
                 p.clicks = (parseInt(p.clicks) || 0) + 1;
             } catch(clickErr) { console.warn(clickErr); }
 
-            if (!isDeepLink) window.location.hash = `${currentPage}!${id}`;
+            // 【核心修正点】：在这里更改Hash时，立刻拉起拦截锁，告诉hashchange事件：不要重绘！不要刷新！死守当前页码！
+            if (!isDeepLink) {
+                ignoreHashChange = true; 
+                window.location.hash = `${currentPage}!${id}`;
+            }
+            
             const modal = document.getElementById('media-modal'), img = document.getElementById('modal-img'), yt = document.getElementById('youtube-frame'), container3d = document.getElementById('modal-3d-container');
             const thumbs = document.getElementById('thumb-bar'), pBtn = document.getElementById('prevBtn'), nBtn = document.getElementById('nextBtn');
             const mediaContainer = document.getElementById('modal-media-container');
@@ -525,7 +530,10 @@
             document.getElementById('youtube-frame').src = "";
             document.getElementById('viewer-holder').innerHTML = "";
             hideGlobalZoom(); 
-            window.location.hash = currentPage;
+            
+            // 【双重保险静默锁】：彻底阻止关闭时触发任何页面重绘
+            ignoreHashChange = true; 
+            history.replaceState(null, document.title, window.location.pathname + window.location.search + '#' + currentPage);
         }
 
         function setupZoomFeature() {
