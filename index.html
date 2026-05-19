@@ -36,6 +36,7 @@
             <button onclick="showPage('hot-sales')" class="hover:text-blue-400 font-medium transition">Hot Sales</button>
             <button onclick="showPage('videos')" class="hover:text-blue-400 font-medium transition">Videos</button>
             <button onclick="showPage('3d-view')" class="hover:text-blue-400 font-medium transition">3D Showroom</button>
+            <button onclick="showPage('live')" class="hover:text-blue-400 font-medium transition">Live</button>
         </div>
     </nav>
 
@@ -85,6 +86,18 @@
                     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6" id="3d-list"></div>
                     <div id="3d-view-pagination" class="mt-10 flex flex-wrap items-center justify-center gap-4 text-sm hidden"></div>
                 </div>
+
+                <div id="live" class="page">
+                    <div class="flex justify-between items-center mb-8 border-b pb-4">
+                        <h2 class="text-3xl font-bold">Live Stream</h2>
+                    </div>
+                    <div class="w-full flex flex-col justify-center items-center bg-[#1a1a1a] py-12 rounded-2xl relative min-h-[50vh] px-4">
+                        <div class="w-full max-w-[800px] aspect-video bg-black rounded-12 overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.5)]">
+                            <iframe src="https://vdo.ninja/?view=myroom123&autoplay=1&transparent=1&cleanviewer=1" allow="autoplay; camera; microphone; fullscreen; picture-in-picture; encrypted-media" allowfullscreen class="w-full h-full border-none"></iframe>
+                        </div>
+                        <div class="mt-6 text-[#888] text-sm tracking-wide">提示：确保手机端已打开并点击了 Start Sharing</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -132,7 +145,8 @@
         let currentMediaTypes = []; 
         let ignoreHashChange = false; // 【新增精准拦截锁：防止打开/关闭详情页触发无意义的重绘】
 
-        const pageStates = { 'hot-sales': 1, 'videos': 1, '3d-view': 1 };
+        // 更新状态字典，加入 live 路由状态映射
+        const pageStates = { 'hot-sales': 1, 'videos': 1, '3d-view': 1, 'live': 1 };
 
         const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Caps", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
 
@@ -170,7 +184,8 @@
 
             const fullHash = window.location.hash.replace('#', '');
             const [pageId, productId] = fullHash.split('!');
-            if (pageId && ['home', 'hot-sales', 'videos', '3d-view'].includes(pageId)) showPage(pageId);
+            // 在路由拦截白名单中加入 'live'
+            if (pageId && ['home', 'hot-sales', 'videos', '3d-view', 'live'].includes(pageId)) showPage(pageId);
             else renderAll();
             if (productId) {
                 const p = allProducts.find(x => x.id == productId);
@@ -209,7 +224,8 @@
                 window.location.hash = id;
             }
             document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
-            document.getElementById('category-sidebar').style.display = (id === 'home') ? 'none' : 'block';
+            // 确保当进入 home 或 live 页面时，侧边栏分类隐藏；而在 hot-sales、videos、3d-view 下正常展示。
+            document.getElementById('category-sidebar').style.display = (id === 'home' || id === 'live') ? 'none' : 'block';
             if(pageStates[id]) pageStates[id] = 1;
             renderAll();
         }
@@ -228,7 +244,7 @@
         }
 
         function renderAll() {
-            if(currentPage === 'home') return;
+            if(currentPage === 'home' || currentPage === 'live') return;
             let items = allProducts.filter(p => 
                 (currentPage === 'hot-sales' && p.category === 'hot-sales') ||
                 (currentPage === 'videos' && p.category === 'videos') ||
@@ -286,7 +302,7 @@
                 if (i === curr) {
                     html += `<button class="w-9 h-9 font-bold bg-blue-600 text-white rounded-lg shadow-sm">${i}</button>`;
                 } else {
-                    html += `<button onclick="changePage('${pageId}', ${i})" class="w-9 h-9 border bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">${i}</button>`;
+                    html += `<button onclick="changePage('${pageId}', i)" class="w-9 h-9 border bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">${i}</button>`;
                 }
             }
 
