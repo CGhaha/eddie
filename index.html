@@ -143,17 +143,8 @@
         async function init() {
             try {
                 const res = await fetch(API);
-                let data = await res.json();
+                allProducts = await res.json();
                 
-                allProducts = data.sort((a, b) => {
-                    const clicksA = parseInt(a.clicks) || 0;
-                    const clicksB = parseInt(b.clicks) || 0;
-                    if (clicksB !== clicksA) {
-                        return clicksB - clicksA;
-                    }
-                    return b.id - a.id;
-                });
-
                 renderTags();
                 handleDeepLink();
                 setupButtons();
@@ -227,6 +218,13 @@
             );
             if (currentTag !== 'All') items = items.filter(p => p.tags && p.tags.includes(currentTag));
             if (currentSearch) items = items.filter(p => p.name.toLowerCase().includes(currentSearch));
+
+            // 【死守核心防线：在切割分页和渲染前，在这里进行最终强力排序，确保绝对生效】
+            items.sort((a, b) => {
+                const clicksA = parseInt(a.clicks) || 0;
+                const clicksB = parseInt(b.clicks) || 0;
+                return clicksB - clicksA;
+            });
 
             let itemsPerPage = 12;
             if (currentPage === 'hot-sales' || currentPage === '3d-view') {
@@ -448,7 +446,6 @@
 
             if (mediaType === '3d') {
                 container3d.classList.remove('hidden');
-                // 🛠️ 优化：将 model-viewer 渲染到 holder 中，按钮则保持在 container3d 级别中，避免被覆盖销毁
                 holder.innerHTML = `<model-viewer src="${fixUrl(mediaUrl)}" camera-controls auto-rotate style="width:100%; height:100%"></model-viewer>`;
                 hideGlobalZoom(); 
             } else if (mediaType === 'video') {
@@ -463,15 +460,14 @@
             }
         }
 
-        // 🛠️ 核心全屏修复：采用标准的浏览器全屏API作用于 3D 独立包裹层，规避移动端与桌面端的组件阻断漏洞
         function toggle3DFullscreen() {
             const container3d = document.getElementById('modal-3d-container');
             if (!document.fullscreenElement) {
                 if (container3d.requestFullscreen) {
                     container3d.requestFullscreen();
-                } else if (container3d.webkitRequestFullscreen) { /* Safari */
+                } else if (container3d.webkitRequestFullscreen) { 
                     container3d.webkitRequestFullscreen();
-                } else if (container3d.msRequestFullscreen) { /* IE11 */
+                } else if (container3d.msRequestFullscreen) { 
                     container3d.msRequestFullscreen();
                 }
             } else {
