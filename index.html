@@ -145,6 +145,14 @@
                 const res = await fetch(API);
                 allProducts = await res.json();
                 
+                // 【刷新时自动重排序：获取完数据，默认执行一次点击量与 ID 降序清洗】
+                allProducts.sort((a, b) => {
+                    const clicksA = parseInt(a.clicks) || 0;
+                    const clicksB = parseInt(b.clicks) || 0;
+                    if (clicksB !== clicksA) return clicksB - clicksA;
+                    return (parseInt(b.id) || 0) - (parseInt(a.id) || 0);
+                });
+                
                 renderTags();
                 handleDeepLink();
                 setupButtons();
@@ -223,7 +231,8 @@
             items.sort((a, b) => {
                 const clicksA = parseInt(a.clicks) || 0;
                 const clicksB = parseInt(b.clicks) || 0;
-                return clicksB - clicksA;
+                if (clicksB !== clicksA) return clicksB - clicksA;
+                return (parseInt(b.id) || 0) - (parseInt(a.id) || 0);
             });
 
             let itemsPerPage = 12;
@@ -364,6 +373,18 @@
 
         function openModal(type, id, isDeepLink = false) {
             const p = allProducts.find(x => x.id === id); if(!p) return;
+            
+            // 【精确插入点：点击打开弹窗详情时，立即异步向后端发送 +1 请求】
+            try {
+                fetch('https://mamba-api.mfgift.workers.dev/api/products/click', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: p.id })
+                });
+                // 内存同步自增，保证在不重新请求整表的情况下本地排序状态最新
+                p.clicks = (parseInt(p.clicks) || 0) + 1;
+            } catch(clickErr) { console.warn(clickErr); }
+
             if (!isDeepLink) window.location.hash = `${currentPage}!${id}`;
             const modal = document.getElementById('media-modal'), img = document.getElementById('modal-img'), yt = document.getElementById('youtube-frame'), container3d = document.getElementById('modal-3d-container');
             const thumbs = document.getElementById('thumb-bar'), pBtn = document.getElementById('prevBtn'), nBtn = document.getElementById('nextBtn');
