@@ -111,6 +111,7 @@
         
         let rawData = [], currentPage = 1, pageSize = 15;
         let uploadedFiles = []; 
+        let currentPageItems = []; // 内存隔离池，防止DOM传参引发JSON崩溃
 
         document.getElementById('tagGroup').innerHTML = CATEGORIES.map(c => `<label class="flex items-center gap-1"><input type="checkbox" name="tag" value="${c}"> ${c}</label>`).join('');
 
@@ -144,7 +145,7 @@
                 <div class="thumb-preview w-16 h-16 rounded-lg overflow-hidden cursor-pointer ${index === 0 ? 'is-first' : 'opacity-60'}" onclick="setAsFirst(${index})">
                     ${index === 0 ? '<span class="first-badge">COVER</span>' : ''}
                     <div class="delete-thumb" onclick="event.stopPropagation(); removeThumb(${index})">×</div>
-                    <img src="${file.previewUrl}" class="w-full h-full object-cover">
+                    <img src="${file.previewUrl}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/60x60?text=Error'">
                 </div>
             `).join('');
         }
@@ -171,19 +172,23 @@
             const filter = document.getElementById('filterCategory').value;
             const filtered = filter === 'all' ? rawData : rawData.filter(p => p.category === filter);
             const totalPages = Math.ceil(filtered.length / pageSize) || 1;
-            const data = filtered.slice((currentPage-1)*pageSize, currentPage*pageSize);
+            
+            currentPageItems = filtered.slice((currentPage-1)*pageSize, currentPage*pageSize);
 
-            document.getElementById('list').innerHTML = data.map(p => `
+            document.getElementById('list').innerHTML = currentPageItems.map((p, index) => {
+                const firstImg = p.file_path ? p.file_path.split(',')[0].trim() : '';
+                return `
                 <tr class="hover:bg-slate-50/50">
                     <td class="p-4 flex items-center gap-3">
-                        <img src="${p.file_path.split(',')[0]}" class="w-10 h-10 rounded object-cover bg-gray-100" onerror="this.src='https://placehold.co/40x40?text=Img'">
-                        <span class="font-medium">${p.name} ${p.file_path.includes(',') ? '<span class="text-blue-500 text-[10px]">(Multi)</span>' : ''}</span>
+                        <img src="${firstImg}" class="w-10 h-10 rounded object-cover bg-gray-100" onerror="this.src='https://placehold.co/40x40?text=Img'">
+                        <span class="font-medium">${p.name} ${p.file_path && p.file_path.includes(',') ? '<span class="text-blue-500 text-[10px]">(Multi)</span>' : ''}</span>
                     </td>
                     <td class="p-4 text-right">
-                        <button onclick='edit(${JSON.stringify(p)})' class="text-blue-600 font-bold mr-3">Edit</button>
-                        <button onclick="delProduct(${p.id}, '${p.name}')" class="text-red-500 font-bold">Del</button>
+                        <button onclick="editByIndex(${index})" class="text-blue-600 font-bold mr-3">Edit</button>
+                        <button onclick="delByIndex(${index})" class="text-red-500 font-bold">Del</button>
                     </td>
-                </tr>`).join('');
+                </tr>`;
+            }).join('');
 
             document.getElementById('pagination').innerHTML = `
                 <span>Total ${filtered.length} | Page ${currentPage}/${totalPages}</span>
@@ -195,14 +200,19 @@
 
         function changePage(dir) { currentPage += dir; renderTable(); }
 
-        async function delProduct(id, name) {
-            if (confirm(`Delete "${name}"?`)) {
-                await fetch(`${API_BASE}/products`, { method: 'DELETE', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id}) });
+        async function delByIndex(index) {
+            const p = currentPageItems[index];
+            if (!p) return;
+            if (confirm(`Delete "${p.name}"?`)) {
+                await fetch(`${API_BASE}/products`, { method: 'DELETE', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id: p.id}) });
                 load();
             }
         }
 
-        function edit(p) {
+        function editByIndex(index) {
+            const p = currentPageItems[index];
+            if (!p) return;
+            
             resetForm();
             document.getElementById('formTitle').innerText = "Edit Product";
             document.getElementById('editId').value = p.id;
@@ -212,11 +222,10 @@
             document.getElementById('category').value = p.category;
             document.getElementById('yt_url').value = p.yt_url || '';
             
-            // 【编辑回显描述】
             document.getElementById('description').value = p.description || '';
             
             if(p.file_path) {
-                p.file_path.split(',').forEach(path => {
+                p.file_path.split(',').map(x => x.trim()).filter(x => x !== "").forEach(path => {
                     uploadedFiles.push({
                         name: path.split('/').pop(),
                         data: null, 
@@ -262,16 +271,13 @@
                 });
 
                 const payload = {
-                    id: document.getElementById('editId').value,
+                    id: document.getElementById('editId').value || "",
                     name: document.getElementById('name').value,
                     material: document.getElementById('material').value,
                     moq: document.getElementById('moq').value,
                     category: document.getElementById('category').value,
                     yt_url: document.getElementById('yt_url').value,
-                    
-                    // 【将描述加入上传负荷】
                     description: document.getElementById('description').value,
-                    
                     existingPath: existingPaths.join(','), 
                     tags: Array.from(document.querySelectorAll('input[name="tag"]:checked')).map(i=>i.value).join(','),
                     fileName: newNames.length > 0 ? newNames.join('|') : "no_file", 
@@ -289,7 +295,7 @@
                     status.classList.replace('bg-blue-50', 'bg-green-50');
                     resetForm(); 
                     load(); 
-                } else { throw new Error("Upload failed"); }
+                } else { throw new Error("Upload failed (Status: " + res.status + ")"); }
             } catch (err) { 
                 status.innerHTML = "❌ Error: " + err.message; 
                 status.classList.replace('bg-blue-50', 'bg-red-50');
