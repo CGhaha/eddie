@@ -195,7 +195,7 @@
 
         const pageStates = { 'hot-sales': 1, 'videos': 1, '3d-view': 1, 'live': 1 };
 
-        const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Caps", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
+        const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Tool", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
 
         function fixUrl(path) {
             if (!path) return '';
@@ -245,13 +245,13 @@
             document.getElementById('inquiry-btn').onclick = () => {
                 const title = document.getElementById('modal-title').innerText;
                 const subject = encodeURIComponent(`Quote for ${title}`);
-                const body = encodeURIComponent(`Hi All, I am very interested in the ${title} product on your website. Can you please provide more information about it?`);
-                window.location.href = `mailto:zhanglonghaha001@gmail.com?subject=${subject}&body=${body}`;
+                const body = encodeURIComponent(`Hi All, I'm very interested in the ${title} product on your website. Can you please provide more information about it?`);
+                window.location.href = `mailto:katfang@foxmail.com?subject=${subject}&body=${body}`;
             };
             
             document.getElementById('whatsapp-btn').onclick = () => {
                 const title = document.getElementById('modal-title').innerText;
-                const text = encodeURIComponent(`Hi All, I am very interested in the ${title} product on your website. Can you please provide more information about it?`);
+                const text = encodeURIComponent(`Hi All, I'm very interested in the ${title} product on your website. Can you please provide more information about it?`);
                 window.open(`https://wa.me/8613323604265?text=${text}`, '_blank');
             };
         }
