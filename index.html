@@ -752,18 +752,12 @@
 
         
         // 👇 仅修改：步骤改为英文 + 按钮加载动画
-        const steps = [
-            "Artwork Confirm",
-            "PI Confirmed",
-            "Payment Received",
-            "Material Ready",
-            "Production Started",
-            "Mass Production",
-            "Shipped",
-            "Delivered"
-        ];
+// 定义两套步骤逻辑
         
-        const shipMap = { "快递": "Express", "空派": "Via Air", "海派": "Via Boat" };
+        const stepsNormal = ["确认效果图", "确认PI", "客户已支付", "物料准备", "订单进入产线", "订单开始生产", "生产完毕并发货", "货物送达"];
+        const stepsSample = ["同意样品", "PI确认", "客户付款", "样品准备", "货物发出", "货物签收", "发送报价", "转为正式订单"];
+
+const shipMap = { "快递": "Express", "空派": "Via Air", "海派": "Via Boat" };
 
         function parseStepData(rawStr) {
             if (!rawStr) return { date: "", carrier: "", tracking: "" };
@@ -799,6 +793,8 @@
                 }
 
                 const order = data.order;
+
+                const steps = (order.cargo === "样品") ? stepsSample : stepsNormal;
 
                 document.getElementById('res-ship').innerText = shipMap[order.ship] || order.ship || "N/A";
                 document.getElementById('res-date').innerText = order.deadline || "N/A";
