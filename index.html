@@ -22,6 +22,30 @@
         img { transition: opacity 0.3s; }
         img[loading="lazy"] { opacity: 0; }
         img.loaded { opacity: 1; }
+        
+        /* 自定义图标样式 */
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 12px;
+            color: white;
+        }
+        .step-icon.passed {
+            background-color: #1f2937; /* 已完成 - 黑色 */
+        }
+        .step-icon.current {
+            background-color: #10b981; /* 当前步骤 - 绿色 */
+        }
+        .step-icon.pending {
+            background-color: #9ca3af; /* 待处理 - 灰色 */
+        }
+        .step-icon.current .checkmark {
+            display: none;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
@@ -833,17 +857,57 @@ const shipMap = { "快递": "Express", "空派": "Via Air", "海派": "Via Boat"
                         const timesData = order.times && order.times[i] ? order.times[i] : "";
                         const { date, carrier, tracking } = parseStepData(timesData);
                         
+                        // 设置图标类型
+                        let iconClass = 'pending';
+                        if (isPassed && i !== order.step) iconClass = 'passed';
+                        if (isActive) iconClass = 'current';
+                        
+                        // 根据步骤选择图标 - 为样品订单和普通订单分别设置
+                        let iconContent = '';
+                        if (order.cargo === "样品") {
+                            // 样品订单图标
+                            if (i === 0) iconContent = '✅'; // Sample Approval
+                            else if (i === 1) iconContent = '📋'; // Confirm PI
+                            else if (i === 2) iconContent = '💰'; // Paid / Other Payment Terms
+                            else if (i === 3) iconContent = '📦'; // Sample Preparation
+                            else if (i === 4) iconContent = '✈️'; // Shipment Dispatch
+                            else if (i === 5) iconContent = '📍'; // Delivery
+                            else if (i === 6) iconContent = '📋'; // Send Quote
+                            else if (i === 7) iconContent = '✅'; // Convert to Formal Order
+                            else iconContent = '•'; // 默认点
+                        } else {
+                            // 普通订单图标
+                            if (i === 0) iconContent = '✓'; // Confirm Virtual Proof
+                            else if (i === 1) iconContent = '📋'; // Confirm PI
+                            else if (i === 2) iconContent = '💰'; // Paid / Other Payment Terms
+                            else if (i === 3) iconContent = '📦'; // Material Preparation
+                            else if (i === 4) iconContent = '🏭'; // Order Enters Production Line
+                            else if (i === 5) iconContent = '⚙️'; // Begins Production
+                            else if (i === 6) {
+                              // Production Complete and Shipped - 根据运输方式显示不同图标
+                              if(order.ship === "快递" || order.ship === "空派") {
+                                iconContent = '✈️'; // 飞机图标
+                              } else if(order.ship === "海派") {
+                                iconContent = '🚢'; // 船只图标
+                              } else {
+                                iconContent = '✈️'; // 默认飞机图标
+                              }
+                            }
+                            else if (i === 7) iconContent = '📍'; // Delivered
+                            else iconContent = '•'; // 默认点
+                        }
+                                                
                         return `
                             <div class="flex items-center flex-1">
                                 <div class="flex flex-col items-center gap-1 w-full">
                                     <span class="text-[10px] text-gray-400 font-bold h-4">${date}</span>
-                                    <div class="w-6 h-6 rounded-full flex items-center justify-center ${isActive ? 'bg-emerald-500' : (isPassed ? 'bg-gray-900' : 'bg-gray-200')}">
-                                        ${isActive ? '<div class="w-2.5 h-2.5 bg-white rounded-full"></div>' : ''}
+                                    <div class="step-icon ${iconClass}">
+                                        ${iconContent}
                                     </div>
                                     <span class="text-[11px] mt-1 text-center font-bold px-1 ${isActive ? 'text-emerald-700' : (isPassed ? 'text-gray-900' : 'text-gray-400')} leading-tight max-w-[80px]">
                                         ${s}
                                     </span>
-                                    ${tracking && i === 6 ? `<div class="text-[9px] text-blue-600 font-bold mt-1 text-center leading-tight bg-blue-50 px-2 py-1 rounded whitespace-nowrap">${carrier.toUpperCase()}: ${tracking}</div>` : ''}
+                                    ${tracking && i === 6 && order.cargo !== "样品" ? `<div class="text-[9px] text-blue-600 font-bold mt-1 text-center leading-tight bg-blue-50 px-2 py-1 rounded whitespace-nowrap">${carrier.toUpperCase()}: ${tracking}</div>` : ''}
                                 </div>
                                 ${i < steps.length - 1 ? `<div class="flex-grow flex items-center justify-center -mt-8 px-1"><svg class="w-5 h-5 ${i < order.step ? 'text-gray-900' : 'text-gray-200'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></div>` : ''}
                             </div>
