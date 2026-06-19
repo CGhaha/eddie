@@ -52,7 +52,8 @@
             <form id="uploadForm" class="space-y-4" onsubmit="return false;">
                 <input type="hidden" id="editId">
                 <input type="text" id="name" placeholder="Product Name" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" required>
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-3 gap-2">
+                    <input type="text" id="item_no" placeholder="Item #" class="px-4 py-2 border rounded-lg">
                     <input type="text" id="material" placeholder="Material" class="px-4 py-2 border rounded-lg">
                     <input type="text" id="moq" placeholder="MOQ" class="px-4 py-2 border rounded-lg">
                 </div>
@@ -72,7 +73,7 @@
 
                 <div id="dropZone" class="border-2 border-dashed border-slate-200 rounded-lg p-4 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
                     <input type="file" id="file" class="hidden" multiple>
-                    <p class="text-gray-400">Click to Select or Drop Multi-Files</p>
+                    <p class="text-gray-400">Click to Select, Drop Files or Paste</p>
                     <div id="thumbContainer" class="flex flex-wrap gap-3 mt-4 justify-center"></div>
                 </div>
 
@@ -82,8 +83,9 @@
         </div>
 
         <div class="md:col-span-2">
-            <div class="mb-4 flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                <select id="filterCategory" onchange="currentPage=1; renderTable()" class="border rounded-lg px-3 py-1 outline-none">
+            <div class="mb-4 flex flex-col sm:flex-row items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-slate-100 gap-4">
+                <input type="text" id="searchInput" oninput="currentPage=1; renderTable()" placeholder="Search by Name or Item #..." class="w-full sm:flex-1 border rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-blue-500">
+                <select id="filterCategory" onchange="currentPage=1; renderTable()" class="w-full sm:w-auto border rounded-lg px-3 py-1.5 outline-none">
                     <option value="all">All Categories</option>
                     <option value="hot-sales">Hot Sales</option>
                     <option value="videos">Videos</option>
@@ -126,7 +128,7 @@
                     rd.readAsDataURL(file);
                 });
                 uploadedFiles.push({
-                    name: file.name,
+                    name: file.name || `pasted-image-${Date.now()}.png`,
                     data: base64,
                     isExisting: false,
                     previewUrl: URL.createObjectURL(file)
@@ -138,6 +140,13 @@
         fileInput.onchange = () => handleFiles(fileInput.files);
         dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('bg-blue-50'); };
         dropZone.ondrop = (e) => { e.preventDefault(); handleFiles(e.dataTransfer.files); };
+
+        // 直接粘贴上传功能
+        document.addEventListener('paste', (e) => {
+            if (e.clipboardData && e.clipboardData.files && e.clipboardData.files.length > 0) {
+                handleFiles(e.clipboardData.files);
+            }
+        });
 
         function renderThumbs() {
             const container = document.getElementById('thumbContainer');
@@ -170,18 +179,38 @@
 
         function renderTable() {
             const filter = document.getElementById('filterCategory').value;
-            const filtered = filter === 'all' ? rawData : rawData.filter(p => p.category === filter);
+            const searchQ = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = filter === 'all' ? rawData : rawData.filter(p => p.category === filter);
+            
+            if (searchQ) {
+                filtered = filtered.filter(p => 
+                    p.name && p.name.toLowerCase().includes(searchQ)
+                );
+            }
+
             const totalPages = Math.ceil(filtered.length / pageSize) || 1;
             
             currentPageItems = filtered.slice((currentPage-1)*pageSize, currentPage*pageSize);
 
             document.getElementById('list').innerHTML = currentPageItems.map((p, index) => {
                 const firstImg = p.file_path ? p.file_path.split(',')[0].trim() : '';
+                
+                // 从数据库 name 字段解构出编号和真实名称
+                let item_no = '';
+                let display_name = p.name || '';
+                if (display_name.startsWith('[#') && display_name.includes('] ')) {
+                    const idx = display_name.indexOf('] ');
+                    item_no = display_name.substring(2, idx);
+                    display_name = display_name.substring(idx + 2);
+                }
+
+                const itemNoDisplay = item_no ? `<span class="text-xs text-gray-500">[${item_no}]</span> ` : '';
                 return `
                 <tr class="hover:bg-slate-50/50">
                     <td class="p-4 flex items-center gap-3">
                         <img src="${firstImg}" class="w-10 h-10 rounded object-cover bg-gray-100" onerror="this.src='https://placehold.co/40x40?text=Img'">
-                        <span class="font-medium">${p.name} ${p.file_path && p.file_path.includes(',') ? '<span class="text-blue-500 text-[10px]">(Multi)</span>' : ''}</span>
+                        <span class="font-medium">${itemNoDisplay}${display_name} ${p.file_path && p.file_path.includes(',') ? '<span class="text-blue-500 text-[10px]">(Multi)</span>' : ''}</span>
                     </td>
                     <td class="p-4 text-right">
                         <button onclick="editByIndex(${index})" class="text-blue-600 font-bold mr-3">Edit</button>
@@ -203,7 +232,11 @@
         async function delByIndex(index) {
             const p = currentPageItems[index];
             if (!p) return;
-            if (confirm(`Delete "${p.name}"?`)) {
+            let display_name = p.name || '';
+            if (display_name.startsWith('[#') && display_name.includes('] ')) {
+                display_name = display_name.substring(display_name.indexOf('] ') + 2);
+            }
+            if (confirm(`Delete "${display_name}"?`)) {
                 await fetch(`${API_BASE}/products`, { method: 'DELETE', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({id: p.id}) });
                 load();
             }
@@ -216,7 +249,18 @@
             resetForm();
             document.getElementById('formTitle').innerText = "Edit Product";
             document.getElementById('editId').value = p.id;
-            document.getElementById('name').value = p.name;
+            
+            // 编辑时从 name 字段完美解析拆分出编号和商品标题并回填入输入框
+            let item_no = '';
+            let display_name = p.name || '';
+            if (display_name.startsWith('[#') && display_name.includes('] ')) {
+                const idx = display_name.indexOf('] ');
+                item_no = display_name.substring(2, idx);
+                display_name = display_name.substring(idx + 2);
+            }
+
+            document.getElementById('item_no').value = item_no;
+            document.getElementById('name').value = display_name;
             document.getElementById('material').value = p.material || '';
             document.getElementById('moq').value = p.moq || '';
             document.getElementById('category').value = p.category;
@@ -270,9 +314,14 @@
                     }
                 });
 
+                // 将 Item # 和 标题 合并打包存入必填的 name 字段中发给服务器
+                const itemNoValue = document.getElementById('item_no').value.trim();
+                const rawNameValue = document.getElementById('name').value.trim();
+                const combinedName = itemNoValue ? `[#${itemNoValue}] ${rawNameValue}` : rawNameValue;
+
                 const payload = {
                     id: document.getElementById('editId').value || "",
-                    name: document.getElementById('name').value,
+                    name: combinedName,
                     material: document.getElementById('material').value,
                     moq: document.getElementById('moq').value,
                     category: document.getElementById('category').value,
