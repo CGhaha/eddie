@@ -65,6 +65,7 @@
                 <span>Live</span>
             </button>
             <button onclick="showPage('order')" class="hover:text-blue-400 font-medium transition">Order Tracking</button>
+            <button onclick="showPage('about')" class="hover:text-blue-400 font-medium transition">About</button>
 
         </div>
     </nav>
@@ -82,7 +83,6 @@
             </div>
         </div>
         
-        <!-- 新增的服务时间信息 -->
         <div class="py-8 bg-white">
             <div class="max-w-4xl mx-auto text-center px-6">
                 <h2 class="text-2xl font-bold text-gray-600 mb-4">Available 24/7/365</h2>
@@ -223,6 +223,69 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="about" class="page">
+                    <div class="flex justify-between items-center mb-8 border-b pb-4">
+                        <h2 class="text-3xl font-bold">About Us</h2>
+                    </div>
+
+                    <div class="space-y-12">
+                        <section class="bg-white rounded-2xl shadow-md p-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6">Our Company</h3>
+                            <div class="flex flex-col md:flex-row gap-8 items-center">
+                                <div class="md:w-2/5">
+                                    <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVI-FqJVBT_aWcAAGCoYGG47NSLK39my8AAuMpAAKpPClVb8Zuz_ncHUE7BA.png" alt="BQACAgUAAyEGAASHRsPbAAEVI-FqJVBT_aWcAAGCoYGG47NSLK39my8AAuMpAAKpPClVb8Zuz_ncHUE7BA.png" class="w-full h-auto rounded-xl shadow-md">
+                                </div>
+                                <div class="md:w-3/5">
+                                    <p class="text-gray-600 text-lg leading-relaxed mb-4">
+                                        Since 2011, we've been specializing in promotional gifts. With over 300 sourcing professionals, we're one of the world's leading promotional gift companies.
+                                    </p>
+                                    <p class="text-gray-600 text-lg leading-relaxed mb-4">
+                                        We can produce 70-80% of the products on the market and provide support through our offices and warehouses in the United States to ensure 100% customer satisfaction.
+                                    </p>
+                                    <p class="text-gray-600 text-lg leading-relaxed">
+                                        We work with leading promotional product distributors, including HALO, 4imprint, Proforma, AIA, and ePromos, among over 100 others.
+                                    </p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="bg-white rounded-2xl shadow-md p-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-8 text-center">Our Core Advantages</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                <div class="text-center p-6 bg-blue-50 rounded-xl">
+                                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mb-2">Quality Assurance</h4>
+                                    <p class="text-gray-600">SAGE A+ certification ensures the highest standards in every product we deliver.</p>
+                                </div>
+                                
+                                <div class="text-center p-6 bg-green-50 rounded-xl">
+                                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mb-2">Fast Response</h4>
+                                    <p class="text-gray-600">Guaranteed response within 24 hours, with rapid turnarounds in just 2 hours.</p>
+                                </div>
+                                
+                                <div class="text-center p-6 bg-purple-50 rounded-xl">
+                                    <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-xl font-bold text-gray-800 mb-2">Custom Solutions</h4>
+                                    <p class="text-gray-600">Professional custom solutions tailored specifically for US distributors.</p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -270,7 +333,7 @@
         let currentMediaTypes = []; 
         let ignoreHashChange = false; 
 
-        const pageStates = { 'hot-sales': 1, 'videos': 1, '3d-view': 1, 'live': 1, 'order': 1 };
+        const pageStates = { 'hot-sales': 1, 'videos': 1, '3d-view': 1, 'live': 1, 'order': 1, 'about': 1 };
 
         const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Tool", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
 
@@ -308,7 +371,7 @@
 
             const fullHash = window.location.hash.replace('#', '');
             const [pageId, productId] = fullHash.split('!');
-            if (pageId && ['home', 'hot-sales', 'videos', '3d-view', 'live', 'order'].includes(pageId)) showPage(pageId);
+            if (pageId && ['home', 'hot-sales', 'videos', '3d-view', 'live', 'order', 'about'].includes(pageId)) showPage(pageId);
             else renderAll();
             if (productId) {
                 const p = allProducts.find(x => x.id == productId);
@@ -347,7 +410,7 @@
                 window.location.hash = id;
             }
             document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
-            document.getElementById('category-sidebar').style.display = (id === 'home' || id === 'live' || id === 'order') ? 'none' : 'block';
+            document.getElementById('category-sidebar').style.display = (id === 'home' || id === 'live' || id === 'order' || id === 'about') ? 'none' : 'block';
             if(pageStates[id]) pageStates[id] = 1;
             renderAll();
         }
@@ -366,7 +429,7 @@
         }
 
         function renderAll() {
-            if(currentPage === 'home' || currentPage === 'live' || currentPage === 'order') return;
+            if(currentPage === 'home' || currentPage === 'live' || currentPage === 'order' || currentPage === 'about') return;
             let items = allProducts.filter(p => 
                 (currentPage === 'hot-sales' && p.category === 'hot-sales') ||
                 (currentPage === 'videos' && p.category === 'videos') ||
@@ -478,6 +541,10 @@
             if (!grid) return;
             grid.innerHTML = items.map(p => {
                 const paths = p.file_path ? p.file_path.split(',').map(x=>x.trim()).filter(x=>x!=='') : [];
+                
+                // 格式化产品名称：将 [] 内容转为小字
+                let formattedName = p.name.replace(/\[(.*?)\]/g, '<span class="text-[10px] opacity-60">$1</span>');
+                
                 if (type === 'img') {
                     const imgOnly = paths.filter(path => !path.toLowerCase().endsWith('.glb'));
                     const firstImg = imgOnly[0] || paths[0] || '';
@@ -485,7 +552,7 @@
                         <div class="aspect-square mb-3 overflow-hidden flex items-center justify-center">
                             <img src="${fixUrl(firstImg)}" class="w-full h-full object-contain group-hover:scale-105 transition" loading="lazy" decoding="async" onload="this.classList.add('loaded')">
                         </div>
-                        <h3 class="font-bold text-gray-900 truncate text-sm">${p.name}</h3>
+                        <h3 class="font-bold text-gray-900 truncate text-sm">${formattedName}</h3>
                         <p class="text-xs text-gray-400 mt-1">MOQ: ${p.moq || 'N/A'}</p>
                     </div>`;
                 } else if (type === 'video') {
@@ -496,14 +563,14 @@
                             <img src="${thumb}" class="w-full h-full object-cover opacity-70 group-hover:scale-105 transition duration-500" loading="lazy" decoding="async" onload="this.classList.add('loaded')">
                             <div class="absolute inset-0 flex items-center justify-center"><div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl">▶</div></div>
                         </div>
-                        <div class="p-3 bg-slate-900 text-white text-xs font-bold truncate">${p.name}</div>
+                        <div class="p-3 bg-slate-900 text-white text-xs font-bold truncate">${formattedName}</div>
                     </div>`;
                 } else if (type === '3d') {
                     const glbPath = paths.find(path => path.toLowerCase().endsWith('.glb')) || paths[0] || '';
                     return `<div class="bg-white border border-gray-100 rounded-xl overflow-hidden model-card shadow-sm">
                         <model-viewer src="${fixUrl(glbPath)}" auto-rotate camera-controls loading="lazy" decoding="async"></model-viewer>
                         <div class="p-3 text-center border-t">
-                            <h3 class="font-bold text-xs mb-2 truncate">${p.name}</h3>
+                            <h3 class="font-bold text-xs mb-2 truncate">${formattedName}</h3>
                             <button onclick="openModal('3d', ${p.id})" class="w-full py-2 text-[10px] font-black bg-blue-600 text-white rounded-lg uppercase">View 3D</button>
                         </div>
                     </div>`;
@@ -955,6 +1022,3 @@ const shipMap = { "快递": "Express", "空派": "Via Air", "海派": "Via Boat"
     </script>
 </body>
 </html>
-
-
-
