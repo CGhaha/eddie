@@ -982,7 +982,7 @@ const shipMap = { "快递": "Express", "空派": "Via Air", "海派": "Via Boat"
                                     <span class="text-[11px] mt-1 text-center font-bold px-1 ${isActive ? 'text-emerald-700' : (isPassed ? 'text-gray-900' : 'text-gray-400')} leading-tight max-w-[80px]">
                                         ${s}
                                     </span>
-                                    ${tracking && i === 6 && order.cargo !== "样品" ? `<div class="text-[9px] text-blue-600 font-bold mt-1 text-center leading-tight bg-blue-50 px-2 py-1 rounded whitespace-nowrap">${carrier.toUpperCase()}: ${tracking}</div>` : ''}
+                                    ${tracking && ((order.cargo !== "样品" && i === 6) || (order.cargo === "样品" && i === 4)) ? `<div class="text-[9px] text-blue-600 font-bold mt-1 text-center leading-tight bg-blue-50 px-2 py-1 rounded whitespace-nowrap">${carrier.toUpperCase()}: ${tracking}</div>` : ''}
                                 </div>
                                 ${i < steps.length - 1 ? `<div class="flex-grow flex items-center justify-center -mt-8 px-1"><svg class="w-5 h-5 ${i < order.step ? 'text-gray-900' : 'text-gray-200'}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg></div>` : ''}
                             </div>
