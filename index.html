@@ -24,28 +24,20 @@
         img.loaded { opacity: 1; }
         
         .step-icon {
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            font-size: 12px;
+            font-size: 14px;
             color: white;
+            margin: 0 auto;
         }
-        .step-icon.passed {
-            background-color: #1f2937;
-        }
-        .step-icon.current {
-            background-color: #10b981;
-        }
-        .step-icon.pending {
-            background-color: #9ca3af;
-        }
-        .step-icon.current .checkmark {
-            display: none;
-        }
-        /* 缩略图样式 */
+        .step-icon.passed { background-color: #1f2937; }
+        .step-icon.current { background-color: #10b981; }
+        .step-icon.pending { background-color: #9ca3af; }
+        
         .thumb-item { border: 2px solid transparent; transition: all 0.2s; }
         .thumb-item.active { border-color: #2563eb; }
     </style>
@@ -136,7 +128,7 @@
                         <h2 class="text-3xl font-bold">Order Tracking</h2>
                     </div>
 
-                    <div class="w-full max-w-[1300px] mx-auto bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+                    <div class="w-full bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
                         <div class="flex gap-3 mb-6">
                             <input type="text" id="pi-input" placeholder="Enter PI Code..." class="flex-1 px-5 py-3.5 border border-gray-200 rounded-xl outline-none text-lg">
                             <button onclick="trackOrder()" id="track-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-xl font-bold transition">Track</button>
@@ -163,12 +155,11 @@
                                 </div>
                             </div>
 
-                            <div class="flex flex-col lg:flex-row gap-8 items-stretch">
-                                <div id="timeline" class="flex justify-between items-start pt-4 pb-4 overflow-x-auto flex-1"></div>
-                                <div id="order-img-box" class="w-full lg:w-[320px] xl:w-[380px] shrink-0 flex-col items-center justify-center border border-gray-100 rounded-2xl p-4 bg-gray-50 shadow-sm self-start" style="display: none;">
-                                    <p class="text-xs text-gray-400 mb-3 font-bold uppercase tracking-wider text-center">Product Image</p>
-                                    <img id="order-img-display" src="" class="w-full h-auto object-contain rounded-lg max-h-[240px]">
-                                </div>
+                            <div id="timeline" class="flex items-center justify-between py-6 overflow-x-auto gap-4"></div>
+
+                            <div id="order-img-box" class="w-full border border-gray-100 rounded-2xl p-4 bg-gray-50 shadow-sm" style="display: none;">
+                                <p class="text-xs text-gray-400 mb-3 font-bold uppercase tracking-wider text-center">Product Image</p>
+                                <img id="order-img-display" src="" class="mx-auto h-48 cursor-pointer hover:opacity-80 transition" onclick="showBigImage(this.src)">
                             </div>
                         </div>
                         <div id="error" class="hidden mt-8 p-4 bg-red-50 text-red-700 border-l-4 border-red-400 rounded-lg font-medium"></div>
@@ -223,6 +214,10 @@
         </div>
     </div>
 
+    <div id="big-img-modal" onclick="this.classList.add('hidden')" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center p-4">
+        <img id="big-img-display" class="max-w-[45%] max-h-[90vh] object-contain" src="">
+    </div>
+
     <div id="media-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] hidden flex items-center justify-center p-2 md:p-6">
         <button onclick="closeModal()" class="absolute top-4 right-4 z-[70] text-white text-3xl md:text-5xl hover:text-gray-300 transition">&times;</button>
         
@@ -275,6 +270,12 @@
         function fixUrl(path) {
             if (!path) return '';
             return path.startsWith('http') ? path : `https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/${path.replace(/^\//, '')}`;
+        }
+
+        function showBigImage(src) {
+            const modal = document.getElementById('big-img-modal');
+            document.getElementById('big-img-display').src = src;
+            modal.classList.remove('hidden');
         }
 
         async function init() {
@@ -574,11 +575,31 @@
                 document.getElementById('res-ship').innerText = shipMap[order.ship] || order.ship || "N/A";
                 document.getElementById('res-date').innerText = order.deadline || "N/A";
                 document.getElementById('res-dest').innerText = order.stateCode || "N/A";
+                
                 document.getElementById('timeline').innerHTML = steps.map((s, i) => {
                     const t = parseStepData(order.times && order.times[i] ? order.times[i] : "");
-                    return `<div class="flex items-center flex-1"><div class="flex flex-col items-center gap-1 w-full"><span class="text-[10px] text-gray-400 font-bold">${t.date}</span><div class="step-icon ${i < order.step ? 'passed' : (i === order.step ? 'current' : 'pending')}">${i <= order.step ? '✓' : '•'}</div><span class="text-[11px] text-center font-bold">${s}</span></div></div>`;
+                    const isPassed = i < order.step;
+                    const isCurrent = i === order.step;
+                    const iconClass = isPassed ? 'passed' : (isCurrent ? 'current' : 'pending');
+                    const iconContent = isPassed ? '✓' : (isCurrent ? '●' : '•');
+                    
+                    let dateDisplay = t.date || '';
+                    if (i >= order.step) {
+                        dateDisplay = '<span class="text-[9px] text-gray-400 uppercase italic">Coming up soon...</span>';
+                    }
+                    
+                    // 箭头逻辑：当前步骤索引之后，且不为最后一个步骤时添加箭头
+                    const arrow = (i < steps.length - 1) ? 
+                        `<div class="flex-1 flex items-center justify-center -mt-8"><div class="w-full h-[2px] bg-gray-200"></div></div>` : '';
+                    
+                    return `<div class="flex flex-col items-center gap-1 flex-1 relative">
+                        <span class="text-[10px] text-gray-400 font-bold h-4 flex items-center justify-center">${dateDisplay}</span>
+                        <div class="step-icon ${iconClass}">${iconContent}</div>
+                        <span class="text-[11px] font-bold text-center mt-1">${s}</span>
+                    </div>` + arrow;
                 }).join('');
-                if (order.imgData) { document.getElementById('order-img-display').src = order.imgData; document.getElementById('order-img-box').style.display = 'flex'; }
+                
+                if (order.imgData) { document.getElementById('order-img-display').src = order.imgData; document.getElementById('order-img-box').style.display = 'block'; }
                 document.getElementById('result').classList.remove('hidden'); document.getElementById('tracking-hint').style.display = 'none';
             } catch (e) { document.getElementById('error').innerText = e.message; document.getElementById('error').classList.remove('hidden'); }
             finally { btn.disabled = false; btn.innerText = "Track"; }
