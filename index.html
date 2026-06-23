@@ -136,9 +136,14 @@
                     </div>
 
                     <div class="w-full max-w-[1300px] mx-auto bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
-                        <div class="flex gap-3 mb-10">
+                        <div class="flex gap-3 mb-6">
                             <input type="text" id="pi-input" placeholder="Enter PI Code..." class="flex-1 px-5 py-3.5 border border-gray-200 rounded-xl outline-none text-lg">
                             <button onclick="trackOrder()" id="track-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-xl font-bold transition">Track</button>
+                        </div>
+
+                        <div id="tracking-hint" class="text-blue-900 font-medium text-[15px] mb-8 leading-relaxed">
+                            1. Find the PI# on the PROFORMA INVOICE provided by the sales representative.<br>
+                            2. Enter the PI# (for example: PIMFEF260611) and click the "Track" button to view the latest real-time status of your order.
                         </div>
 
                         <div id="result" class="hidden space-y-10">
@@ -895,6 +900,9 @@ const shipMap = { "快递": "Express", "空派": "Via Air", "海派": "Via Boat"
                     btn.disabled = true;
                     btn.innerText = "Loading...";
                 }
+
+                const trackingHint = document.getElementById('tracking-hint');
+                if (trackingHint) trackingHint.style.display = 'none';
 
                 const errDiv = document.getElementById('error');
                 const resDiv = document.getElementById('result');
