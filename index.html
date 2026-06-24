@@ -23,6 +23,23 @@
         img[loading="lazy"] { opacity: 0; }
         img.loaded { opacity: 1; }
         
+        /* 强制 Hot Sales 弹出窗口图片填充满显示 */
+        #modal-media-container img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            object-position: center !important;
+            display: block !important;
+        }
+        #modal-media-container {
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
         .step-icon {
             width: 32px;
             height: 32px;
@@ -375,10 +392,6 @@
             currentTag = tag;
             document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.toggle('active', btn.innerText === tag || (tag === 'All' && btn.innerText === 'All Items')));
             if(pageStates[currentPage]) pageStates[currentPage] = 1;
-            
-            const sidebarParent = document.getElementById('category-sidebar');
-            if(window.innerWidth < 768 && sidebarParent.style.display === 'block') {
-            }
             renderAll();
         }
 
