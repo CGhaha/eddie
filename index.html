@@ -470,7 +470,7 @@
         function renderGrid(containerId, items, type) {
             const grid = document.getElementById(containerId);
             if (!grid) return;
-            const hotSalesOrder = type === 'img' ? allProducts.filter(x => x.category === 'hot-sales').map(x => String(x.id)) : [];
+            const hotSalesOrder = type === 'img' ? allProducts.filter(x => x.category === 'hot-sales').map(x => String(x.id || '')) : [];
             grid.innerHTML = items.map(p => {
                 const paths = p.file_path ? p.file_path.split(',').map(x=>x.trim()).filter(x=>x!=='') : [];
                 let formattedName = p.name.replace(/\[(.*?)\]/g, '<span class="text-[10px] opacity-60">$1</span>');
@@ -486,32 +486,46 @@
                         isNew = (new Date() - parsedDate) / (1000 * 60 * 60 * 24) <= 7;
                     }
                 }
-                const newBadgeHtml = isNew ? `<div class="absolute top-2 right-2 bg-green-500 text-white text-[9px] font-extrabold w-7 h-7 rounded-full flex items-center justify-center shadow-sm z-30 select-none uppercase tracking-tighter">New</div>` : '';
+                const newBadgeHtml = isNew ? `<div class="absolute top-2 right-2 bg-gradient-to-r from-green-500 to-emerald-400 text-white text-[10px] font-black px-2 py-1 rounded shadow-md z-40 select-none uppercase tracking-wider">NEW</div>` : '';
 
                 if (type === 'img') {
                     const imgOnly = paths.filter(path => !path.toLowerCase().endsWith('.glb'));
                     const firstImg = imgOnly[0] || paths[0] || '';
-                    const rankIndex = hotSalesOrder.indexOf(String(p.id));
-                    const rank = rankIndex !== -1 ? rankIndex + 1 : 999;
-                    const badgeHtml = (rank <= 10) ? `<div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm z-30">Top ${rank}</div>` : '';
+                    const rankIndex = hotSalesOrder.indexOf(String(p.id || ''));
+                    let badgeHtml = '';
+                    
+                    if (rankIndex !== -1) {
+                        const rank = rankIndex + 1;
+                        if (rank <= 10) {
+                            badgeHtml = `<div class="absolute top-2 left-2 bg-gradient-to-r from-red-600 to-red-500 text-white text-[10px] font-black px-2 py-1 rounded shadow-md z-40">TOP ${rank}</div>`;
+                        } else {
+                            badgeHtml = `<div class="absolute top-2 left-2 bg-gradient-to-r from-orange-500 to-amber-500 text-white text-[10px] font-black px-2 py-1 rounded shadow-md z-40">HOT</div>`;
+                        }
+                    }
+                    
                     return `<div class="bg-white rounded-xl shadow-sm border border-gray-100 hover:border-blue-500 hover:shadow-lg transition-all duration-300 cursor-pointer group flex flex-col h-full overflow-hidden relative" onclick="openModal('img', ${p.id})">
-                        <div class="aspect-square bg-white relative p-4 flex items-center justify-center overflow-hidden"><img src="${fixUrl(firstImg)}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" loading="lazy" decoding="async" onload="this.classList.add('loaded')"></div>
-                        ${badgeHtml}
-                        ${newBadgeHtml}
+                        <div class="aspect-square bg-white relative p-4 flex items-center justify-center overflow-hidden">
+                            ${badgeHtml}
+                            ${newBadgeHtml}
+                            <img src="${fixUrl(firstImg)}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" loading="lazy" decoding="async" onload="this.classList.add('loaded')">
+                        </div>
                         <div class="p-4 flex-1 flex flex-col border-t border-gray-50 bg-gray-50/50"><h3 class="font-bold text-gray-800 text-sm mb-3 line-clamp-2 leading-relaxed group-hover:text-blue-700 transition-colors">${formattedName}</h3></div>
                     </div>`;
                 } else if (type === 'video') {
                     const vid = getYTId(p.yt_url);
                     const thumb = vid ? `https://i3.ytimg.com/vi/${vid}/hqdefault.jpg` : 'https://placehold.co/600x400?text=No+Video';
                     return `<div class="group relative cursor-pointer overflow-hidden rounded-xl bg-black" onclick="openModal('video', ${p.id})">
-                        <div class="aspect-video relative"><img src="${thumb}" class="w-full h-full object-cover opacity-70 group-hover:scale-105 transition duration-500" loading="lazy" decoding="async" onload="this.classList.add('loaded')"><div class="absolute inset-0 flex items-center justify-center"><div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl">▶</div></div></div>
-                        ${newBadgeHtml}
+                        <div class="aspect-video relative">
+                            ${newBadgeHtml}
+                            <img src="${thumb}" class="w-full h-full object-cover opacity-70 group-hover:scale-105 transition duration-500" loading="lazy" decoding="async" onload="this.classList.add('loaded')">
+                            <div class="absolute inset-0 flex items-center justify-center"><div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl">▶</div></div>
+                        </div>
                         <div class="p-3 bg-slate-900 text-white text-xs font-bold truncate">${formattedName}</div></div>`;
                 } else if (type === '3d') {
                     const glbPath = paths.find(path => path.toLowerCase().endsWith('.glb')) || paths[0] || '';
                     return `<div class="bg-white border border-gray-100 rounded-xl overflow-hidden model-card shadow-sm relative">
-                        <model-viewer src="${fixUrl(glbPath)}" auto-rotate camera-controls loading="lazy" decoding="async"></model-viewer>
                         ${newBadgeHtml}
+                        <model-viewer src="${fixUrl(glbPath)}" auto-rotate camera-controls loading="lazy" decoding="async"></model-viewer>
                         <div class="p-3 text-center border-t"><h3 class="font-bold text-xs mb-2 truncate">${formattedName}</h3><button onclick="openModal('3d', ${p.id})" class="w-full py-2 text-[10px] font-black bg-blue-600 text-white rounded-lg uppercase">View 3D</button></div></div>`;
                 }
             }).join('');
