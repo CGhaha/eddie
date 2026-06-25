@@ -2,49 +2,7 @@ name = "www"
 compatibility_date = "2026-05-22"
 
 [assets]
-directory = "./public"
+directory = "."
 
 [observability]
 enabled = true
-
-
-
-
-.git/
-
-
-# ==========================================
-# Version Control (版本控制核心 - 必须忽略)
-# ==========================================
-.git/
-.github/
-.gitignore
-
-# ==========================================
-# Wrangler & Cloudflare (配置与本地缓存)
-# ==========================================
-wrangler.toml
-.wrangler/
-.wranglerignore
-
-# ==========================================
-# Dependencies (环境与依赖包 - 严禁上传)
-# ==========================================
-node_modules/
-.npm/
-
-# ==========================================
-# Package Manager Files (包管理文件)
-# ==========================================
-package.json
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
-bun.lockb
-
-# ==========================================
-# OS Metadata (系统生成的临时垃圾文件)
-# ==========================================
-.DS_Store
-Thumbs.db
-Desktop.ini
