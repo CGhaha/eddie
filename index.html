@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MF TEAM | SAGE A+ Supplier</title>
+    <link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/assets/web0101.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <style>
+        .page { display: none; }
+        .page.active { display: block; }
+        .model-card model-viewer {
+            width: 100%;
+            height: 180px;
+            --poster-color: transparent;
+            background-color: #f8fafc;
+        }
+        ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
+        .sidebar-item.active { background-color: #2563eb; color: white; }
+        #modal-content { max-height: 95vh; }
+        img { transition: opacity 0.3s; }
+        img[loading="lazy"] { opacity: 0; }
+        img.loaded { opacity: 1; }
+        
+        .step-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 14px;
+            color: white;
+            margin: 0 auto;
+        }
+        .step-icon.passed { background-color: #1f2937; }
+        .step-icon.current { background-color: #10b981; }
+        .step-icon.pending { background-color: #9ca3af; }
+        
+        .thumb-item { border: 2px solid transparent; transition: all 0.2s; }
+        .thumb-item.active { border-color: #2563eb; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 antialiased overflow-x-hidden">
+
+    <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-lg relative h-[72px] flex items-center justify-center">
+        <div class="absolute left-4 md:left-10 flex items-center h-full top-0 cursor-pointer z-50" onclick="showPage('home')">
+            <img id="nav-logo" src="https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/assets/web002.png" alt="Logo" class="h-11 md:h-14 w-auto object-contain transition-opacity duration-300">
+        </div>
+        
+        <button onclick="toggleMobileMenu()" class="absolute right-4 top-0 h-full flex items-center md:hidden z-50 text-white p-2">
+            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+
+        <div id="mobile-menu-backdrop" onclick="toggleMobileMenu(false)" class="fixed inset-0 bg-black/60 z-[40] hidden md:hidden transition-opacity"></div>
+        
+        <div id="nav-links" class="fixed inset-y-0 left-0 bg-slate-900 w-64 transform -translate-x-full transition-transform duration-300 ease-in-out z-[45] flex flex-col pt-24 px-8 gap-6 shadow-2xl md:static md:w-auto md:bg-transparent md:transform-none md:flex-row md:pt-0 md:px-0 md:gap-8 overflow-y-auto md:overflow-visible">
+            <button onclick="showPage('home'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium transition text-lg md:text-base">Home</button>
+            <button onclick="showPage('hot-sales'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium transition text-lg md:text-base">Hot Sales</button>
+            <button onclick="showPage('videos'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium transition text-lg md:text-base">Videos</button>
+            <button onclick="showPage('3d-view'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium transition text-lg md:text-base">3D Showroom</button>
+            <button onclick="showPage('live'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium transition flex items-center gap-2 md:gap-1.5 text-lg md:text-base">
+                <span class="w-2.5 h-2.5 bg-red-600 rounded-full inline-block"></span>
+                <span>Live</span>
+            </button>
+            <button onclick="showPage('order'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium transition text-lg md:text-base">Order Tracking</button>
+            <button onclick="showPage('about'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium transition text-lg md:text-base">About</button>
+        </div>
+    </nav>
+
+    <div id="home" class="page active">
+        <div class="h-[60vh] flex flex-col justify-center items-center bg-gradient-to-br from-indigo-900 via-blue-800 to-blue-600 text-white text-center px-4">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 italic tracking-tight">MF TEAM</h1>
+            <p class="text-lg md:text-xl opacity-90 max-w-2xl">Premium SAGE A+ Supplier. Professional Custom Solutions for US Distributors.</p>
+            <div class="mt-8 flex flex-wrap justify-center gap-4">
+                <button onclick="showPage('hot-sales')" class="bg-white text-blue-900 px-8 py-3 rounded-full font-bold hover:bg-blue-50 transition shadow-lg">View Our Catalog</button>
+                <button onclick="showPage('live')" class="bg-red-600 text-white px-8 py-3 rounded-full font-bold hover:bg-red-700 transition shadow-lg flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 bg-white rounded-full inline-block animate-pulse"></span>
+                    <span>Watch Live</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="py-8 bg-white">
+            <div class="max-w-4xl mx-auto text-center px-6">
+                <h2 class="text-2xl font-bold text-gray-600 mb-4">Available 24/7/365</h2>
+                <p class="text-gray-500 text-lg">We guarantee a response to all inquiries within 24 hours, with rapid turnarounds in just 2 hours.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-content" class="max-w-[1920px] mx-auto py-12 px-4 md:px-10">
+        <div class="flex flex-col md:flex-row gap-8">
+            <aside id="category-sidebar" class="w-full md:w-64 flex-shrink-0 hidden">
+                <div class="sticky top-24">
+                    <h3 class="font-bold text-slate-900 mb-4 pb-2 border-b uppercase text-xs tracking-widest">Categories</h3>
+                    <div id="tag-list" class="flex flex-wrap md:flex-col gap-1">
+                        <button onclick="filterByTag('All')" class="sidebar-item active px-3 py-2 rounded-lg text-left text-sm font-medium hover:bg-gray-100 transition">All Items</button>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="flex-1 min-w-0">
+                <div id="hot-sales" class="page">
+                    <div class="flex justify-between items-center mb-8 border-b pb-4">
+                        <h2 class="text-3xl font-bold">Hot Sales</h2>
+                        <input type="text" oninput="searchItems(this.value)" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6" id="product-list"></div>
+                    <div id="hot-sales-pagination" class="mt-10 flex flex-wrap items-center justify-center gap-4 text-sm hidden"></div>
+                </div>
+                
+                <div id="videos" class="page">
+                    <div class="flex justify-between items-center mb-8 border-b pb-4">
+                        <h2 class="text-3xl font-bold">Videos</h2>
+                        <input type="text" oninput="searchItems(this.value)" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm">
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8" id="video-list"></div>
+                    <div id="videos-pagination" class="mt-10 flex flex-wrap items-center justify-center gap-4 text-sm hidden"></div>
+                </div>
+
+                <div id="3d-view" class="page">
+                    <div class="flex justify-between items-center mb-8 border-b pb-4">
+                        <h2 class="text-3xl font-bold">3D Showroom</h2>
+                        <input type="text" oninput="searchItems(this.value)" placeholder="Search..." class="px-4 py-2 border rounded-full text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6" id="3d-list"></div>
+                    <div id="3d-view-pagination" class="mt-10 flex flex-wrap items-center justify-center gap-4 text-sm hidden"></div>
+                </div>
+
+                <div id="order" class="page">
+                    <div class="flex justify-between items-center mb-8 border-b pb-4">
+                        <h2 class="text-3xl font-bold">Order Tracking</h2>
+                    </div>
+
+                    <div class="w-full bg-white p-5 md:p-8 rounded-3xl shadow-xl border border-gray-100">
+                        <div class="flex flex-col md:flex-row gap-3 mb-6">
+                            <input type="text" id="pi-input" placeholder="Enter PI Code..." class="flex-1 px-5 py-3.5 border border-gray-200 rounded-xl outline-none text-lg">
+                            <button onclick="trackOrder()" id="track-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-xl font-bold transition">Track</button>
+                        </div>
+
+                        <div id="tracking-hint" class="text-blue-900 font-medium text-[14px] md:text-[15px] mb-8 leading-relaxed">
+                            1. Find the PI# on the PROFORMA INVOICE provided by the sales representative.<br>
+                            2. Enter the PI# (for example: PIMFEF260611) and click the "Track" button to view the latest real-time status of your order.
+                        </div>
+
+                        <div id="result" class="hidden space-y-10 w-full overflow-hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                    <p class="text-xs text-gray-400 uppercase font-bold mb-1">Shipping Method</p>
+                                    <p id="res-ship" class="font-bold text-lg"></p>
+                                </div>
+                                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                    <p class="text-xs text-gray-400 uppercase font-bold mb-1">Estimated Delivery</p>
+                                    <p id="res-date" class="font-bold text-lg"></p>
+                                </div>
+                                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100">
+                                    <p class="text-xs text-gray-400 uppercase font-bold mb-1">Destination</p>
+                                    <p id="res-dest" class="font-bold text-lg"></p>
+                                </div>
+                            </div>
+
+                            <div class="w-full overflow-x-auto pb-4">
+                                <div id="timeline" class="flex items-start md:items-center py-6 gap-2 md:gap-4 min-w-max md:min-w-0 px-2 md:px-0"></div>
+                            </div>
+
+                            <div id="order-img-box" class="w-full border border-gray-100 rounded-2xl p-4 bg-gray-50 shadow-sm" style="display: none;">
+                                <p class="text-xs text-gray-400 mb-3 font-bold uppercase tracking-wider text-center">Product Image</p>
+                                <img id="order-img-display" src="" class="mx-auto h-48 cursor-pointer hover:opacity-80 transition" onclick="showBigImage(this.src)">
+                            </div>
+                        </div>
+                        <div id="error" class="hidden mt-8 p-4 bg-red-50 text-red-700 border-l-4 border-red-400 rounded-lg font-medium"></div>
+                    </div>
+                </div>
+
+                <div id="live" class="page">
+                    <div class="flex justify-between items-center mb-8 border-b pb-4">
+                        <h2 class="text-3xl font-bold">Live Stream</h2>
+                    </div>
+
+                    <div class="w-full flex flex-col justify-center items-center bg-[#1a1a1a] py-6 md:py-12 rounded-2xl relative min-h-[50vh] px-4">
+                        <div id="live-video-wrapper" class="w-full max-w-[1000px] aspect-video bg-black rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.5)] relative">
+                            <iframe src="https://vdo.ninja/?view=iphone&autoplay=1&muted=1&cleanviewer=1&transparent=1" allow="camera; microphone; autoplay; fullscreen; picture-in-picture; display-capture" allowfullscreen playsinline webkitallowfullscreen class="w-full h-full border-none"></iframe>
+                            <div class="absolute top-3 right-3 flex items-center gap-2 bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-lg text-white pointer-events-none select-none z-20 text-xs md:text-sm font-medium tracking-wide">
+                                <span class="flex h-2 w-2 relative">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                                </span>
+                                <span>LIVE</span>
+                                <span class="opacity-40">|</span>
+                                <span id="beijing-time">Loading...</span>
+                            </div>
+                            <button onclick="toggleLiveFullscreen()" class="absolute bottom-3 right-3 bg-black/60 hover:bg-blue-600 text-white w-10 h-10 rounded-lg flex items-center justify-center transition shadow-lg z-20 backdrop-blur-sm" title="Full Screen">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="about" class="page">
+                    <div class="flex justify-between items-center mb-8 border-b pb-4">
+                        <h2 class="text-3xl font-bold">About Us</h2>
+                    </div>
+                    <div class="space-y-12">
+                        <section class="bg-white rounded-2xl shadow-md p-6 md:p-8">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-6">Our Company</h3>
+                            <div class="flex flex-col md:flex-row gap-8 items-center">
+                                <div class="md:w-2/5">
+                                    <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEVI-FqJVBT_aWcAAGCoYGG47NSLK39my8AAuMpAAKpPClVb8Zuz_ncHUE7BA.png" alt="Company" class="w-full h-auto rounded-xl shadow-md">
+                                </div>
+                                <div class="md:w-3/5">
+                                    <p class="text-gray-600 text-base md:text-lg leading-relaxed mb-4">Since 2011, we've been specializing in promotional gifts. With over 300 sourcing professionals, we're one of the world's leading promotional gift companies.</p>
+                                    <p class="text-gray-600 text-base md:text-lg leading-relaxed mb-4">We can produce 70-80% of the products on the market and provide support through our offices and warehouses in the United States to ensure 100% customer satisfaction.</p>
+                                    <p class="text-gray-600 text-base md:text-lg leading-relaxed">We work with leading promotional product distributors, including HALO, 4imprint, Proforma, AIA, and ePromos, among over 100 others.</p>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="big-img-modal" onclick="this.classList.add('hidden')" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center p-4">
+        <img id="big-img-display" class="max-w-[95%] md:max-w-[45%] max-h-[90vh] object-contain" src="">
+    </div>
+
+    <div id="media-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] hidden flex items-center justify-center p-2 md:p-6">
+        
+        <div id="modal-content" class="w-full max-w-[85rem] h-[95vh] flex flex-col md:flex-row bg-white rounded-2xl overflow-hidden shadow-2xl relative">
+            
+            <button onclick="closeModal()" class="absolute top-2 right-2 md:top-4 md:right-4 z-[70] bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full w-9 h-9 md:w-12 md:h-12 flex items-center justify-center text-2xl md:text-4xl transition shadow-md">&times;</button>
+            
+            <div class="w-full md:w-1/2 p-4 md:p-12 bg-white flex flex-col justify-center items-center relative border-b md:border-b-0 md:border-r border-gray-100 h-1/2 md:h-auto flex-shrink-0">
+                <div id="modal-media-container" class="w-full h-full flex items-center justify-center overflow-hidden relative">
+                    <iframe id="youtube-frame" width="100%" height="100%" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen class="hidden"></iframe>
+                    <img id="modal-img" src="" class="w-full h-full object-contain hidden mix-blend-multiply">
+                    <div id="modal-3d-container" class="hidden w-full h-full relative bg-gray-50">
+                        <div id="viewer-holder" class="w-full h-full"></div>
+                        <button onclick="toggle3DFullscreen()" class="absolute bottom-4 right-4 bg-black/70 hover:bg-blue-600 text-white w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center transition shadow-lg z-30" title="Full Screen">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" /></svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="thumb-bar" class="mt-4 md:mt-6 flex gap-2 overflow-x-auto max-w-full hidden z-20 pb-2"></div>
+            </div>
+
+            <div class="w-full md:w-1/2 p-6 md:p-12 flex flex-col overflow-y-auto text-left bg-gray-50 h-1/2 md:h-auto">
+                <h2 id="modal-title" class="text-xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight pr-8"></h2>
+                
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-6 md:mb-8">
+                    <p id="modal-desc" class="text-gray-700 text-sm md:text-base font-medium leading-relaxed whitespace-pre-line"></p>
+                </div>
+                
+                <div class="flex-1">
+                    <h3 class="text-sm md:text-base font-black text-gray-900 uppercase tracking-widest mb-3 md:mb-4 border-b border-gray-200 pb-2 md:pb-3">Description</h3>
+                    <p id="modal-custom-desc" class="mt-2 text-sm md:text-base text-gray-600 whitespace-pre-wrap leading-relaxed hidden"></p>
+                </div>
+
+                <div class="mt-6 md:mt-10 flex flex-col xl:flex-row gap-3 md:gap-4 pt-6 border-t border-gray-200">
+                    <button id="inquiry-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition shadow-md text-sm md:text-base text-center">Inquiry</button>
+                    <button id="whatsapp-btn" class="flex-1 bg-green-500 hover:bg-green-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition shadow-md text-sm md:text-base text-center">WhatsApp</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = 'https://mamba-api.mfgift.workers.dev/api/products';
+        let allProducts = [], currentImgs = [], currentIndex = 0;
+        let currentTag = 'All', currentSearch = '', currentPage = 'home';
+        let currentMediaTypes = []; 
+        let ignoreHashChange = false; 
+
+        const pageStates = { 'hot-sales': 1, 'videos': 1, '3d-view': 1, 'live': 1, 'order': 1, 'about': 1 };
+        const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Tool", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
+
+        function fixUrl(path) {
+            if (!path) return '';
+            return path.startsWith('http') ? path : `https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/${path.replace(/^\//, '')}`;
+        }
+
+        function showBigImage(src) {
+            const modal = document.getElementById('big-img-modal');
+            document.getElementById('big-img-display').src = src;
+            modal.classList.remove('hidden');
+        }
+
+        function toggleMobileMenu(forceState) {
+            const nav = document.getElementById('nav-links');
+            const backdrop = document.getElementById('mobile-menu-backdrop');
+            const isOpen = !nav.classList.contains('-translate-x-full');
+            const newState = forceState !== undefined ? forceState : !isOpen;
+            
+            if (newState) {
+                nav.classList.remove('-translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                nav.classList.add('-translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        async function init() {
+            try {
+                const res = await fetch(API);
+                allProducts = await res.json();
+                allProducts.sort((a, b) => {
+                    const clicksA = parseInt(a.clicks) || 0;
+                    const clicksB = parseInt(b.clicks) || 0;
+                    if (clicksB !== clicksA) return clicksB - clicksA;
+                    return (parseInt(b.id) || 0) - (parseInt(a.id) || 0);
+                });
+                renderTags();
+                handleDeepLink();
+                setupButtons();
+                setupZoomFeature(); 
+                updateBeijingTime();
+                setInterval(updateBeijingTime, 1000);
+            } catch (e) { console.error(e); }
+        }
+
+        function handleDeepLink() {
+            if (ignoreHashChange) {
+                ignoreHashChange = false;
+                return;
+            }
+            const fullHash = window.location.hash.replace('#', '');
+            const [pageId, productId] = fullHash.split('!');
+            if (pageId && ['home', 'hot-sales', 'videos', '3d-view', 'live', 'order', 'about'].includes(pageId)) showPage(pageId);
+            else renderAll();
+            if (productId) {
+                const p = allProducts.find(x => x.id == productId);
+                if (p) openModal(p.category === 'videos' ? 'video' : (p.category === 'showroom-3d' ? '3d' : 'img'), p.id, true);
+            }
+        }
+
+        window.addEventListener('hashchange', handleDeepLink);
+
+        function setupButtons() {
+            document.getElementById('inquiry-btn').onclick = () => {
+                const title = document.getElementById('modal-title').innerText;
+                const subject = encodeURIComponent(`Quote for ${title}`);
+                const body = encodeURIComponent(`Hi All, I'm very interested in the ${title} product on your website. Can you please provide more information about it?`);
+                window.location.href = `mailto:katfang@foxmail.com?subject=${subject}&body=${body}`;
+            };
+            document.getElementById('whatsapp-btn').onclick = () => {
+                const title = document.getElementById('modal-title').innerText;
+                const text = encodeURIComponent(`Hi All, I'm very interested in the ${title} product on your website. Can you please provide more information about it?`);
+                window.open(`https://wa.me/8613323604265?text=${text}`, '_blank');
+            };
+        }
+
+        function renderTags() {
+            const tagContainer = document.getElementById('tag-list');
+            if(!tagContainer) return;
+            tagContainer.innerHTML = `<button onclick="filterByTag('All')" class="sidebar-item active px-3 py-2 rounded-lg text-left text-sm font-medium hover:bg-gray-100 transition">All Items</button>` + 
+                CATEGORIES.map(cat => `<button onclick="filterByTag('${cat}')" class="sidebar-item px-3 py-2 rounded-lg text-left text-sm font-medium hover:bg-gray-100 transition">${cat}</button>`).join('');
+        }
+
+        function showPage(id) {
+            currentPage = id;
+            if (document.getElementById('media-modal').classList.contains('hidden')) {
+                ignoreHashChange = true; 
+                window.location.hash = id;
+            }
+            document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
+            document.getElementById('category-sidebar').style.display = (id === 'home' || id === 'live' || id === 'order' || id === 'about') ? 'none' : 'block';
+            if(pageStates[id]) pageStates[id] = 1;
+            renderAll();
+        }
+
+        function filterByTag(tag) {
+            currentTag = tag;
+            document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.toggle('active', btn.innerText === tag || (tag === 'All' && btn.innerText === 'All Items')));
+            if(pageStates[currentPage]) pageStates[currentPage] = 1;
+            
+            const sidebarParent = document.getElementById('category-sidebar');
+            if(window.innerWidth < 768 && sidebarParent.style.display === 'block') {
+            }
+            renderAll();
+        }
+
+        function searchItems(val) { 
+            currentSearch = val.toLowerCase(); 
+            if(pageStates[currentPage]) pageStates[currentPage] = 1;
+            renderAll(); 
+        }
+
+        function renderAll() {
+            if(currentPage === 'home' || currentPage === 'live' || currentPage === 'order' || currentPage === 'about') return;
+            let items = allProducts.filter(p => 
+                (currentPage === 'hot-sales' && p.category === 'hot-sales') ||
+                (currentPage === 'videos' && p.category === 'videos') ||
+                (currentPage === '3d-view' && p.category === 'showroom-3d')
+            );
+            if (currentTag !== 'All') items = items.filter(p => p.tags && p.tags.includes(currentTag));
+            if (currentSearch) items = items.filter(p => p.name.toLowerCase().includes(currentSearch));
+
+            let itemsPerPage = 12;
+            if (currentPage === 'hot-sales' || currentPage === '3d-view') {
+                itemsPerPage = window.innerWidth >= 1024 ? 18 : (window.innerWidth >= 768 ? 12 : 6); 
+            } else if (currentPage === 'videos') {
+                itemsPerPage = window.innerWidth >= 1024 ? 15 : (window.innerWidth >= 768 ? 9 : 3);
+            }
+
+            const totalItems = items.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+            if (pageStates[currentPage] > totalPages) pageStates[currentPage] = totalPages;
+            if (pageStates[currentPage] < 1) pageStates[currentPage] = 1;
+
+            const startIndex = (pageStates[currentPage] - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedItems = items.slice(startIndex, endIndex);
+
+            const containerId = currentPage === 'hot-sales' ? 'product-list' : (currentPage === 'videos' ? 'video-list' : '3d-list');
+            renderGrid(containerId, paginatedItems, currentPage === 'hot-sales' ? 'img' : (currentPage === 'videos' ? 'video' : '3d'));
+            renderPaginationControls(currentPage, totalPages);
+        }
+
+        function renderPaginationControls(pageId, totalPages) {
+            const container = document.getElementById(`${pageId}-pagination`);
+            if (!container) return;
+            if (totalPages <= 1) { container.classList.add('hidden'); return; }
+            container.classList.remove('hidden');
+
+            const curr = pageStates[pageId];
+            let html = `<div class="flex items-center gap-2">`;
+            if (curr > 1) html += `<button onclick="changePage('${pageId}', ${curr - 1})" class="px-3 py-1.5 border rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition font-medium">Prev</button>`;
+            else html += `<button class="px-3 py-1.5 border rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed font-medium" disabled>Prev</button>`;
+
+            const startNum = Math.max(1, curr - 3);
+            const endNum = Math.min(totalPages, curr + 3);
+            for (let i = startNum; i <= endNum; i++) {
+                if (i === curr) html += `<button class="w-9 h-9 font-bold bg-blue-600 text-white rounded-lg shadow-sm">${i}</button>`;
+                else html += `<button onclick="changePage('${pageId}', ${i})" class="w-9 h-9 border bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">${i}</button>`;
+            }
+            if (curr < totalPages) html += `<button onclick="changePage('${pageId}', ${curr + 1})" class="px-3 py-1.5 border rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition font-medium">Next</button>`;
+            else html += `<button class="px-3 py-1.5 border rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed font-medium" disabled>Next</button>`;
+            
+            html += `</div><div class="flex items-center gap-2 text-gray-500"><span>Page</span><input type="number" id="${pageId}-jump-input" min="1" max="${totalPages}" value="${curr}" class="w-14 px-2 py-1 text-center border rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none"><span>of ${totalPages}</span><button onclick="jumpToPage('${pageId}', ${totalPages})" class="px-3 py-1 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition text-xs font-semibold uppercase tracking-wider">Go</button></div>`;
+            container.innerHTML = html;
+        }
+
+        function changePage(pageId, targetPage) {
+            pageStates[pageId] = targetPage;
+            renderAll();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function jumpToPage(pageId, maxPage) {
+            const input = document.getElementById(`${pageId}-jump-input`);
+            if(!input) return;
+            let val = parseInt(input.value);
+            if (isNaN(val) || val < 1) val = 1;
+            if (val > maxPage) val = maxPage;
+            pageStates[pageId] = val;
+            renderAll();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function getYTId(url) {
+            if (!url) return '';
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function renderGrid(containerId, items, type) {
+            const grid = document.getElementById(containerId);
+            if (!grid) return;
+            const hotSalesOrder = type === 'img' ? allProducts.filter(x => x.category === 'hot-sales').map(x => x.id) : [];
+            grid.innerHTML = items.map(p => {
+                const paths = p.file_path ? p.file_path.split(',').map(x=>x.trim()).filter(x=>x!=='') : [];
+                let formattedName = p.name.replace(/\[(.*?)\]/g, '<span class="text-[10px] opacity-60">$1</span>');
+                
+                let isNew = false;
+                const uploadDate = p.created_at || p.date || p.upload_date || p.time;
+                if (uploadDate) {
+                    let parsedDate = new Date(uploadDate);
+                    if (isNaN(parsedDate.getTime()) && !isNaN(uploadDate)) {
+                        parsedDate = new Date(Number(uploadDate) * (Number(uploadDate) < 10000000000 ? 1000 : 1));
+                    }
+                    if (!isNaN(parsedDate.getTime())) {
+                        isNew = (new Date() - parsedDate) / (1000 * 60 * 60 * 24) <= 7;
+                    }
+                }
+                const newBadgeHtml = isNew ? `<div class="absolute top-2 right-2 bg-green-500 text-white text-[9px] font-extrabold w-7 h-7 rounded-full flex items-center justify-center shadow-sm z-10 select-none uppercase tracking-tighter">New</div>` : '';
+
+                if (type === 'img') {
+                    const imgOnly = paths.filter(path => !path.toLowerCase().endsWith('.glb'));
+                    const firstImg = imgOnly[0] || paths[0] || '';
+                    const rankIndex = hotSalesOrder.indexOf(p.id);
+                    const rank = rankIndex !== -1 ? rankIndex + 1 : 999;
+                    const badgeHtml = (rank <= 10) ? `<div class="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-black px-2 py-0.5 rounded shadow-sm z-10">Top ${rank}</div>` : '';
+                    return `<div class="bg-white rounded-xl shadow-sm border border-gray-100 hover:border-blue-500 hover:shadow-lg transition-all duration-300 cursor-pointer group flex flex-col h-full overflow-hidden relative" onclick="openModal('img', ${p.id})">
+                        ${badgeHtml}
+                        ${newBadgeHtml}
+                        <div class="aspect-square bg-white relative p-4 flex items-center justify-center overflow-hidden"><img src="${fixUrl(firstImg)}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" loading="lazy" decoding="async" onload="this.classList.add('loaded')"></div>
+                        <div class="p-4 flex-1 flex flex-col border-t border-gray-50 bg-gray-50/50"><h3 class="font-bold text-gray-800 text-sm mb-3 line-clamp-2 leading-relaxed group-hover:text-blue-700 transition-colors">${formattedName}</h3></div>
+                    </div>`;
+                } else if (type === 'video') {
+                    const vid = getYTId(p.yt_url);
+                    const thumb = vid ? `https://i3.ytimg.com/vi/${vid}/hqdefault.jpg` : 'https://placehold.co/600x400?text=No+Video';
+                    return `<div class="group relative cursor-pointer overflow-hidden rounded-xl bg-black" onclick="openModal('video', ${p.id})">
+                        ${newBadgeHtml}
+                        <div class="aspect-video relative"><img src="${thumb}" class="w-full h-full object-cover opacity-70 group-hover:scale-105 transition duration-500" loading="lazy" decoding="async" onload="this.classList.add('loaded')"><div class="absolute inset-0 flex items-center justify-center"><div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl">▶</div></div></div><div class="p-3 bg-slate-900 text-white text-xs font-bold truncate">${formattedName}</div></div>`;
+                } else if (type === '3d') {
+                    const glbPath = paths.find(path => path.toLowerCase().endsWith('.glb')) || paths[0] || '';
+                    return `<div class="bg-white border border-gray-100 rounded-xl overflow-hidden model-card shadow-sm relative">
+                        ${newBadgeHtml}
+                        <model-viewer src="${fixUrl(glbPath)}" auto-rotate camera-controls min-camera-orbit="auto auto 5%" max-camera-orbit="auto auto 500%" loading="lazy" decoding="async"></model-viewer><div class="p-3 text-center border-t"><h3 class="font-bold text-xs mb-2 truncate">${formattedName}</h3><button onclick="openModal('3d', ${p.id})" class="w-full py-2 text-[10px] font-black bg-blue-600 text-white rounded-lg uppercase">View 3D</button></div></div>`;
+                }
+            }).join('');
+        }
+
+        function openModal(type, id, isDeepLink = false) {
+            const p = allProducts.find(x => x.id === id); if(!p) return;
+            try {
+                fetch('https://mamba-api.mfgift.workers.dev/api/products/click', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: p.id }) });
+            } catch(e) {}
+            if (!isDeepLink) { ignoreHashChange = true; window.location.hash = `${currentPage}!${id}`; }
+            
+            const modal = document.getElementById('media-modal'), yt = document.getElementById('youtube-frame'), container3d = document.getElementById('modal-3d-container');
+            document.getElementById('modal-title').innerText = p.name;
+            document.getElementById('modal-desc').innerText = `Material: ${p.material || 'Standard'}\nMOQ: ${p.moq || 'N/A'}`;
+            const customDescEl = document.getElementById('modal-custom-desc');
+            if (p.description && p.description.trim() !== "") { customDescEl.innerText = p.description; customDescEl.classList.remove('hidden'); }
+            else { customDescEl.innerText = ""; customDescEl.classList.add('hidden'); }
+            modal.classList.remove('hidden');
+            
+            currentImgs = []; currentMediaTypes = []; currentIndex = 0;
+            yt.src = ""; document.getElementById('viewer-holder').innerHTML = "";
+            const uploadedPaths = p.file_path ? p.file_path.split(',').map(x=>x.trim()).filter(x => x !== "") : [];
+            if (p.category === 'showroom-3d') {
+                uploadedPaths.forEach(path => { currentImgs.push(path); currentMediaTypes.push(path.toLowerCase().endsWith('.glb') ? '3d' : 'img'); });
+            } else if (p.category === 'videos' && p.yt_url) {
+                currentImgs.push(p.yt_url); currentMediaTypes.push('video');
+                uploadedPaths.forEach(path => { currentImgs.push(path); currentMediaTypes.push('img'); });
+            } else { uploadedPaths.forEach(path => { currentImgs.push(path); currentMediaTypes.push('img'); }); }
+            
+            switchActiveMedia();
+            renderThumbs();
+        }
+
+        function switchActiveMedia() {
+            const img = document.getElementById('modal-img'), yt = document.getElementById('youtube-frame'), container3d = document.getElementById('modal-3d-container');
+            [img, yt, container3d].forEach(el => el.classList.add('hidden'));
+            
+            const mediaType = currentMediaTypes[currentIndex], mediaUrl = currentImgs[currentIndex];
+            if (mediaType === '3d') { container3d.classList.remove('hidden'); document.getElementById('viewer-holder').innerHTML = `<model-viewer src="${fixUrl(mediaUrl)}" camera-controls auto-rotate min-camera-orbit="auto auto 5%" max-camera-orbit="auto auto 500%" style="width:100%; height:100%"></model-viewer>`; hideGlobalZoom(); }
+            else if (mediaType === 'video') { yt.classList.remove('hidden'); yt.src = `https://www.youtube.com/embed/${getYTId(mediaUrl)}?autoplay=1`; hideGlobalZoom(); }
+            else if (mediaType === 'img') { img.classList.remove('hidden'); img.src = fixUrl(mediaUrl); bindZoomEvents(); }
+            
+            document.querySelectorAll('.thumb-item').forEach((el, i) => {
+                el.classList.toggle('active', i === currentIndex);
+            });
+        }
+
+        function renderThumbs() {
+            const container = document.getElementById('thumb-bar');
+            if (currentImgs.length <= 1) { container.classList.add('hidden'); return; }
+            container.classList.remove('hidden');
+            container.innerHTML = currentImgs.map((src, i) => {
+                const isVideo = currentMediaTypes[i] === 'video';
+                const is3D = currentMediaTypes[i] === '3d';
+                const thumbSrc = isVideo ? `https://i3.ytimg.com/vi/${getYTId(src)}/hqdefault.jpg` : (is3D ? '' : fixUrl(src));
+                return `<div onclick="currentIndex=${i};switchActiveMedia()" class="thumb-item w-12 h-12 md:w-16 md:h-16 flex-shrink-0 cursor-pointer rounded-lg bg-gray-100 overflow-hidden ${i===currentIndex?'active':''}">
+                    ${is3D ? '<div class="w-full h-full flex items-center justify-center text-[10px] font-bold text-gray-500">3D</div>' : (isVideo ? '<div class="w-full h-full flex items-center justify-center text-[10px] font-bold text-gray-500">VID</div>' : `<img src="${thumbSrc}" class="w-full h-full object-cover">`)}
+                </div>`;
+            }).join('');
+        }
+
+        function toggle3DFullscreen() { const c = document.getElementById('modal-3d-container'); if (!document.fullscreenElement) c.requestFullscreen(); else document.exitFullscreen(); }
+        function toggleLiveFullscreen() { const w = document.getElementById('live-video-wrapper'); if (!document.fullscreenElement) w.requestFullscreen(); else document.exitFullscreen(); }
+        function updateBeijingTime() { const t = document.getElementById('beijing-time'); if(t) t.innerText = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(new Date()); }
+        function hideGlobalZoom() { const l = document.getElementById('global-zoom-lens'), r = document.getElementById('global-zoom-result'); if(l) l.style.display = 'none'; if(r) r.style.display = 'none'; }
+        function closeModal() { document.getElementById('media-modal').classList.add('hidden'); document.getElementById('youtube-frame').src = ""; document.getElementById('viewer-holder').innerHTML = ""; hideGlobalZoom(); ignoreHashChange = true; history.replaceState(null, document.title, window.location.pathname + window.location.search + '#' + currentPage); }
+
+        function setupZoomFeature() {
+            const container = document.getElementById('modal-media-container'), img = document.getElementById('modal-img');
+            let lens = document.getElementById('global-zoom-lens'); if(!lens) { lens = document.createElement('div'); lens.id = 'global-zoom-lens'; lens.style.cssText = 'position:absolute; border:1px solid #94a3b8; background:rgba(255,255,255,0.3); cursor:crosshair; width:100px; height:100px; display:none; pointer-events:none; z-index:20;'; container.appendChild(lens); }
+            let result = document.getElementById('global-zoom-result'); if(!result) { result = document.createElement('div'); result.id = 'global-zoom-result'; result.style.cssText = 'position:fixed; width:280px; height:280px; background-color:#0f172a; display:none; z-index:100; border-radius:12px; pointer-events:none;'; document.getElementById('modal-content').appendChild(result); }
+            window.moveLens = (e) => {
+                if (window.innerWidth < 768) return; 
+                if (img.classList.contains('hidden') || !img.complete) return;
+                const rect = container.getBoundingClientRect();
+                result.style.top = (rect.top) + 'px'; result.style.left = (rect.left - 300) + 'px';
+                let x = (e.touches ? e.touches[0].pageX : e.pageX) - rect.left - window.pageXOffset;
+                let y = (e.touches ? e.touches[0].pageY : e.pageY) - rect.top - window.pageYOffset;
+                lens.style.left = (x - 50) + "px"; lens.style.top = (y - 50) + "px";
+                result.style.backgroundImage = `url('${img.src}')`; result.style.backgroundSize = (img.clientWidth * 2) + "px " + (img.clientHeight * 2) + "px";
+                result.style.backgroundPosition = `-${x * 2 - 140}px -${y * 2 - 140}px`;
+            };
+            bindZoomEvents();
+        }
+
+        function bindZoomEvents() {
+            const container = document.getElementById('modal-media-container'), lens = document.getElementById('global-zoom-lens'), result = document.getElementById('global-zoom-result');
+            container.onmouseenter = () => { if(window.innerWidth >= 768 && !document.getElementById('modal-img').classList.contains('hidden')) { lens.style.display = 'block'; result.style.display = 'block'; } };
+            container.onmouseleave = () => { lens.style.display = 'none'; result.style.display = 'none'; };
+            container.onmousemove = window.moveLens;
+        }
+
+        const stepsNormal = ["Confirm Virtual Proof", "Confirm PI", "Paid / Other Payment Terms", "Material Preparation", "Order Enters Production Line", "Begins Production", "Production Complete and Shipped", "Delivered"];
+        const stepsSample = ["Sample Approval", "Confirm PI", "Paid / Other Payment Terms", "Sample Preparation", "Shipment Dispatch", "Delivery", "Send Quote", "Convert to Formal Order"];
+        const shipMap = { "快递": "Express", "空派": "Via Air", "海派": "Via Boat" };
+
+        function parseStepData(rawStr) {
+            if (!rawStr) return { date: "", carrier: "", tracking: "" };
+            const parts = rawStr.split(':');
+            const d = parts[0].trim().split(' ');
+            return { date: d[0] || "", carrier: (d[1] || "").replace('[', ''), tracking: parts[1] ? parts[1].replace(']', '').trim() : "" };
+        }
+
+        async function trackOrder() {
+            const btn = document.getElementById('track-btn');
+            try {
+                const pi = document.getElementById('pi-input').value.trim();
+                if (!pi) return;
+                btn.disabled = true; btn.innerText = "Loading...";
+                const res = await fetch(`https://eddie-unified-backend.mfgift.workers.dev/order?pi=${encodeURIComponent(pi)}`);
+                const data = await res.json();
+                if (!data.success) throw new Error(data.error);
+                const order = data.order, steps = (order.cargo === "样品") ? stepsSample : stepsNormal;
+                document.getElementById('res-ship').innerText = shipMap[order.ship] || order.ship || "N/A";
+                document.getElementById('res-date').innerText = order.deadline || "N/A";
+                document.getElementById('res-dest').innerText = order.stateCode || "N/A";
+                
+                document.getElementById('timeline').innerHTML = steps.map((s, i) => {
+                    const t = parseStepData(order.times && order.times[i] ? order.times[i] : "");
+                    const isPassed = i < order.step;
+                    const isCurrent = i === order.step;
+                    const iconClass = isPassed ? 'passed' : (isCurrent ? 'current' : 'pending');
+                    const iconContent = isPassed ? '✓' : (isCurrent ? '●' : '•');
+                    
+                    let dateDisplay = t.date || '';
+                    if (i >= order.step) {
+                        dateDisplay = '<span class="text-[9px] text-gray-400 uppercase italic">Coming up soon...</span>';
+                    }
+                    
+                    const arrow = (i < steps.length - 1) ? 
+                        `<div class="w-8 md:flex-1 flex-shrink-0 flex items-center justify-center -mt-8">
+                            <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                        </div>` : '';
+                    
+                    return `<div class="flex flex-col items-center gap-1 w-24 md:flex-1 flex-shrink-0 relative">
+                        <span class="text-[10px] text-gray-400 font-bold h-4 flex items-center justify-center text-center whitespace-nowrap">${dateDisplay}</span>
+                        <div class="step-icon ${iconClass} flex-shrink-0">${iconContent}</div>
+                        <span class="text-[11px] font-bold text-center mt-1 leading-tight break-words max-w-full">${s}</span>
+                    </div>` + arrow;
+                }).join('');
+                
+                if (order.imgData) { document.getElementById('order-img-display').src = order.imgData; document.getElementById('order-img-box').style.display = 'block'; }
+                document.getElementById('result').classList.remove('hidden'); document.getElementById('tracking-hint').style.display = 'none';
+            } catch (e) { document.getElementById('error').innerText = e.message; document.getElementById('error').classList.remove('hidden'); }
+            finally { btn.disabled = false; btn.innerText = "Track"; }
+        }
+        init();
+    </script>
+</body>
+</html>
