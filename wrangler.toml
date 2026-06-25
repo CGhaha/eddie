@@ -2,7 +2,7 @@ name = "www"
 compatibility_date = "2026-05-22"
 
 [assets]
-directory = "."
+directory = "./dist"
 
 [observability]
 enabled = true
