@@ -1,4 +1,5 @@
+.git
 .git/
-.git/**/*
-.github/
+.github
+node_modules
 wrangler.toml
