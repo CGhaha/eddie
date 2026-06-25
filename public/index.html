@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MF TEAM | SAGE A+ Supplier</title>
-    <link rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/assets/web0101.png">
+    <link class="flex" rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/assets/web0101.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
     <style>
@@ -134,43 +134,43 @@
                         <h2 class="text-3xl font-bold">Order Tracking</h2>
                     </div>
 
-                    <div class="w-full bg-white p-5 md:p-8 rounded-3xl shadow-xl border border-gray-100">
-                        <div class="flex flex-col md:flex-row gap-3 mb-6">
-                            <input type="text" id="pi-input" placeholder="Enter PI Code..." class="flex-1 px-5 py-3.5 border border-gray-200 rounded-xl outline-none text-lg">
-                            <button onclick="trackOrder()" id="track-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-xl font-bold transition">Track</button>
+                    <div class="max-w-6xl mx-auto w-full bg-white p-6 md:p-12 rounded-3xl shadow-xl border border-gray-100">
+                        <div class="flex flex-col md:flex-row gap-4 mb-10">
+                            <input type="text" id="pi-input" placeholder="Enter PI Code..." class="flex-1 px-6 py-4 border border-gray-200 rounded-xl outline-none text-xl">
+                            <button onclick="trackOrder()" id="track-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-12 py-4 rounded-xl font-bold text-lg transition">Track</button>
                         </div>
 
-                        <div id="tracking-hint" class="text-blue-900 font-medium text-[14px] md:text-[15px] mb-8 leading-relaxed">
+                        <div id="tracking-hint" class="text-blue-900 font-medium text-lg mb-10 leading-relaxed">
                             1. Find the PI# on the PROFORMA INVOICE provided by the sales representative.<br>
                             2. Enter the PI# (for example: PIMFEF260611) and click the "Track" button to view the latest real-time status of your order.
                         </div>
 
-                        <div id="result" class="hidden space-y-10 w-full overflow-hidden">
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                                    <p class="text-xs text-gray-400 uppercase font-bold mb-1">Shipping Method</p>
-                                    <p id="res-ship" class="font-bold text-lg"></p>
+                        <div id="result" class="hidden space-y-12 w-full overflow-hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="bg-gray-50 p-8 rounded-2xl border border-gray-100">
+                                    <p class="text-sm text-gray-400 uppercase font-bold mb-2">Shipping Method</p>
+                                    <p id="res-ship" class="font-bold text-2xl"></p>
                                 </div>
-                                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                                    <p class="text-xs text-gray-400 uppercase font-bold mb-1">Estimated Delivery</p>
-                                    <p id="res-date" class="font-bold text-lg"></p>
+                                <div class="bg-gray-50 p-8 rounded-2xl border border-gray-100">
+                                    <p class="text-sm text-gray-400 uppercase font-bold mb-2">Estimated Delivery</p>
+                                    <p id="res-date" class="font-bold text-2xl"></p>
                                 </div>
-                                <div class="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                                    <p class="text-xs text-gray-400 uppercase font-bold mb-1">Destination</p>
-                                    <p id="res-dest" class="font-bold text-lg"></p>
+                                <div class="bg-gray-50 p-8 rounded-2xl border border-gray-100">
+                                    <p class="text-sm text-gray-400 uppercase font-bold mb-2">Destination</p>
+                                    <p id="res-dest" class="font-bold text-2xl"></p>
                                 </div>
                             </div>
 
-                            <div class="w-full overflow-x-auto pb-4">
-                                <div id="timeline" class="flex items-start md:items-center py-6 gap-2 md:gap-4 min-w-max md:min-w-0 px-2 md:px-0"></div>
+                            <div class="w-full overflow-x-auto pb-6">
+                                <div id="timeline" class="flex items-start md:items-center py-8 gap-4 min-w-max md:min-w-0 px-2 md:px-0"></div>
                             </div>
 
-                            <div id="order-img-box" class="w-full border border-gray-100 rounded-2xl p-4 bg-gray-50 shadow-sm" style="display: none;">
-                                <p class="text-xs text-gray-400 mb-3 font-bold uppercase tracking-wider text-center">Product Image</p>
-                                <img id="order-img-display" src="" class="mx-auto h-48 cursor-pointer hover:opacity-80 transition" onclick="showBigImage(this.src)">
+                            <div id="order-img-box" class="w-full border border-gray-100 rounded-2xl p-6 bg-gray-50 shadow-sm" style="display: none;">
+                                <p class="text-sm text-gray-400 mb-4 font-bold uppercase tracking-wider text-center">Product Image</p>
+                                <img id="order-img-display" src="" class="mx-auto h-64 cursor-pointer hover:opacity-80 transition" onclick="showBigImage(this.src)">
                             </div>
                         </div>
-                        <div id="error" class="hidden mt-8 p-4 bg-red-50 text-red-700 border-l-4 border-red-400 rounded-lg font-medium"></div>
+                        <div id="error" class="hidden mt-10 p-6 bg-red-50 text-red-700 border-l-4 border-red-400 rounded-lg font-medium text-lg"></div>
                     </div>
                 </div>
 
@@ -315,7 +315,6 @@
                 renderTags();
                 handleDeepLink();
                 setupButtons();
-                setupZoomFeature(); 
                 updateBeijingTime();
                 setInterval(updateBeijingTime, 1000);
             } catch (e) { console.error(e); }
@@ -375,10 +374,6 @@
             currentTag = tag;
             document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.toggle('active', btn.innerText === tag || (tag === 'All' && btn.innerText === 'All Items')));
             if(pageStates[currentPage]) pageStates[currentPage] = 1;
-            
-            const sidebarParent = document.getElementById('category-sidebar');
-            if(window.innerWidth < 768 && sidebarParent.style.display === 'block') {
-            }
             renderAll();
         }
 
@@ -578,29 +573,13 @@
         function hideGlobalZoom() { const l = document.getElementById('global-zoom-lens'), r = document.getElementById('global-zoom-result'); if(l) l.style.display = 'none'; if(r) r.style.display = 'none'; }
         function closeModal() { document.getElementById('media-modal').classList.add('hidden'); document.getElementById('youtube-frame').src = ""; document.getElementById('viewer-holder').innerHTML = ""; hideGlobalZoom(); ignoreHashChange = true; history.replaceState(null, document.title, window.location.pathname + window.location.search + '#' + currentPage); }
 
-        function setupZoomFeature() {
-            const container = document.getElementById('modal-media-container'), img = document.getElementById('modal-img');
-            let lens = document.getElementById('global-zoom-lens'); if(!lens) { lens = document.createElement('div'); lens.id = 'global-zoom-lens'; lens.style.cssText = 'position:absolute; border:1px solid #94a3b8; background:rgba(255,255,255,0.3); cursor:crosshair; width:100px; height:100px; display:none; pointer-events:none; z-index:20;'; container.appendChild(lens); }
-            let result = document.getElementById('global-zoom-result'); if(!result) { result = document.createElement('div'); result.id = 'global-zoom-result'; result.style.cssText = 'position:fixed; width:280px; height:280px; background-color:#0f172a; display:none; z-index:100; border-radius:12px; pointer-events:none;'; document.getElementById('modal-content').appendChild(result); }
-            window.moveLens = (e) => {
-                if (window.innerWidth < 768) return; 
-                if (img.classList.contains('hidden') || !img.complete) return;
-                const rect = container.getBoundingClientRect();
-                result.style.top = (rect.top) + 'px'; result.style.left = (rect.left - 300) + 'px';
-                let x = (e.touches ? e.touches[0].pageX : e.pageX) - rect.left - window.pageXOffset;
-                let y = (e.touches ? e.touches[0].pageY : e.pageY) - rect.top - window.pageYOffset;
-                lens.style.left = (x - 50) + "px"; lens.style.top = (y - 50) + "px";
-                result.style.backgroundImage = `url('${img.src}')`; result.style.backgroundSize = (img.clientWidth * 2) + "px " + (img.clientHeight * 2) + "px";
-                result.style.backgroundPosition = `-${x * 2 - 140}px -${y * 2 - 140}px`;
-            };
-            bindZoomEvents();
-        }
-
         function bindZoomEvents() {
-            const container = document.getElementById('modal-media-container'), lens = document.getElementById('global-zoom-lens'), result = document.getElementById('global-zoom-result');
-            container.onmouseenter = () => { if(window.innerWidth >= 768 && !document.getElementById('modal-img').classList.contains('hidden')) { lens.style.display = 'block'; result.style.display = 'block'; } };
-            container.onmouseleave = () => { lens.style.display = 'none'; result.style.display = 'none'; };
-            container.onmousemove = window.moveLens;
+            const container = document.getElementById('modal-media-container'), img = document.getElementById('modal-img');
+            container.onmousemove = (e) => {
+                if (window.innerWidth < 768 || img.classList.contains('hidden')) return;
+                const rect = container.getBoundingClientRect();
+                const x = e.clientX - rect.left, y = e.clientY - rect.top;
+            };
         }
 
         const stepsNormal = ["Confirm Virtual Proof", "Confirm PI", "Paid / Other Payment Terms", "Material Preparation", "Order Enters Production Line", "Begins Production", "Production Complete and Shipped", "Delivered"];
@@ -616,29 +595,30 @@
 
         async function trackOrder() {
             const btn = document.getElementById('track-btn');
+            const pi = document.getElementById('pi-input').value.trim();
+            if (!pi) return;
+            
+            btn.disabled = true; 
+            btn.innerText = "Loading...";
+
             try {
-                const pi = document.getElementById('pi-input').value.trim();
-                if (!pi) return;
-                btn.disabled = true; btn.innerText = "Loading...";
-                const res = await fetch(`https://eddie-unified-backend.mfgift.workers.dev/order?pi=${encodeURIComponent(pi)}`);
-                const data = await res.json();
+                const response = await fetch(`https://eddie-unified-backend.mfgift.workers.dev/order?pi=${encodeURIComponent(pi)}`);
+                const data = await response.json();
+                
                 if (!data.success) throw new Error(data.error);
-                const order = data.order, steps = (order.cargo === "样品") ? stepsSample : stepsNormal;
+                
+                const order = data.order;
+                const steps = (order.cargo === "样品") ? stepsSample : stepsNormal;
+                
                 document.getElementById('res-ship').innerText = shipMap[order.ship] || order.ship || "N/A";
                 document.getElementById('res-date').innerText = order.deadline || "N/A";
                 document.getElementById('res-dest').innerText = order.stateCode || "N/A";
                 
                 document.getElementById('timeline').innerHTML = steps.map((s, i) => {
-                    const t = parseStepData(order.times && order.times[i] ? order.times[i] : "");
                     const isPassed = i < order.step;
                     const isCurrent = i === order.step;
                     const iconClass = isPassed ? 'passed' : (isCurrent ? 'current' : 'pending');
                     const iconContent = isPassed ? '✓' : (isCurrent ? '●' : '•');
-                    
-                    let dateDisplay = t.date || '';
-                    if (i >= order.step) {
-                        dateDisplay = '<span class="text-[9px] text-gray-400 uppercase italic">Coming up soon...</span>';
-                    }
                     
                     const arrow = (i < steps.length - 1) ? 
                         `<div class="w-8 md:flex-1 flex-shrink-0 flex items-center justify-center -mt-8">
@@ -646,16 +626,28 @@
                         </div>` : '';
                     
                     return `<div class="flex flex-col items-center gap-1 w-24 md:flex-1 flex-shrink-0 relative">
-                        <span class="text-[10px] text-gray-400 font-bold h-4 flex items-center justify-center text-center whitespace-nowrap">${dateDisplay}</span>
                         <div class="step-icon ${iconClass} flex-shrink-0">${iconContent}</div>
                         <span class="text-[11px] font-bold text-center mt-1 leading-tight break-words max-w-full">${s}</span>
                     </div>` + arrow;
                 }).join('');
                 
-                if (order.imgData) { document.getElementById('order-img-display').src = order.imgData; document.getElementById('order-img-box').style.display = 'block'; }
-                document.getElementById('result').classList.remove('hidden'); document.getElementById('tracking-hint').style.display = 'none';
-            } catch (e) { document.getElementById('error').innerText = e.message; document.getElementById('error').classList.remove('hidden'); }
-            finally { btn.disabled = false; btn.innerText = "Track"; }
+                if (order.imgData) { 
+                    document.getElementById('order-img-display').src = order.imgData; 
+                    document.getElementById('order-img-box').style.display = 'block'; 
+                }
+                
+                document.getElementById('result').classList.remove('hidden'); 
+                document.getElementById('tracking-hint').style.display = 'none';
+                document.getElementById('error').classList.add('hidden');
+                
+            } catch (e) { 
+                document.getElementById('error').innerText = e.message; 
+                document.getElementById('error').classList.remove('hidden'); 
+                document.getElementById('result').classList.add('hidden');
+            } finally { 
+                btn.disabled = false; 
+                btn.innerText = "Track"; 
+            }
         }
         init();
     </script>
