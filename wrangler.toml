@@ -6,3 +6,4 @@ directory = "."
 
 [observability]
 enabled = true
+.git/
