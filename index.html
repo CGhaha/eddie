@@ -23,6 +23,10 @@
         img[loading="lazy"] { opacity: 0; }
         img.loaded { opacity: 1; }
         
+        /* 强制覆盖所有冲突，当图片带有 hidden 时必须绝对不渲染 */
+        #modal-media-container img.hidden {
+            display: none !important;
+        }
         #modal-media-container img:not(.hidden) {
             width: 100% !important;
             height: 100% !important;
@@ -77,7 +81,7 @@
             <button onclick="showPage('hot-sales'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium transition text-lg md:text-base">Hot Sales</button>
             <button onclick="showPage('videos'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium transition text-lg md:text-base">Videos</button>
             <button onclick="showPage('3d-view'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium transition text-lg md:text-base">3D Showroom</button>
-            <button onclick="showPage('live'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium transition flex items-center gap-2 md:gap-1.5 text-lg md:text-base">
+            <button onclick="showPage('live'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium flex items-center gap-2 md:gap-1.5 text-lg md:text-base">
                 <span class="w-2.5 h-2.5 bg-red-600 rounded-full inline-block"></span>
                 <span>Live</span>
             </button>
