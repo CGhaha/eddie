@@ -155,7 +155,7 @@
                         <h2 class="text-3xl font-bold">Order Tracking</h2>
                     </div>
 
-                    <div class="w-full bg-white p-5 md:p-8 rounded-3xl shadow-xl border border-gray-100">
+                    <div class="w-full bg-white p-5 md:p-8 rounded-3xl shadow-xl border border-gray-100" style="zoom: 0.75;">
                         <div class="flex flex-col md:flex-row gap-3 mb-6">
                             <input type="text" id="pi-input" placeholder="Enter PI Code..." class="flex-1 px-5 py-3.5 border border-gray-200 rounded-xl outline-none text-lg">
                             <button onclick="trackOrder()" id="track-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-xl font-bold transition">Track</button>
@@ -493,8 +493,18 @@
                     if (globalIndex >= 0 && globalIndex < 10) badges += `<span class="absolute top-2 left-2 z-10 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">Top ${globalIndex + 1}</span>`;
                 }
                 
-                const uploadDate = new Date(p.upload_date || 0).getTime();
-                if (now - uploadDate < 7 * 24 * 60 * 60 * 1000) {
+                let rawDate = p.upload_date || p.created_at || p.date || p.add_time || 0;
+                let uploadDate = 0;
+                if (rawDate) {
+                    if (!isNaN(rawDate) && typeof rawDate !== 'boolean' && typeof rawDate !== 'object') {
+                        uploadDate = String(rawDate).length === 10 ? Number(rawDate) * 1000 : Number(rawDate);
+                    } else {
+                        uploadDate = new Date(String(rawDate).replace(/-/g, '/').replace(/T/g, ' ')).getTime();
+                    }
+                }
+                if (isNaN(uploadDate)) uploadDate = 0;
+
+                if (uploadDate > 0 && (now - uploadDate < 7 * 24 * 60 * 60 * 1000)) {
                     badges += `<span class="absolute top-2 right-2 z-10 bg-blue-400 text-white text-[9px] font-bold w-8 h-8 flex items-center justify-center rounded-full shadow">New</span>`;
                 }
 
@@ -620,6 +630,21 @@
             return { date: d[0] || "", carrier: (d[1] || "").replace('[', ''), tracking: parts[1] ? parts[1].replace(']', '').trim() : "" };
         }
 
+        window.openTrackingLinks = function(carrier, trackingStr) {
+            if (!trackingStr) return;
+            const trackings = trackingStr.split(/[,，\s]+/).filter(x => x);
+            const c = (carrier || '').toUpperCase();
+            
+            trackings.forEach(num => {
+                let url = `https://t.17track.net/en#nums=${num}`;
+                if (c.includes('FEDEX')) url = `https://www.fedex.com/fedextrack/?trknbr=${num}`;
+                else if (c.includes('UPS')) url = `https://www.ups.com/track?tracknum=${num}`;
+                else if (c.includes('DHL')) url = `https://www.dhl.com/en/express/tracking.html?AWB=${num}`;
+                else if (c.includes('USPS')) url = `https://tools.usps.com/go/TrackConfirmAction?tLabels=${num}`;
+                window.open(url, '_blank');
+            });
+        };
+
         async function trackOrder() {
             const btn = document.getElementById('track-btn');
             try {
@@ -650,11 +675,30 @@
                         `<div class="w-8 md:flex-1 flex-shrink-0 flex items-center justify-center -mt-8">
                             <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                         </div>` : '';
+
+                    let trackingHtml = '';
+                    if (t.tracking) {
+                        const safeCarrier = (t.carrier || 'CARRIER').replace(/'/g, "\\'").toUpperCase();
+                        const safeTracking = t.tracking.replace(/'/g, "\\'");
+                        const trackings = t.tracking.split(/[,，\s]+/).filter(x => x);
+                        const carrierName = (t.carrier || 'CARRIER').toUpperCase();
+                        
+                        trackingHtml = `<div class="mt-4 flex flex-col items-center justify-center w-full px-1 z-10">
+                            <div class="font-black text-gray-800 text-[13px] uppercase cursor-pointer hover:text-blue-600 transition tracking-wider text-center" onclick="openTrackingLinks('${safeCarrier}', '${safeTracking}')" title="Click to track all numbers">${carrierName}</div>
+                            <div class="flex flex-col gap-2 mt-2 items-center w-full">
+                                ${trackings.map(num => {
+                                    const safeNum = num.replace(/'/g, "\\'");
+                                    return `<span class="text-[12px] text-blue-700 font-bold bg-blue-50 border border-blue-200 px-2 py-1.5 rounded-lg cursor-pointer hover:bg-blue-600 hover:text-white transition w-full text-center break-all shadow-sm" onclick="event.stopPropagation(); openTrackingLinks('${safeCarrier}', '${safeNum}')">${num}</span>`;
+                                }).join('')}
+                            </div>
+                        </div>`;
+                    }
                     
                     return `<div class="flex flex-col items-center gap-1 w-24 md:flex-1 flex-shrink-0 relative">
                         <span class="text-[10px] text-gray-400 font-bold h-4 flex items-center justify-center text-center whitespace-nowrap">${dateDisplay}</span>
                         <div class="step-icon ${iconClass} flex-shrink-0">${iconContent}</div>
                         <span class="text-[11px] font-bold text-center mt-1 leading-tight break-words max-w-full">${s}</span>
+                        ${trackingHtml}
                     </div>` + arrow;
                 }).join('');
                 
