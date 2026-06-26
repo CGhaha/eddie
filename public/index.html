@@ -190,6 +190,14 @@
                                 <p class="text-xs text-gray-400 mb-3 font-bold uppercase tracking-wider text-center">Product Image</p>
                                 <img id="order-img-display" src="" class="mx-auto h-48 cursor-pointer hover:opacity-80 transition" onclick="showBigImage(this.src)">
                             </div>
+                            
+                            <div id="urge-container" class="mt-8 pt-6 border-t border-gray-100 flex flex-col items-center justify-center w-full" style="display: none;">
+                                <p class="text-xs text-gray-400 mb-3 font-medium text-center">Need it faster? Let our team know.</p>
+                                <button id="urge-btn" onclick="urgeOrder()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-8 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm w-full md:w-auto">
+                                    <span class="w-2.5 h-2.5 bg-red-600 rounded-full inline-block animate-pulse"></span>
+                                    <span>Urge Order (催促发货)</span>
+                                </button>
+                            </div>
                         </div>
                         <div id="error" class="hidden mt-8 p-4 bg-red-50 text-red-700 border-l-4 border-red-400 rounded-lg font-medium"></div>
                     </div>
@@ -293,6 +301,8 @@
         let currentTag = 'All', currentSearch = '', currentPage = 'home';
         let currentMediaTypes = []; 
         let ignoreHashChange = false; 
+
+        window.currentTrackedPI = ''; // 新增：全局记录查询的PI
 
         const pageStates = { 'hot-sales': 1, 'videos': 1, '3d-view': 1, 'live': 1, 'order': 1, 'about': 1 };
         const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Tool", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
@@ -659,6 +669,9 @@
             try {
                 const pi = document.getElementById('pi-input').value.trim();
                 if (!pi) return;
+                
+                window.currentTrackedPI = pi; // 核心修改：记录当前查询单号
+                
                 btn.disabled = true; btn.innerText = "Loading...";
                 const res = await fetch(`https://eddie-unified-backend.mfgift.workers.dev/order?pi=${encodeURIComponent(pi)}`);
                 const data = await res.json();
@@ -715,6 +728,14 @@
                 }).join('');
                 
                 if (order.imgData) { document.getElementById('order-img-display').src = order.imgData; document.getElementById('order-img-box').style.display = 'block'; }
+                
+                // 核心修改：重新查询订单时，恢复催单按钮状态并显示
+                const urgeBtn = document.getElementById('urge-btn');
+                urgeBtn.innerHTML = `<span class="w-2.5 h-2.5 bg-red-600 rounded-full inline-block animate-pulse"></span><span>Urge Order (催促发货)</span>`;
+                urgeBtn.className = "bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-8 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm w-full md:w-auto";
+                urgeBtn.disabled = false;
+                document.getElementById('urge-container').style.display = 'flex';
+
                 document.getElementById('result').classList.remove('hidden'); document.getElementById('tracking-hint').style.display = 'none';
             } catch (e) { document.getElementById('error').innerText = e.message; document.getElementById('error').classList.remove('hidden'); }
             finally { btn.disabled = false; btn.innerText = "Track"; }
@@ -725,6 +746,56 @@
             const parts = rawStr.split(':');
             const d = parts[0].trim().split(' ');
             return { date: d[0] || "", carrier: (d[1] || "").replace('[', ''), tracking: parts[1] ? parts[1].replace(']', '').trim() : "" };
+        }
+
+        // 核心修改：纯前端催促发货方法
+        async function urgeOrder() {
+            const btn = document.getElementById('urge-btn');
+            if (!window.currentTrackedPI) return;
+            
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = "Processing...";
+            
+            try {
+                // 采用直接走 OA 总接口 PUT 数据的方式，零后端修改实现数据传递
+                const API_URL = "https://eddie-unified-backend.mfgift.workers.dev";
+                const AUTH_KEY = "SAGE_SECURE_2026";
+                
+                // 1. 抓取总单列表
+                const res = await fetch(API_URL, { headers: { "X-Auth-Key": AUTH_KEY }, cache: "no-store" });
+                const data = await res.json();
+                
+                let found = false;
+                if (data.orders) {
+                    for (let o of data.orders) {
+                        if (o.piCode === window.currentTrackedPI) {
+                            o.isUrged = true; // 打上催单标签
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (found) {
+                    // 2. 存回数据库
+                    await fetch(API_URL, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json", "X-Auth-Key": AUTH_KEY },
+                        body: JSON.stringify(data)
+                    });
+                }
+
+                btn.innerHTML = "✓ Urge Request Sent to Sales Team!";
+                btn.classList.replace('text-red-600', 'text-green-600');
+                btn.classList.replace('bg-red-50', 'bg-green-50');
+                btn.classList.replace('border-red-200', 'border-green-200');
+                btn.classList.replace('hover:bg-red-100', 'hover:bg-green-100');
+            } catch (e) {
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+                alert("Network error, please try again.");
+            }
         }
         
         init();
