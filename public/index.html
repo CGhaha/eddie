@@ -638,6 +638,22 @@
             });
         };
 
+        window.copyToClipboard = function(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.classList.add('bg-green-100', 'text-green-700', 'border-green-300');
+                btn.classList.remove('bg-gray-100', 'text-gray-600', 'border-gray-200');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.remove('bg-green-100', 'text-green-700', 'border-green-300');
+                    btn.classList.add('bg-gray-100', 'text-gray-600', 'border-gray-200');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        };
+
         async function trackOrder() {
             const btn = document.getElementById('track-btn');
             try {
@@ -681,7 +697,10 @@
                             <div class="flex flex-col gap-2 mt-2 items-center w-full">
                                 ${trackings.map(num => {
                                     const safeNum = num.replace(/'/g, "\\'");
-                                    return `<span class="text-[12px] text-blue-700 font-bold bg-blue-50 border border-blue-200 px-4 py-1.5 rounded-lg cursor-pointer hover:bg-blue-600 hover:text-white transition text-center shadow-sm w-fit" style="display:inline-block; white-space:nowrap;" onclick="event.stopPropagation(); openTrackingLinks('${safeCarrier}', '${safeNum}')">${num}</span>`;
+                                    return `<div class="flex items-center justify-center gap-1 w-full">
+                                        <span class="text-[12px] text-blue-700 font-bold bg-blue-50 border border-blue-200 px-4 py-1.5 rounded-lg cursor-pointer hover:bg-blue-600 hover:text-white transition text-center shadow-sm w-fit" style="display:inline-block; white-space:nowrap;" onclick="event.stopPropagation(); openTrackingLinks('${safeCarrier}', '${safeNum}')">${num}</span>
+                                        <button class="bg-gray-100 hover:bg-gray-200 text-gray-600 border border-gray-200 rounded text-[10px] font-bold px-2 py-1 transition shadow-sm whitespace-nowrap" onclick="event.stopPropagation(); copyToClipboard('${safeNum}', this)" title="Copy">Copy</button>
+                                    </div>`;
                                 }).join('')}
                             </div>
                         </div>`;
