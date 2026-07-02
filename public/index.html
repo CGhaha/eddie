@@ -3,7 +3,6 @@
 <head>
 
 
-<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-MM6WDMQT6L"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -76,6 +75,7 @@
         .thumb-item.active { border-color: #2563eb; }
     </style>
 </head>
+
 <body class="bg-gray-50 text-gray-800 antialiased overflow-x-hidden">
 
     <nav class="bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-lg relative h-[72px] flex items-center justify-center">
@@ -196,12 +196,7 @@
                             </div>
 
                             <div class="w-full overflow-x-auto pb-4">
-                                <div id="timeline" class="flex items-start md:items-center py-6 gap-2 md:gap-4 min-w-max md:min-w-0 px-2 md:px-0"></div>
-                            </div>
-
-                            <div id="order-img-box" class="w-full border border-gray-100 rounded-2xl p-4 bg-gray-50 shadow-sm" style="display: none;">
-                                <p class="text-xs text-gray-400 mb-3 font-bold uppercase tracking-wider text-center">Product Image</p>
-                                <img id="order-img-display" src="" class="mx-auto h-48 cursor-pointer hover:opacity-80 transition" onclick="showBigImage(this.src)">
+                                <div id="timeline" class="flex items-start py-6 gap-2 md:gap-4 min-w-max md:min-w-0 px-2 md:px-0"></div>
                             </div>
                             
                             <div id="urge-container" class="mt-8 pt-6 border-t border-gray-100 flex flex-col items-center justify-center w-full" style="display: none;">
@@ -300,9 +295,13 @@
                     <p id="modal-custom-desc" class="mt-2 text-sm md:text-base text-gray-600 whitespace-pre-wrap leading-relaxed hidden"></p>
                 </div>
 
-                <div class="mt-6 md:mt-10 flex flex-col xl:flex-row gap-3 md:gap-4 pt-6 border-t border-gray-200">
+                <div class="mt-6 md:mt-10 flex flex-col xl:flex-row gap-3 md:gap-4 pt-6 border-t border-gray-200" id="action-buttons-container">
                     <button id="inquiry-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition shadow-md text-sm md:text-base text-center">Inquiry</button>
                     <button id="whatsapp-btn" class="flex-1 bg-green-500 hover:bg-green-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition shadow-md text-sm md:text-base text-center">WhatsApp</button>
+                    <button id="like-btn" onclick="handleLike()" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition shadow-md text-sm md:text-base text-center flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.514"></path></svg>
+                        <span id="like-text">Like</span> <span id="like-count" class="bg-white text-red-500 px-2 py-0.5 rounded-full text-xs font-bold ml-1">0</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -316,6 +315,15 @@
         let ignoreHashChange = false; 
 
         window.currentTrackedPI = ''; // 新增：全局记录查询的PI
+        
+        let currentProductId = null;
+        let userIp = '';
+        
+        // 获取用户 IP 用于点赞限制
+        fetch('https://api.ipify.org?format=json')
+            .then(r => r.json())
+            .then(d => userIp = d.ip)
+            .catch(() => userIp = 'local-' + Math.random().toString(36).substring(7));
 
         const pageStates = { 'hot-sales': 1, 'videos': 1, '3d-view': 1, 'live': 1, 'order': 1, 'about': 1 };
         const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Tool", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
@@ -559,6 +567,8 @@
             try {
                 fetch('https://mamba-api.mfgift.workers.dev/api/products/click', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: p.id }) });
             } catch(e) {}
+            
+            currentProductId = id;
             if (!isDeepLink) { ignoreHashChange = true; window.location.hash = `${currentPage}!${id}`; }
             
             const modal = document.getElementById('media-modal'), yt = document.getElementById('youtube-frame'), container3d = document.getElementById('modal-3d-container');
@@ -567,6 +577,18 @@
             const customDescEl = document.getElementById('modal-custom-desc');
             if (p.description && p.description.trim() !== "") { customDescEl.innerText = p.description; customDescEl.classList.remove('hidden'); }
             else { customDescEl.innerText = ""; customDescEl.classList.add('hidden'); }
+            
+            // 核心修改：如果是 3D 展厅弹窗，隐藏 Inquiry 和 WhatsApp，否则正常展示
+            const inquiryBtn = document.getElementById('inquiry-btn');
+            const whatsappBtn = document.getElementById('whatsapp-btn');
+            if (p.category === 'showroom-3d') {
+                if (inquiryBtn) inquiryBtn.style.display = 'none';
+                if (whatsappBtn) whatsappBtn.style.display = 'none';
+            } else {
+                if (inquiryBtn) inquiryBtn.style.display = '';
+                if (whatsappBtn) whatsappBtn.style.display = '';
+            }
+            
             modal.classList.remove('hidden');
             
             currentImgs = []; currentMediaTypes = []; currentIndex = 0;
@@ -581,6 +603,54 @@
             
             switchActiveMedia();
             renderThumbs();
+            updateLikeUI();
+        }
+
+        function handleLike() {
+            if(!currentProductId) return;
+            const likeKey = `liked_${currentProductId}_${userIp}`;
+            if(localStorage.getItem(likeKey)) {
+                alert('You have already liked this product!');
+                return;
+            }
+            
+            localStorage.setItem(likeKey, 'true');
+            
+            let counts = JSON.parse(localStorage.getItem('like_counts') || '{}');
+            counts[currentProductId] = (counts[currentProductId] || 0) + 1;
+            localStorage.setItem('like_counts', JSON.stringify(counts));
+            
+            updateLikeUI();
+        }
+
+        function updateLikeUI() {
+            if(!currentProductId) return;
+            const likeKey = `liked_${currentProductId}_${userIp}`;
+            const btn = document.getElementById('like-btn');
+            const text = document.getElementById('like-text');
+            const countDisplay = document.getElementById('like-count');
+            
+            let counts = JSON.parse(localStorage.getItem('like_counts') || '{}');
+            let count = counts[currentProductId] || 0; 
+            
+            if (count === 0) {
+                const p = allProducts.find(x => x.id === currentProductId);
+                count = p ? Math.floor((parseInt(p.clicks) || 0) / 10) + 1 : 1; 
+                counts[currentProductId] = count;
+                localStorage.setItem('like_counts', JSON.stringify(counts));
+            }
+
+            countDisplay.innerText = count;
+
+            if(localStorage.getItem(likeKey)) {
+                btn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                btn.classList.add('bg-gray-400', 'cursor-not-allowed');
+                text.innerText = 'Liked';
+            } else {
+                btn.classList.add('bg-red-500', 'hover:bg-red-600');
+                btn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                text.innerText = 'Like';
+            }
         }
 
         function switchActiveMedia() {
@@ -694,6 +764,7 @@
                 document.getElementById('res-date').innerText = order.deadline || "N/A";
                 document.getElementById('res-dest').innerText = order.stateCode || "N/A";
                 
+                // 核心修改：确保每个步骤容器始终向下固定伸展，使横向箭头和图标完美对齐
                 document.getElementById('timeline').innerHTML = steps.map((s, i) => {
                     const t = parseStepData(order.times && order.times[i] ? order.times[i] : "");
                     const isPassed = i < order.step;
@@ -706,8 +777,9 @@
                         dateDisplay = '<span class="text-[9px] text-gray-400 uppercase italic">Coming up soon...</span>';
                     }
                     
+                    // 修改点：这里的 pt-[24px] 能够确保水平的箭头和固定的 step-icon 圆圈完美对齐
                     const arrow = (i < steps.length - 1) ? 
-                        `<div class="w-8 md:flex-1 flex-shrink-0 flex items-center justify-center -mt-8">
+                        `<div class="w-8 md:flex-1 flex-shrink-0 flex justify-center pt-[24px]">
                             <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                         </div>` : '';
 
@@ -732,15 +804,37 @@
                         </div>`;
                     }
                     
-                    return `<div class="flex flex-col items-center gap-1 w-24 md:flex-1 flex-shrink-0 relative">
-                        <span class="text-[10px] text-gray-400 font-bold h-4 flex items-center justify-center text-center whitespace-nowrap">${dateDisplay}</span>
+                    let stepMediaHtml = '';
+                    if (order.stepMedia && order.stepMedia[i]) {
+                        const mediaUrl = order.stepMedia[i];
+                        const safeUrl = mediaUrl.replace(/'/g, "\\'");
+                        const isVideo = mediaUrl.match(/\.(mp4|webm|ogg)$/i) || mediaUrl.includes('youtube.com') || mediaUrl.includes('youtu.be');
+                        
+                        if (isVideo) {
+                            if(mediaUrl.includes('youtube') || mediaUrl.includes('youtu.be')) {
+                                const ytId = getYTId(mediaUrl); 
+                                if(ytId) {
+                                    stepMediaHtml = `<div class="mt-3 w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-video z-10 relative"><iframe src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen class="w-full h-full pointer-events-auto"></iframe></div>`;
+                                }
+                            } else {
+                                stepMediaHtml = `<div class="mt-3 w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-video z-10 relative"><video src="${safeUrl}" controls class="w-full h-full object-cover pointer-events-auto"></video></div>`;
+                            }
+                        } else {
+                            stepMediaHtml = `<div class="mt-3 w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-square cursor-pointer hover:shadow-md transition z-10 relative bg-white flex items-center justify-center p-1" onclick="event.stopPropagation(); showBigImage('${safeUrl}')"><img src="${safeUrl}" class="w-full h-full object-contain"></div>`;
+                        }
+                    }
+                    
+                    // 修改点：这里的 w-24 md:flex-1 是垂直布局的关键。上面所有的固定高度保证水平线不会发生偏移。
+                    return `<div class="flex flex-col items-center w-24 md:flex-1 flex-shrink-0 relative">
+                        <span class="text-[10px] text-gray-400 font-bold h-4 flex items-center justify-center text-center whitespace-nowrap mb-1">${dateDisplay}</span>
                         <div class="step-icon ${iconClass} flex-shrink-0">${iconContent}</div>
-                        <span class="text-[11px] font-bold text-center mt-1 leading-tight break-words max-w-full">${s}</span>
-                        ${trackingHtml}
+                        <div class="text-[11px] font-bold text-center mt-2 leading-tight break-words w-full h-[40px] flex justify-center">${s}</div>
+                        <div class="flex flex-col items-center w-full flex-1">
+                            ${trackingHtml}
+                            ${stepMediaHtml}
+                        </div>
                     </div>` + arrow;
                 }).join('');
-                
-                if (order.imgData) { document.getElementById('order-img-display').src = order.imgData; document.getElementById('order-img-box').style.display = 'block'; }
                 
                 // 核心修改：重新查询订单时，恢复催单按钮状态并显示
                 const urgeBtn = document.getElementById('urge-btn');
