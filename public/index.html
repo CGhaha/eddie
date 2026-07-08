@@ -1,18 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-MM6WDMQT6L"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-MM6WDMQT6L');
-</script>
-
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MF AGENCY HUBS | SAGE A+ Supplier</title>
@@ -22,12 +10,7 @@
     <style>
         .page { display: none; }
         .page.active { display: block; }
-        .model-card model-viewer {
-            width: 100%;
-            height: 180px;
-            --poster-color: transparent;
-            background-color: #f8fafc;
-        }
+        .model-card model-viewer { width: 100%; height: 180px; --poster-color: transparent; background-color: #f8fafc; }
         ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
         .sidebar-item.active { background-color: #2563eb; color: white; }
         #modal-content { max-height: 95vh; }
@@ -35,42 +18,23 @@
         img[loading="lazy"] { opacity: 0; }
         img.loaded { opacity: 1; }
         
-        /* 强制覆盖所有冲突，当图片带有 hidden 时必须绝对不渲染 */
-        #modal-media-container img.hidden {
-            display: none !important;
-        }
+        #modal-media-container img.hidden { display: none !important; }
         #modal-media-container img:not(.hidden) {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: contain !important; 
-            object-position: center !important;
-            display: block !important;
+            width: 100% !important; height: 100% !important; object-fit: contain !important; 
+            object-position: center !important; display: block !important;
         }
         #modal-media-container {
-            width: 100% !important;
-            height: 100% !important;
-            overflow: hidden !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
+            width: 100% !important; height: 100% !important; overflow: hidden !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
             background-color: #fff;
         }
-        
         .step-icon {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-size: 14px;
-            color: white;
-            margin: 0 auto;
+            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; font-size: 14px; color: white; margin: 0 auto;
         }
         .step-icon.passed { background-color: #1f2937; }
         .step-icon.current { background-color: #10b981; }
         .step-icon.pending { background-color: #9ca3af; }
-        
         .thumb-item { border: 2px solid transparent; transition: all 0.2s; }
         .thumb-item.active { border-color: #2563eb; }
     </style>
@@ -215,7 +179,6 @@
                     <div class="flex justify-between items-center mb-8 border-b pb-4">
                         <h2 class="text-3xl font-bold">Live Stream</h2>
                     </div>
-
                     <div class="w-full flex flex-col justify-center items-center bg-[#1a1a1a] py-6 md:py-12 rounded-2xl relative min-h-[50vh] px-4">
                         <div id="live-video-wrapper" class="w-full max-w-[1000px] aspect-video bg-black rounded-2xl overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.5)] relative">
                             <iframe src="https://vdo.ninja/?view=iphone&autoplay=1&muted=1&cleanviewer=1&transparent=1" allow="camera; microphone; autoplay; fullscreen; picture-in-picture; display-capture" allowfullscreen playsinline webkitallowfullscreen class="w-full h-full border-none"></iframe>
@@ -244,7 +207,7 @@
                             <h3 class="text-2xl font-bold text-gray-800 mb-6">Our Company</h3>
                             <div class="flex flex-col md:flex-row gap-8 items-center">
                                 <div class="md:w-2/5">
-                                    <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWVT5qQpFFg9q0QnYVAdQzrOiJM7su_AACDykAAv6GGFYompftPoy3PzwE.jpg" alt="BQACAgUAAyEGAASHRsPbAAEWVT5qQpFFg9q0QnYVAdQzrOiJM7su_AACDykAAv6GGFYompftPoy3PzwE.jpg" alt="BQACAgUAAyEGAASHRsPbAAEWVT5qQpFFg9q0QnYVAdQzrOiJM7su_AACDykAAv6GGFYompftPoy3PzwE.jpg" />
+                                    <img src="https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEWVT5qQpFFg9q0QnYVAdQzrOiJM7su_AACDykAAv6GGFYompftPoy3PzwE.jpg" alt="Our Company" />
                                 </div>
                                 <div class="md:w-3/5">
                                     <p class="text-gray-600 text-base md:text-lg leading-relaxed mb-4">Since 2011, we've been specializing in promotional gifts. With over 300 sourcing professionals, we're one of the world's leading promotional gift companies.</p>
@@ -264,11 +227,8 @@
     </div>
 
     <div id="media-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] hidden flex items-center justify-center p-2 md:p-6">
-        
         <div id="modal-content" class="w-full max-w-[85rem] h-[95vh] flex flex-col md:flex-row bg-white rounded-2xl overflow-hidden shadow-2xl relative">
-            
             <button onclick="closeModal()" class="absolute top-2 right-2 md:top-4 md:right-4 z-[70] bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full w-9 h-9 md:w-12 md:h-12 flex items-center justify-center text-2xl md:text-4xl transition shadow-md">&times;</button>
-            
             <div class="w-full md:w-1/2 p-4 md:p-12 bg-white flex flex-col justify-center items-center relative border-b md:border-b-0 md:border-r border-gray-100 h-1/2 md:h-auto flex-shrink-0">
                 <div id="modal-media-container" class="w-full h-full flex items-center justify-center overflow-hidden relative">
                     <iframe id="youtube-frame" width="100%" height="100%" src="" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen class="hidden"></iframe>
@@ -282,19 +242,15 @@
                 </div>
                 <div id="thumb-bar" class="mt-4 md:mt-6 flex gap-2 overflow-x-auto max-w-full hidden z-20 pb-2"></div>
             </div>
-
             <div class="w-full md:w-1/2 p-6 md:p-12 flex flex-col overflow-y-auto text-left bg-gray-50 h-1/2 md:h-auto">
                 <h2 id="modal-title" class="text-xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight pr-8"></h2>
-                
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-6 md:mb-8">
                     <p id="modal-desc" class="text-gray-700 text-sm md:text-base font-medium leading-relaxed whitespace-pre-line"></p>
                 </div>
-                
                 <div class="flex-1">
                     <h3 class="text-sm md:text-base font-black text-gray-900 uppercase tracking-widest mb-3 md:mb-4 border-b border-gray-200 pb-2 md:pb-3">Description</h3>
                     <p id="modal-custom-desc" class="mt-2 text-sm md:text-base text-gray-600 whitespace-pre-wrap leading-relaxed hidden"></p>
                 </div>
-
                 <div class="mt-6 md:mt-10 flex flex-col xl:flex-row gap-3 md:gap-4 pt-6 border-t border-gray-200" id="action-buttons-container">
                     <button id="inquiry-btn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition shadow-md text-sm md:text-base text-center">Inquiry</button>
                     <button id="whatsapp-btn" class="flex-1 bg-green-500 hover:bg-green-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold transition shadow-md text-sm md:text-base text-center">WhatsApp</button>
@@ -314,12 +270,11 @@
         let currentMediaTypes = []; 
         let ignoreHashChange = false; 
 
-        window.currentTrackedPI = ''; // 新增：全局记录查询的PI
+        window.currentTrackedPI = '';
         
         let currentProductId = null;
         let userIp = '';
         
-        // 获取用户 IP 用于点赞限制
         fetch('https://api.ipify.org?format=json')
             .then(r => r.json())
             .then(d => userIp = d.ip)
@@ -578,7 +533,6 @@
             if (p.description && p.description.trim() !== "") { customDescEl.innerText = p.description; customDescEl.classList.remove('hidden'); }
             else { customDescEl.innerText = ""; customDescEl.classList.add('hidden'); }
             
-            // 核心修改：如果是 3D 展厅弹窗，隐藏 Inquiry 和 WhatsApp，否则正常展示
             const inquiryBtn = document.getElementById('inquiry-btn');
             const whatsappBtn = document.getElementById('whatsapp-btn');
             if (p.category === 'showroom-3d') {
@@ -753,7 +707,7 @@
                 const pi = document.getElementById('pi-input').value.trim();
                 if (!pi) return;
                 
-                window.currentTrackedPI = pi; // 核心修改：记录当前查询单号
+                window.currentTrackedPI = pi;
                 
                 btn.disabled = true; btn.innerText = "Loading...";
                 const res = await fetch(`https://eddie-unified-backend.mfgift.workers.dev/order?pi=${encodeURIComponent(pi)}`);
@@ -764,7 +718,6 @@
                 document.getElementById('res-date').innerText = order.deadline || "N/A";
                 document.getElementById('res-dest').innerText = order.stateCode || "N/A";
                 
-                // 核心修改：确保每个步骤容器始终向下固定伸展，使横向箭头和图标完美对齐
                 document.getElementById('timeline').innerHTML = steps.map((s, i) => {
                     const t = parseStepData(order.times && order.times[i] ? order.times[i] : "");
                     const isPassed = i < order.step;
@@ -777,7 +730,6 @@
                         dateDisplay = '<span class="text-[9px] text-gray-400 uppercase italic">Coming up soon...</span>';
                     }
                     
-                    // 修改点：这里的 pt-[24px] 能够确保水平的箭头和固定的 step-icon 圆圈完美对齐
                     const arrow = (i < steps.length - 1) ? 
                         `<div class="w-8 md:flex-1 flex-shrink-0 flex justify-center pt-[24px]">
                             <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
@@ -804,27 +756,25 @@
                         </div>`;
                     }
                     
+                    /* ✨ 新增素材渲染：从 order.attachments 读取多类型素材 */
                     let stepMediaHtml = '';
-                    if (order.stepMedia && order.stepMedia[i]) {
-                        const mediaUrl = order.stepMedia[i];
-                        const safeUrl = mediaUrl.replace(/'/g, "\\'");
-                        const isVideo = mediaUrl.match(/\.(mp4|webm|ogg)$/i) || mediaUrl.includes('youtube.com') || mediaUrl.includes('youtu.be');
-                        
-                        if (isVideo) {
-                            if(mediaUrl.includes('youtube') || mediaUrl.includes('youtu.be')) {
-                                const ytId = getYTId(mediaUrl); 
-                                if(ytId) {
-                                    stepMediaHtml = `<div class="mt-3 w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-video z-10 relative"><iframe src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen class="w-full h-full pointer-events-auto"></iframe></div>`;
-                                }
-                            } else {
-                                stepMediaHtml = `<div class="mt-3 w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-video z-10 relative"><video src="${safeUrl}" controls class="w-full h-full object-cover pointer-events-auto"></video></div>`;
+                    if (order.attachments && order.attachments[i] && order.attachments[i].length > 0) {
+                        stepMediaHtml = '<div class="mt-3 w-full flex flex-col items-center gap-2 z-10">';
+                        order.attachments[i].forEach(att => {
+                            const safeData = att.data.replace(/'/g, "\\'");
+                            if (att.type === 'image') {
+                                stepMediaHtml += `<div class="w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-square cursor-pointer hover:shadow-md transition bg-white flex items-center justify-center p-1" onclick="event.stopPropagation(); showBigImage('${safeData}')"><img src="${safeData}" class="w-full h-full object-contain"></div>`;
+                            } else if (att.type === 'video') {
+                                stepMediaHtml += `<div class="w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-video"><video src="${safeData}" controls class="w-full h-full object-cover pointer-events-auto"></video></div>`;
+                            } else if (att.type === 'youtube') {
+                                stepMediaHtml += `<div class="w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-video"><iframe src="https://www.youtube.com/embed/${att.data}" frameborder="0" allowfullscreen class="w-full h-full pointer-events-auto"></iframe></div>`;
+                            } else if (att.type === 'pdf') {
+                                stepMediaHtml += `<div class="w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-[3/4] cursor-pointer hover:shadow-md transition bg-white flex items-center justify-center" onclick="window.open('${safeData}', '_blank')"><span class="text-sm font-bold text-red-600">PDF</span></div>`;
                             }
-                        } else {
-                            stepMediaHtml = `<div class="mt-3 w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-square cursor-pointer hover:shadow-md transition z-10 relative bg-white flex items-center justify-center p-1" onclick="event.stopPropagation(); showBigImage('${safeUrl}')"><img src="${safeUrl}" class="w-full h-full object-contain"></div>`;
-                        }
+                        });
+                        stepMediaHtml += '</div>';
                     }
                     
-                    // 修改点：这里的 w-24 md:flex-1 是垂直布局的关键。上面所有的固定高度保证水平线不会发生偏移。
                     return `<div class="flex flex-col items-center w-24 md:flex-1 flex-shrink-0 relative">
                         <span class="text-[10px] text-gray-400 font-bold h-4 flex items-center justify-center text-center whitespace-nowrap mb-1">${dateDisplay}</span>
                         <div class="step-icon ${iconClass} flex-shrink-0">${iconContent}</div>
@@ -836,7 +786,6 @@
                     </div>` + arrow;
                 }).join('');
                 
-                // 核心修改：重新查询订单时，恢复催单按钮状态并显示
                 const urgeBtn = document.getElementById('urge-btn');
                 urgeBtn.innerHTML = `<span class="w-2.5 h-2.5 bg-red-600 rounded-full inline-block animate-pulse"></span><span>Urge Order</span>`;
                 urgeBtn.className = "bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-8 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm w-full md:w-auto";
@@ -855,7 +804,6 @@
             return { date: d[0] || "", carrier: (d[1] || "").replace('[', ''), tracking: parts[1] ? parts[1].replace(']', '').trim() : "" };
         }
 
-        // 核心修改：纯前端催促发货方法
         async function urgeOrder() {
             const btn = document.getElementById('urge-btn');
             if (!window.currentTrackedPI) return;
@@ -865,11 +813,9 @@
             btn.innerHTML = "Processing...";
             
             try {
-                // 采用直接走 OA 总接口 PUT 数据的方式，零后端修改实现数据传递
                 const API_URL = "https://eddie-unified-backend.mfgift.workers.dev";
                 const AUTH_KEY = "SAGE_SECURE_2026";
                 
-                // 1. 抓取总单列表
                 const res = await fetch(API_URL, { headers: { "X-Auth-Key": AUTH_KEY }, cache: "no-store" });
                 const data = await res.json();
                 
@@ -877,7 +823,7 @@
                 if (data.orders) {
                     for (let o of data.orders) {
                         if (o.piCode === window.currentTrackedPI) {
-                            o.isUrged = true; // 打上催单标签
+                            o.isUrged = true;
                             found = true;
                             break;
                         }
@@ -885,7 +831,6 @@
                 }
                 
                 if (found) {
-                    // 2. 存回数据库
                     await fetch(API_URL, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json", "X-Auth-Key": AUTH_KEY },
