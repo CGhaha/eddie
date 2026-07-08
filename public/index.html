@@ -5,38 +5,219 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MF AGENCY HUBS | SAGE A+ Supplier</title>
     <link class="flex" rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/assets/web0101.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js">
+    </script>
     <style>
-        .page { display: none; }
-        .page.active { display: block; }
-        .model-card model-viewer { width: 100%; height: 180px; --poster-color: transparent; background-color: #f8fafc; }
-        ::-webkit-scrollbar { width: 0px; height: 0px; background: transparent; }
-        .sidebar-item.active { background-color: #2563eb; color: white; }
-        #modal-content { max-height: 95vh; }
-        img { transition: opacity 0.3s; }
-        img[loading="lazy"] { opacity: 0; }
-        img.loaded { opacity: 1; }
-        
-        #modal-media-container img.hidden { display: none !important; }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .model-card model-viewer {
+            width: 100%;
+            height: 180px;
+            --poster-color: transparent;
+            background-color: #f8fafc;
+        }
+        ::-webkit-scrollbar {
+            width: 0px;
+            height: 0px;
+            background: transparent;
+        }
+        .sidebar-item.active {
+            background-color: #2563eb;
+            color: white;
+        }
+        #modal-content {
+            max-height: 95vh;
+        }
+        img {
+            transition: opacity 0.3s;
+        }
+        img[loading="lazy"] {
+            opacity: 0;
+        }
+        img.loaded {
+            opacity: 1;
+        }
+
+        #modal-media-container img.hidden {
+            display: none !important;
+        }
         #modal-media-container img:not(.hidden) {
-            width: 100% !important; height: 100% !important; object-fit: contain !important; 
-            object-position: center !important; display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
+            object-position: center !important;
+            display: block !important;
         }
         #modal-media-container {
-            width: 100% !important; height: 100% !important; overflow: hidden !important;
-            display: flex !important; align-items: center !important; justify-content: center !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             background-color: #fff;
         }
         .step-icon {
-            width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-            border-radius: 50%; font-size: 14px; color: white; margin: 0 auto;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 14px;
+            color: white;
+            margin: 0 auto;
         }
-        .step-icon.passed { background-color: #1f2937; }
-        .step-icon.current { background-color: #10b981; }
-        .step-icon.pending { background-color: #9ca3af; }
-        .thumb-item { border: 2px solid transparent; transition: all 0.2s; }
-        .thumb-item.active { border-color: #2563eb; }
+        .step-icon.passed {
+            background-color: #1f2937;
+        }
+        .step-icon.current {
+            background-color: #10b981;
+        }
+        .step-icon.pending {
+            background-color: #9ca3af;
+        }
+        .thumb-item {
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .thumb-item.active {
+            border-color: #2563eb;
+        }
+
+        /* 视频弹窗样式 */
+        #video-popup-modal {
+            z-index: 110;
+        }
+        #video-popup-modal .video-popup-content {
+            position: relative;
+            width: 90vw;
+            max-width: 800px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+        #video-popup-modal .video-popup-content iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        #video-popup-close {
+            position: absolute;
+            top: -44px;
+            right: 0;
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            color: white;
+            border-radius: 50%;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            line-height: 1;
+        }
+        #video-popup-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.08);
+        }
+
+        /* YouTube缩略图卡片 — 框更大，按钮更小 */
+        .yt-thumb-wrapper {
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            transition: all 0.2s;
+            background: #000;
+            aspect-ratio: 16 / 9;
+            width: 100%;
+            max-width: 240px;
+            margin: 0 auto;
+        }
+        .yt-thumb-wrapper:hover {
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+            border-color: #3b82f6;
+        }
+        .yt-thumb-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.4s;
+        }
+        .yt-thumb-wrapper:hover img {
+            transform: scale(1.06);
+        }
+        .yt-play-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 2;
+        }
+        .yt-play-circle {
+            width: 30px;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        .yt-thumb-wrapper:hover .yt-play-circle {
+            background: #ef4444;
+            border-color: #ef4444;
+            box-shadow: 0 6px 24px rgba(239, 68, 68, 0.5);
+            transform: scale(1.1);
+        }
+        .yt-play-triangle {
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 6px 0 6px 10px;
+            border-color: transparent transparent transparent white;
+            margin-left: 1px;
+            transition: transform 0.3s;
+        }
+        .yt-thumb-wrapper:hover .yt-play-triangle {
+            transform: scale(1.15);
+        }
+
+        @media (max-width: 767px) {
+            .yt-thumb-wrapper {
+                max-width: 180px;
+            }
+            .yt-play-circle {
+                width: 26px;
+                height: 26px;
+            }
+            .yt-play-triangle {
+                border-width: 5px 0 5px 8px;
+                margin-left: 1px;
+            }
+        }
     </style>
 </head>
 
@@ -46,13 +227,13 @@
         <div class="absolute left-4 md:left-10 flex items-center h-full top-0 cursor-pointer z-50" onclick="showPage('home')">
             <img id="nav-logo" src="https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/assets/web002.png" alt="Logo" class="h-11 md:h-14 w-auto object-contain transition-opacity duration-300">
         </div>
-        
+
         <button onclick="toggleMobileMenu()" class="absolute right-4 top-0 h-full flex items-center md:hidden z-50 text-white p-2">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
 
         <div id="mobile-menu-backdrop" onclick="toggleMobileMenu(false)" class="fixed inset-0 bg-black/60 z-[40] hidden md:hidden transition-opacity"></div>
-        
+
         <div id="nav-links" class="fixed inset-y-0 left-0 bg-slate-900 w-64 transform -translate-x-full transition-transform duration-300 ease-in-out z-[45] flex flex-col pt-24 px-8 gap-6 shadow-2xl md:static md:w-auto md:bg-transparent md:transform-none md:flex-row md:pt-0 md:px-0 md:gap-8 overflow-y-auto md:overflow-visible">
             <button onclick="showPage('home'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium transition text-lg md:text-base">Home</button>
             <button onclick="showPage('hot-sales'); toggleMobileMenu(false)" class="text-left hover:text-blue-400 font-medium transition text-lg md:text-base">Hot Sales</button>
@@ -79,7 +260,7 @@
                 </button>
             </div>
         </div>
-        
+
         <div class="py-8 bg-white">
             <div class="max-w-4xl mx-auto text-center px-6">
                 <h2 class="text-2xl font-bold text-gray-600 mb-4">Available 24/7/365</h2>
@@ -108,7 +289,7 @@
                     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 md:gap-6" id="product-list"></div>
                     <div id="hot-sales-pagination" class="mt-10 flex flex-wrap items-center justify-center gap-4 text-sm hidden"></div>
                 </div>
-                
+
                 <div id="videos" class="page">
                     <div class="flex justify-between items-center mb-8 border-b pb-4">
                         <h2 class="text-3xl font-bold">Videos</h2>
@@ -162,7 +343,7 @@
                             <div class="w-full overflow-x-auto pb-4">
                                 <div id="timeline" class="flex items-start py-6 gap-2 md:gap-4 min-w-max md:min-w-0 px-2 md:px-0"></div>
                             </div>
-                            
+
                             <div id="urge-container" class="mt-8 pt-6 border-t border-gray-100 flex flex-col items-center justify-center w-full" style="display: none;">
                                 <p class="text-xs text-gray-400 mb-3 font-medium text-center">Need it faster? Let our team know.</p>
                                 <button id="urge-btn" onclick="urgeOrder()" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-8 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm w-full md:w-auto">
@@ -222,10 +403,20 @@
         </div>
     </div>
 
+    <!-- 大图弹窗 -->
     <div id="big-img-modal" onclick="this.classList.add('hidden')" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center p-4">
         <img id="big-img-display" class="max-w-[95%] md:max-w-[45%] max-h-[90vh] object-contain" src="">
     </div>
 
+    <!-- YouTube视频弹窗 -->
+    <div id="video-popup-modal" onclick="closeVideoPopup(event)" class="fixed inset-0 bg-black/85 z-[110] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="video-popup-content" onclick="event.stopPropagation()">
+            <button id="video-popup-close" onclick="closeVideoPopup()" title="Close">✕</button>
+            <iframe id="video-popup-iframe" src="" frameborder="0" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen class="w-full h-full"></iframe>
+        </div>
+    </div>
+
+    <!-- 产品详情弹窗 -->
     <div id="media-modal" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] hidden flex items-center justify-center p-2 md:p-6">
         <div id="modal-content" class="w-full max-w-[85rem] h-[95vh] flex flex-col md:flex-row bg-white rounded-2xl overflow-hidden shadow-2xl relative">
             <button onclick="closeModal()" class="absolute top-2 right-2 md:top-4 md:right-4 z-[70] bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full w-9 h-9 md:w-12 md:h-12 flex items-center justify-center text-2xl md:text-4xl transition shadow-md">&times;</button>
@@ -265,27 +456,41 @@
 
     <script>
         const API = 'https://mamba-api.mfgift.workers.dev/api/products';
-        let allProducts = [], currentImgs = [], currentIndex = 0;
-        let currentTag = 'All', currentSearch = '', currentPage = 'home';
-        let currentMediaTypes = []; 
-        let ignoreHashChange = false; 
+        let allProducts = [],
+            currentImgs = [],
+            currentIndex = 0;
+        let currentTag = 'All',
+            currentSearch = '',
+            currentPage = 'home';
+        let currentMediaTypes = [];
+        let ignoreHashChange = false;
 
         window.currentTrackedPI = '';
-        
+
         let currentProductId = null;
         let userIp = '';
-        
+
         fetch('https://api.ipify.org?format=json')
             .then(r => r.json())
             .then(d => userIp = d.ip)
             .catch(() => userIp = 'local-' + Math.random().toString(36).substring(7));
 
-        const pageStates = { 'hot-sales': 1, 'videos': 1, '3d-view': 1, 'live': 1, 'order': 1, 'about': 1 };
-        const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Tool", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar", "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"];
+        const pageStates = {
+            'hot-sales': 1,
+            'videos': 1,
+            '3d-view': 1,
+            'live': 1,
+            'order': 1,
+            'about': 1
+        };
+        const CATEGORIES = ["Apparel", "Bags", "Trade Show", "Tool", "Outdoor & Leisure", "Technology", "Mugs & Drinkware", "Bar",
+            "Automotive", "Home & Kitchen", "Wellness & Health", "Sports", "Offices & Desks", "Jewelry & Giveaways", "Toys & Fun"
+        ];
 
         function fixUrl(path) {
             if (!path) return '';
-            return path.startsWith('http') ? path : `https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/${path.replace(/^\//, '')}`;
+            return path.startsWith('http') ? path :
+                `https://cdn.jsdelivr.net/gh/CGhaha/eddie@main/${path.replace(/^\//, '')}`;
         }
 
         function showBigImage(src) {
@@ -294,12 +499,39 @@
             modal.classList.remove('hidden');
         }
 
+        function openVideoPopup(youtubeVideoId, event) {
+            if (event) event.stopPropagation();
+            const modal = document.getElementById('video-popup-modal');
+            const iframe = document.getElementById('video-popup-iframe');
+            iframe.src = `https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&rel=0`;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideoPopup(event) {
+            if (event && event.target !== document.getElementById('video-popup-modal')) return;
+            const modal = document.getElementById('video-popup-modal');
+            const iframe = document.getElementById('video-popup-iframe');
+            iframe.src = '';
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const videoModal = document.getElementById('video-popup-modal');
+                if (!videoModal.classList.contains('hidden')) {
+                    closeVideoPopup();
+                }
+            }
+        });
+
         function toggleMobileMenu(forceState) {
             const nav = document.getElementById('nav-links');
             const backdrop = document.getElementById('mobile-menu-backdrop');
             const isOpen = !nav.classList.contains('-translate-x-full');
             const newState = forceState !== undefined ? forceState : !isOpen;
-            
+
             if (newState) {
                 nav.classList.remove('-translate-x-full');
                 backdrop.classList.remove('hidden');
@@ -317,7 +549,7 @@
                 renderTags();
                 handleDeepLink();
                 setupButtons();
-                setupZoomFeature(); 
+                setupZoomFeature();
                 updateBeijingTime();
                 setInterval(updateBeijingTime, 1000);
             } catch (e) { console.error(e); }
@@ -330,11 +562,13 @@
             }
             const fullHash = window.location.hash.replace('#', '');
             const [pageId, productId] = fullHash.split('!');
-            if (pageId && ['home', 'hot-sales', 'videos', '3d-view', 'live', 'order', 'about'].includes(pageId)) showPage(pageId);
+            if (pageId && ['home', 'hot-sales', 'videos', '3d-view', 'live', 'order', 'about'].includes(pageId)) showPage(
+                pageId);
             else renderAll();
             if (productId) {
                 const p = allProducts.find(x => x.id == productId);
-                if (p) openModal(p.category === 'videos' ? 'video' : (p.category === 'showroom-3d' ? '3d' : 'img'), p.id, true);
+                if (p) openModal(p.category === 'videos' ? 'video' : (p.category === 'showroom-3d' ? '3d' : 'img'), p.id,
+                    true);
             }
         }
 
@@ -344,51 +578,61 @@
             document.getElementById('inquiry-btn').onclick = () => {
                 const title = document.getElementById('modal-title').innerText;
                 const subject = encodeURIComponent(`Quote for ${title}`);
-                const body = encodeURIComponent(`Hi All, I'm very interested in the ${title} product on your website. Can you please provide more information about it?`);
+                const body = encodeURIComponent(
+                    `Hi All, I'm very interested in the ${title} product on your website. Can you please provide more information about it?`
+                    );
                 window.location.href = `mailto:katfang@foxmail.com?subject=${subject}&body=${body}`;
             };
             document.getElementById('whatsapp-btn').onclick = () => {
                 const title = document.getElementById('modal-title').innerText;
-                const text = encodeURIComponent(`Hi All, I'm very interested in the ${title} product on your website. Can you please provide more information about it?`);
+                const text = encodeURIComponent(
+                    `Hi All, I'm very interested in the ${title} product on your website. Can you please provide more information about it?`
+                    );
                 window.open(`https://wa.me/8613323604265?text=${text}`, '_blank');
             };
         }
 
         function renderTags() {
             const tagContainer = document.getElementById('tag-list');
-            if(!tagContainer) return;
-            tagContainer.innerHTML = `<button onclick="filterByTag('All')" class="sidebar-item active px-3 py-2 rounded-lg text-left text-sm font-medium hover:bg-gray-100 transition">All Items</button>` + 
-                CATEGORIES.map(cat => `<button onclick="filterByTag('${cat}')" class="sidebar-item px-3 py-2 rounded-lg text-left text-sm font-medium hover:bg-gray-100 transition">${cat}</button>`).join('');
+            if (!tagContainer) return;
+            tagContainer.innerHTML =
+                `<button onclick="filterByTag('All')" class="sidebar-item active px-3 py-2 rounded-lg text-left text-sm font-medium hover:bg-gray-100 transition">All Items</button>` +
+                CATEGORIES.map(cat =>
+                    `<button onclick="filterByTag('${cat}')" class="sidebar-item px-3 py-2 rounded-lg text-left text-sm font-medium hover:bg-gray-100 transition">${cat}</button>`
+                    ).join('');
         }
 
         function showPage(id) {
             currentPage = id;
             if (document.getElementById('media-modal').classList.contains('hidden')) {
-                ignoreHashChange = true; 
+                ignoreHashChange = true;
                 window.location.hash = id;
             }
             document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
-            document.getElementById('category-sidebar').style.display = (id === 'home' || id === 'live' || id === 'order' || id === 'about') ? 'none' : 'block';
-            if(pageStates[id]) pageStates[id] = 1;
+            document.getElementById('category-sidebar').style.display = (id === 'home' || id === 'live' || id === 'order' ||
+                id === 'about') ? 'none' : 'block';
+            if (pageStates[id]) pageStates[id] = 1;
             renderAll();
         }
 
         function filterByTag(tag) {
             currentTag = tag;
-            document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.toggle('active', btn.innerText === tag || (tag === 'All' && btn.innerText === 'All Items')));
-            if(pageStates[currentPage]) pageStates[currentPage] = 1;
+            document.querySelectorAll('.sidebar-item').forEach(btn => btn.classList.toggle('active', btn.innerText === tag || (
+                tag === 'All' && btn.innerText === 'All Items')));
+            if (pageStates[currentPage]) pageStates[currentPage] = 1;
             renderAll();
         }
 
-        function searchItems(val) { 
-            currentSearch = val.toLowerCase(); 
-            if(pageStates[currentPage]) pageStates[currentPage] = 1;
-            renderAll(); 
+        function searchItems(val) {
+            currentSearch = val.toLowerCase();
+            if (pageStates[currentPage]) pageStates[currentPage] = 1;
+            renderAll();
         }
 
         function renderAll() {
-            if(currentPage === 'home' || currentPage === 'live' || currentPage === 'order' || currentPage === 'about') return;
-            let items = allProducts.filter(p => 
+            if (currentPage === 'home' || currentPage === 'live' || currentPage === 'order' || currentPage === 'about')
+                return;
+            let items = allProducts.filter(p =>
                 (currentPage === 'hot-sales' && p.category === 'hot-sales') ||
                 (currentPage === 'videos' && p.category === 'videos') ||
                 (currentPage === '3d-view' && p.category === 'showroom-3d')
@@ -398,7 +642,7 @@
 
             let itemsPerPage = 12;
             if (currentPage === 'hot-sales' || currentPage === '3d-view') {
-                itemsPerPage = window.innerWidth >= 1024 ? 18 : (window.innerWidth >= 768 ? 12 : 6); 
+                itemsPerPage = window.innerWidth >= 1024 ? 18 : (window.innerWidth >= 768 ? 12 : 6);
             } else if (currentPage === 'videos') {
                 itemsPerPage = window.innerWidth >= 1024 ? 15 : (window.innerWidth >= 768 ? 9 : 3);
             }
@@ -412,8 +656,10 @@
             const endIndex = startIndex + itemsPerPage;
             const paginatedItems = items.slice(startIndex, endIndex);
 
-            const containerId = currentPage === 'hot-sales' ? 'product-list' : (currentPage === 'videos' ? 'video-list' : '3d-list');
-            renderGrid(containerId, paginatedItems, currentPage === 'hot-sales' ? 'img' : (currentPage === 'videos' ? 'video' : '3d'));
+            const containerId = currentPage === 'hot-sales' ? 'product-list' : (currentPage === 'videos' ? 'video-list' :
+                '3d-list');
+            renderGrid(containerId, paginatedItems, currentPage === 'hot-sales' ? 'img' : (currentPage === 'videos' ?
+                'video' : '3d'));
             renderPaginationControls(currentPage, totalPages);
         }
 
@@ -425,19 +671,26 @@
 
             const curr = pageStates[pageId];
             let html = `<div class="flex items-center gap-2">`;
-            if (curr > 1) html += `<button onclick="changePage('${pageId}', ${curr - 1})" class="px-3 py-1.5 border rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition font-medium">Prev</button>`;
-            else html += `<button class="px-3 py-1.5 border rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed font-medium" disabled>Prev</button>`;
+            if (curr > 1) html +=
+                `<button onclick="changePage('${pageId}', ${curr - 1})" class="px-3 py-1.5 border rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition font-medium">Prev</button>`;
+            else html +=
+                `<button class="px-3 py-1.5 border rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed font-medium" disabled>Prev</button>`;
 
             const startNum = Math.max(1, curr - 3);
             const endNum = Math.min(totalPages, curr + 3);
             for (let i = startNum; i <= endNum; i++) {
-                if (i === curr) html += `<button class="w-9 h-9 font-bold bg-blue-600 text-white rounded-lg shadow-sm">${i}</button>`;
-                else html += `<button onclick="changePage('${pageId}', ${i})" class="w-9 h-9 border bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">${i}</button>`;
+                if (i === curr) html +=
+                    `<button class="w-9 h-9 font-bold bg-blue-600 text-white rounded-lg shadow-sm">${i}</button>`;
+                else html +=
+                    `<button onclick="changePage('${pageId}', ${i})" class="w-9 h-9 border bg-white text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium">${i}</button>`;
             }
-            if (curr < totalPages) html += `<button onclick="changePage('${pageId}', ${curr + 1})" class="px-3 py-1.5 border rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition font-medium">Next</button>`;
-            else html += `<button class="px-3 py-1.5 border rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed font-medium" disabled>Next</button>`;
-            
-            html += `</div><div class="flex items-center gap-2 text-gray-500"><span>Page</span><input type="number" id="${pageId}-jump-input" min="1" max="${totalPages}" value="${curr}" class="w-14 px-2 py-1 text-center border rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none"><span>of ${totalPages}</span><button onclick="jumpToPage('${pageId}', ${totalPages})" class="px-3 py-1 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition text-xs font-semibold uppercase tracking-wider">Go</button></div>`;
+            if (curr < totalPages) html +=
+                `<button onclick="changePage('${pageId}', ${curr + 1})" class="px-3 py-1.5 border rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition font-medium">Next</button>`;
+            else html +=
+                `<button class="px-3 py-1.5 border rounded-lg bg-gray-100 text-gray-400 cursor-not-allowed font-medium" disabled>Next</button>`;
+
+            html +=
+                `</div><div class="flex items-center gap-2 text-gray-500"><span>Page</span><input type="number" id="${pageId}-jump-input" min="1" max="${totalPages}" value="${curr}" class="w-14 px-2 py-1 text-center border rounded-lg text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none"><span>of ${totalPages}</span><button onclick="jumpToPage('${pageId}', ${totalPages})" class="px-3 py-1 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition text-xs font-semibold uppercase tracking-wider">Go</button></div>`;
             container.innerHTML = html;
         }
 
@@ -449,7 +702,7 @@
 
         function jumpToPage(pageId, maxPage) {
             const input = document.getElementById(`${pageId}-jump-input`);
-            if(!input) return;
+            if (!input) return;
             let val = parseInt(input.value);
             if (isNaN(val) || val < 1) val = 1;
             if (val > maxPage) val = maxPage;
@@ -470,15 +723,17 @@
             if (!grid) return;
             const now = new Date().getTime();
             grid.innerHTML = items.map((p, index) => {
-                const paths = p.file_path ? p.file_path.split(',').map(x=>x.trim()).filter(x=>x!=='') : [];
-                let formattedName = p.name.replace(/\[(.*?)\]/g, '<span class="text-[10px] opacity-60">$1</span>');
-                
+                const paths = p.file_path ? p.file_path.split(',').map(x => x.trim()).filter(x => x !== '') : [];
+                let formattedName = p.name.replace(/\[(.*?)\]/g,
+                    '<span class="text-[10px] opacity-60">$1</span>');
+
                 let badges = "";
                 if (currentPage === 'hot-sales') {
                     const globalIndex = allProducts.findIndex(x => x.id === p.id);
-                    if (globalIndex >= 0 && globalIndex < 10) badges += `<span class="absolute top-2 left-2 z-10 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">Top ${globalIndex + 1}</span>`;
+                    if (globalIndex >= 0 && globalIndex < 10) badges +=
+                        `<span class="absolute top-2 left-2 z-10 bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded shadow">Top ${globalIndex + 1}</span>`;
                 }
-                
+
                 let rawDate = p.upload_date || p.created_at || p.date || p.add_time || 0;
                 let uploadDate = 0;
                 if (rawDate) {
@@ -491,7 +746,8 @@
                 if (isNaN(uploadDate)) uploadDate = 0;
 
                 if (uploadDate > 0 && (now - uploadDate < 7 * 24 * 60 * 60 * 1000)) {
-                    badges += `<span class="absolute top-2 right-2 z-10 bg-blue-400 text-white text-[9px] font-bold w-8 h-8 flex items-center justify-center rounded-full shadow">New</span>`;
+                    badges +=
+                        `<span class="absolute top-2 right-2 z-10 bg-blue-400 text-white text-[9px] font-bold w-8 h-8 flex items-center justify-center rounded-full shadow">New</span>`;
                 }
 
                 if (type === 'img') {
@@ -504,7 +760,8 @@
                     </div>`;
                 } else if (type === 'video') {
                     const vid = getYTId(p.yt_url);
-                    const thumb = vid ? `https://i3.ytimg.com/vi/${vid}/hqdefault.jpg` : 'https://placehold.co/600x400?text=No+Video';
+                    const thumb = vid ? `https://i3.ytimg.com/vi/${vid}/hqdefault.jpg` :
+                        'https://placehold.co/600x400?text=No+Video';
                     return `<div class="group relative cursor-pointer overflow-hidden rounded-xl bg-black" onclick="openModal('video', ${p.id})">
                         ${badges}
                         <div class="aspect-video relative"><img src="${thumb}" class="w-full h-full object-cover opacity-70 group-hover:scale-105 transition duration-500" loading="lazy" decoding="async" onload="this.classList.add('loaded')"><div class="absolute inset-0 flex items-center justify-center"><div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-xl">▶</div></div></div><div class="p-3 bg-slate-900 text-white text-xs font-bold truncate">${formattedName}</div></div>`;
@@ -516,23 +773,33 @@
                 }
             }).join('');
         }
-        
+
         function openModal(type, id, isDeepLink = false) {
-            const p = allProducts.find(x => x.id === id); if(!p) return;
+            const p = allProducts.find(x => x.id === id);
+            if (!p) return;
             try {
-                fetch('https://mamba-api.mfgift.workers.dev/api/products/click', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: p.id }) });
-            } catch(e) {}
-            
+                fetch('https://mamba-api.mfgift.workers.dev/api/products/click', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: p.id })
+                });
+            } catch (e) {}
+
             currentProductId = id;
-            if (!isDeepLink) { ignoreHashChange = true; window.location.hash = `${currentPage}!${id}`; }
-            
-            const modal = document.getElementById('media-modal'), yt = document.getElementById('youtube-frame'), container3d = document.getElementById('modal-3d-container');
+            if (!isDeepLink) { ignoreHashChange = true;
+                window.location.hash = `${currentPage}!${id}`; }
+
+            const modal = document.getElementById('media-modal'),
+                yt = document.getElementById('youtube-frame'),
+                container3d = document.getElementById('modal-3d-container');
             document.getElementById('modal-title').innerText = p.name;
-            document.getElementById('modal-desc').innerText = `Material: ${p.material || 'Standard'}\nMOQ: ${p.moq || 'N/A'}`;
+            document.getElementById('modal-desc').innerText =
+                `Material: ${p.material || 'Standard'}\nMOQ: ${p.moq || 'N/A'}`;
             const customDescEl = document.getElementById('modal-custom-desc');
-            if (p.description && p.description.trim() !== "") { customDescEl.innerText = p.description; customDescEl.classList.remove('hidden'); }
-            else { customDescEl.innerText = ""; customDescEl.classList.add('hidden'); }
-            
+            if (p.description && p.description.trim() !== "") { customDescEl.innerText = p.description;
+                customDescEl.classList.remove('hidden'); } else { customDescEl.innerText = "";
+                customDescEl.classList.add('hidden'); }
+
             const inquiryBtn = document.getElementById('inquiry-btn');
             const whatsappBtn = document.getElementById('whatsapp-btn');
             if (p.category === 'showroom-3d') {
@@ -542,61 +809,68 @@
                 if (inquiryBtn) inquiryBtn.style.display = '';
                 if (whatsappBtn) whatsappBtn.style.display = '';
             }
-            
+
             modal.classList.remove('hidden');
-            
-            currentImgs = []; currentMediaTypes = []; currentIndex = 0;
-            yt.src = ""; document.getElementById('viewer-holder').innerHTML = "";
-            const uploadedPaths = p.file_path ? p.file_path.split(',').map(x=>x.trim()).filter(x => x !== "") : [];
+
+            currentImgs = [];
+            currentMediaTypes = [];
+            currentIndex = 0;
+            yt.src = "";
+            document.getElementById('viewer-holder').innerHTML = "";
+            const uploadedPaths = p.file_path ? p.file_path.split(',').map(x => x.trim()).filter(x => x !== "") : [];
             if (p.category === 'showroom-3d') {
-                uploadedPaths.forEach(path => { currentImgs.push(path); currentMediaTypes.push(path.toLowerCase().endsWith('.glb') ? '3d' : 'img'); });
+                uploadedPaths.forEach(path => { currentImgs.push(path);
+                    currentMediaTypes.push(path.toLowerCase().endsWith('.glb') ? '3d' : 'img'); });
             } else if (p.category === 'videos' && p.yt_url) {
-                currentImgs.push(p.yt_url); currentMediaTypes.push('video');
-                uploadedPaths.forEach(path => { currentImgs.push(path); currentMediaTypes.push('img'); });
-            } else { uploadedPaths.forEach(path => { currentImgs.push(path); currentMediaTypes.push('img'); }); }
-            
+                currentImgs.push(p.yt_url);
+                currentMediaTypes.push('video');
+                uploadedPaths.forEach(path => { currentImgs.push(path);
+                    currentMediaTypes.push('img'); });
+            } else { uploadedPaths.forEach(path => { currentImgs.push(path);
+                    currentMediaTypes.push('img'); }); }
+
             switchActiveMedia();
             renderThumbs();
             updateLikeUI();
         }
 
         function handleLike() {
-            if(!currentProductId) return;
+            if (!currentProductId) return;
             const likeKey = `liked_${currentProductId}_${userIp}`;
-            if(localStorage.getItem(likeKey)) {
+            if (localStorage.getItem(likeKey)) {
                 alert('You have already liked this product!');
                 return;
             }
-            
+
             localStorage.setItem(likeKey, 'true');
-            
+
             let counts = JSON.parse(localStorage.getItem('like_counts') || '{}');
             counts[currentProductId] = (counts[currentProductId] || 0) + 1;
             localStorage.setItem('like_counts', JSON.stringify(counts));
-            
+
             updateLikeUI();
         }
 
         function updateLikeUI() {
-            if(!currentProductId) return;
+            if (!currentProductId) return;
             const likeKey = `liked_${currentProductId}_${userIp}`;
             const btn = document.getElementById('like-btn');
             const text = document.getElementById('like-text');
             const countDisplay = document.getElementById('like-count');
-            
+
             let counts = JSON.parse(localStorage.getItem('like_counts') || '{}');
-            let count = counts[currentProductId] || 0; 
-            
+            let count = counts[currentProductId] || 0;
+
             if (count === 0) {
                 const p = allProducts.find(x => x.id === currentProductId);
-                count = p ? Math.floor((parseInt(p.clicks) || 0) / 10) + 1 : 1; 
+                count = p ? Math.floor((parseInt(p.clicks) || 0) / 10) + 1 : 1;
                 counts[currentProductId] = count;
                 localStorage.setItem('like_counts', JSON.stringify(counts));
             }
 
             countDisplay.innerText = count;
 
-            if(localStorage.getItem(likeKey)) {
+            if (localStorage.getItem(likeKey)) {
                 btn.classList.remove('bg-red-500', 'hover:bg-red-600');
                 btn.classList.add('bg-gray-400', 'cursor-not-allowed');
                 text.innerText = 'Liked';
@@ -608,14 +882,22 @@
         }
 
         function switchActiveMedia() {
-            const img = document.getElementById('modal-img'), yt = document.getElementById('youtube-frame'), container3d = document.getElementById('modal-3d-container');
+            const img = document.getElementById('modal-img'),
+                yt = document.getElementById('youtube-frame'),
+                container3d = document.getElementById('modal-3d-container');
             [img, yt, container3d].forEach(el => el.classList.add('hidden'));
-            
-            const mediaType = currentMediaTypes[currentIndex], mediaUrl = currentImgs[currentIndex];
-            if (mediaType === '3d') { container3d.classList.remove('hidden'); document.getElementById('viewer-holder').innerHTML = `<model-viewer src="${fixUrl(mediaUrl)}" camera-controls auto-rotate max-field-of-view="120deg" style="width:100%; height:100%"></model-viewer>`; hideGlobalZoom(); }
-            else if (mediaType === 'video') { yt.classList.remove('hidden'); yt.src = `https://www.youtube.com/embed/${getYTId(mediaUrl)}?autoplay=1`; hideGlobalZoom(); }
-            else if (mediaType === 'img') { img.classList.remove('hidden'); img.src = fixUrl(mediaUrl); bindZoomEvents(); }
-            
+
+            const mediaType = currentMediaTypes[currentIndex],
+                mediaUrl = currentImgs[currentIndex];
+            if (mediaType === '3d') { container3d.classList.remove('hidden');
+                document.getElementById('viewer-holder').innerHTML =
+                    `<model-viewer src="${fixUrl(mediaUrl)}" camera-controls auto-rotate max-field-of-view="120deg" style="width:100%; height:100%"></model-viewer>`;
+                hideGlobalZoom(); } else if (mediaType === 'video') { yt.classList.remove('hidden');
+                yt.src = `https://www.youtube.com/embed/${getYTId(mediaUrl)}?autoplay=1`;
+                hideGlobalZoom(); } else if (mediaType === 'img') { img.classList.remove('hidden');
+                img.src = fixUrl(mediaUrl);
+                bindZoomEvents(); }
+
             document.querySelectorAll('.thumb-item').forEach((el, i) => {
                 el.classList.toggle('active', i === currentIndex);
             });
@@ -628,59 +910,99 @@
             container.innerHTML = currentImgs.map((src, i) => {
                 const isVideo = currentMediaTypes[i] === 'video';
                 const is3D = currentMediaTypes[i] === '3d';
-                const thumbSrc = isVideo ? `https://i3.ytimg.com/vi/${getYTId(src)}/hqdefault.jpg` : (is3D ? '' : fixUrl(src));
+                const thumbSrc = isVideo ? `https://i3.ytimg.com/vi/${getYTId(src)}/hqdefault.jpg` : (is3D ? '' :
+                    fixUrl(src));
                 return `<div onclick="currentIndex=${i};switchActiveMedia()" class="thumb-item w-12 h-12 md:w-16 md:h-16 flex-shrink-0 cursor-pointer rounded-lg bg-gray-100 overflow-hidden ${i===currentIndex?'active':''}">
                     ${is3D ? '<div class="w-full h-full flex items-center justify-center text-[10px] font-bold text-gray-500">3D</div>' : (isVideo ? '<div class="w-full h-full flex items-center justify-center text-[10px] font-bold text-gray-500">VID</div>' : `<img src="${thumbSrc}" class="w-full h-full object-cover">`)}
                 </div>`;
             }).join('');
         }
 
-        function toggle3DFullscreen() { const c = document.getElementById('modal-3d-container'); if (!document.fullscreenElement) c.requestFullscreen(); else document.exitFullscreen(); }
-        function toggleLiveFullscreen() { const w = document.getElementById('live-video-wrapper'); if (!document.fullscreenElement) w.requestFullscreen(); else document.exitFullscreen(); }
-        function updateBeijingTime() { const t = document.getElementById('beijing-time'); if(t) t.innerText = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).format(new Date()); }
-        function hideGlobalZoom() { const l = document.getElementById('global-zoom-lens'), r = document.getElementById('global-zoom-result'); if(l) l.style.display = 'none'; if(r) r.style.display = 'none'; }
-        function closeModal() { document.getElementById('media-modal').classList.add('hidden'); document.getElementById('youtube-frame').src = ""; document.getElementById('viewer-holder').innerHTML = ""; hideGlobalZoom(); ignoreHashChange = true; history.replaceState(null, document.title, window.location.pathname + window.location.search + '#' + currentPage); }
+        function toggle3DFullscreen() { const c = document.getElementById('modal-3d-container'); if (!document
+                .fullscreenElement) c.requestFullscreen(); else document.exitFullscreen(); }
+
+        function toggleLiveFullscreen() { const w = document.getElementById('live-video-wrapper'); if (!document
+                .fullscreenElement) w.requestFullscreen(); else document.exitFullscreen(); }
+
+        function updateBeijingTime() { const t = document.getElementById('beijing-time'); if (t) t.innerText = new Intl
+                .DateTimeFormat('en-US', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit',
+                    second: '2-digit', hour12: false }).format(new Date()); }
+
+        function hideGlobalZoom() { const l = document.getElementById('global-zoom-lens'),
+                r = document.getElementById('global-zoom-result'); if (l) l.style.display = 'none'; if (r) r.style.display =
+                'none'; }
+
+        function closeModal() { document.getElementById('media-modal').classList.add('hidden');
+            document.getElementById('youtube-frame').src = "";
+            document.getElementById('viewer-holder').innerHTML = "";
+            hideGlobalZoom();
+            ignoreHashChange = true;
+            history.replaceState(null, document.title, window.location.pathname + window.location.search + '#' + currentPage); }
 
         function setupZoomFeature() {
-            const container = document.getElementById('modal-media-container'), img = document.getElementById('modal-img');
-            let lens = document.getElementById('global-zoom-lens'); if(!lens) { lens = document.createElement('div'); lens.id = 'global-zoom-lens'; lens.style.cssText = 'position:absolute; border:1px solid #94a3b8; background:rgba(255,255,255,0.3); cursor:crosshair; width:100px; height:100px; display:none; pointer-events:none; z-index:20;'; container.appendChild(lens); }
-            let result = document.getElementById('global-zoom-result'); if(!result) { result = document.createElement('div'); result.id = 'global-zoom-result'; result.style.cssText = 'position:fixed; width:280px; height:280px; background-color:#0f172a; display:none; z-index:100; border-radius:12px; pointer-events:none;'; document.getElementById('modal-content').appendChild(result); }
+            const container = document.getElementById('modal-media-container'),
+                img = document.getElementById('modal-img');
+            let lens = document.getElementById('global-zoom-lens'); if (!lens) { lens = document.createElement('div');
+                lens.id = 'global-zoom-lens';
+                lens.style.cssText =
+                    'position:absolute; border:1px solid #94a3b8; background:rgba(255,255,255,0.3); cursor:crosshair; width:100px; height:100px; display:none; pointer-events:none; z-index:20;';
+                container.appendChild(lens); }
+            let result = document.getElementById('global-zoom-result'); if (!result) { result = document.createElement(
+                    'div');
+                result.id = 'global-zoom-result';
+                result.style.cssText =
+                    'position:fixed; width:280px; height:280px; background-color:#0f172a; display:none; z-index:100; border-radius:12px; pointer-events:none;';
+                document.getElementById('modal-content').appendChild(result); }
             window.moveLens = (e) => {
-                if (window.innerWidth < 768) return; 
+                if (window.innerWidth < 768) return;
                 if (img.classList.contains('hidden') || !img.complete) return;
                 const rect = container.getBoundingClientRect();
-                result.style.top = (rect.top) + 'px'; result.style.left = (rect.left - 300) + 'px';
+                result.style.top = (rect.top) + 'px';
+                result.style.left = (rect.left - 300) + 'px';
                 let x = (e.touches ? e.touches[0].pageX : e.pageX) - rect.left - window.pageXOffset;
                 let y = (e.touches ? e.touches[0].pageY : e.pageY) - rect.top - window.pageYOffset;
-                lens.style.left = (x - 50) + "px"; lens.style.top = (y - 50) + "px";
-                result.style.backgroundImage = `url('${img.src}')`; result.style.backgroundSize = (img.clientWidth * 2) + "px " + (img.clientHeight * 2) + "px";
+                lens.style.left = (x - 50) + "px";
+                lens.style.top = (y - 50) + "px";
+                result.style.backgroundImage = `url('${img.src}')`;
+                result.style.backgroundSize = (img.clientWidth * 2) + "px " + (img.clientHeight * 2) + "px";
                 result.style.backgroundPosition = `-${x * 2 - 140}px -${y * 2 - 140}px`;
             };
             bindZoomEvents();
         }
 
         function bindZoomEvents() {
-            const container = document.getElementById('modal-media-container'), lens = document.getElementById('global-zoom-lens'), result = document.getElementById('global-zoom-result');
-            container.onmouseenter = () => { if(window.innerWidth >= 768 && !document.getElementById('modal-img').classList.contains('hidden')) { lens.style.display = 'block'; result.style.display = 'block'; } };
-            container.onmouseleave = () => { lens.style.display = 'none'; result.style.display = 'none'; };
+            const container = document.getElementById('modal-media-container'),
+                lens = document.getElementById('global-zoom-lens'),
+                result = document.getElementById('global-zoom-result');
+            container.onmouseenter = () => { if (window.innerWidth >= 768 && !document.getElementById('modal-img').classList
+                    .contains('hidden')) { lens.style.display = 'block';
+                    result.style.display = 'block'; } };
+            container.onmouseleave = () => { lens.style.display = 'none';
+                result.style.display = 'none'; };
             container.onmousemove = window.moveLens;
         }
 
-        const stepsNormal = ["Confirm Virtual Proof", "Confirm PI", "Paid / Other Payment Terms", "Material Preparation", "Order Enters Production Line", "Begins Production", "Production Complete and Shipped", "Delivered"];
-        const stepsSample = ["Sample Approval", "Confirm PI", "Paid / Other Payment Terms", "Sample Preparation", "Shipment Dispatch", "Delivery", "Send Quote", "Convert to Formal Order"];
+        const stepsNormal = ["Confirm Virtual Proof", "Confirm PI", "Paid / Other Payment Terms", "Material Preparation",
+            "Order Enters Production Line", "Begins Production", "Production Complete and Shipped", "Delivered"
+        ];
+        const stepsSample = ["Sample Approval", "Confirm PI", "Paid / Other Payment Terms", "Sample Preparation",
+            "Shipment Dispatch", "Delivery", "Send Quote", "Convert to Formal Order"
+        ];
         const shipMap = { "快递": "Express", "空派": "Via Air", "海派": "Via Boat" };
 
         window.openTrackingLinks = function(carrier, trackingStr) {
             if (!trackingStr) return;
             const trackings = trackingStr.split(/[,，\s]+/).filter(x => x);
             const c = (carrier || '').toUpperCase();
-            
+
             trackings.forEach(num => {
                 let url = `https://t.17track.net/en#nums=${num}`;
                 if (c.includes('FEDEX')) url = `https://www.fedex.com/fedextrack/?trknbr=${num}`;
                 else if (c.includes('UPS')) url = `https://www.ups.com/track?tracknum=${num}`;
-                else if (c.includes('DHL')) url = `https://www.dhl.com/en/express/tracking.html?AWB=${num}`;
-                else if (c.includes('USPS')) url = `https://tools.usps.com/go/TrackConfirmAction?tLabels=${num}`;
+                else if (c.includes('DHL')) url =
+                    `https://www.dhl.com/en/express/tracking.html?AWB=${num}`;
+                else if (c.includes('USPS')) url =
+                    `https://tools.usps.com/go/TrackConfirmAction?tLabels=${num}`;
                 window.open(url, '_blank');
             });
         };
@@ -706,31 +1028,46 @@
             try {
                 const pi = document.getElementById('pi-input').value.trim();
                 if (!pi) return;
-                
+
                 window.currentTrackedPI = pi;
-                
-                btn.disabled = true; btn.innerText = "Loading...";
-                const res = await fetch(`https://eddie-unified-backend.mfgift.workers.dev/order?pi=${encodeURIComponent(pi)}`);
+
+                btn.disabled = true;
+                btn.innerText = "Loading...";
+                const res = await fetch(
+                    `https://eddie-unified-backend.mfgift.workers.dev/order?pi=${encodeURIComponent(pi)}`);
                 const data = await res.json();
                 if (!data.success) throw new Error(data.error);
-                const order = data.order, steps = (order.cargo === "样品") ? stepsSample : stepsNormal;
+                const order = data.order,
+                    steps = (order.cargo === "样品") ? stepsSample : stepsNormal;
                 document.getElementById('res-ship').innerText = shipMap[order.ship] || order.ship || "N/A";
                 document.getElementById('res-date').innerText = order.deadline || "N/A";
                 document.getElementById('res-dest').innerText = order.stateCode || "N/A";
-                
+
                 document.getElementById('timeline').innerHTML = steps.map((s, i) => {
                     const t = parseStepData(order.times && order.times[i] ? order.times[i] : "");
                     const isPassed = i < order.step;
                     const isCurrent = i === order.step;
                     const iconClass = isPassed ? 'passed' : (isCurrent ? 'current' : 'pending');
                     const iconContent = isPassed ? '✓' : (isCurrent ? '●' : '•');
-                    
-                    let dateDisplay = t.date || '';
+
+                    // 格式化日期为美国格式 MM/DD/YYYY
+                    let rawDate = t.date || '';
+                    let formattedDate = '';
+                    if (rawDate) {
+                        const dateObj = new Date(rawDate);
+                        if (!isNaN(dateObj.getTime())) {
+                            formattedDate = `${String(dateObj.getMonth() + 1).padStart(2, '0')}/${String(dateObj.getDate()).padStart(2, '0')}/${dateObj.getFullYear()}`;
+                        } else {
+                            formattedDate = rawDate; // 解析失败则保留原始字符串
+                        }
+                    }
+
+                    let dateDisplay = formattedDate;
                     if (i >= order.step) {
                         dateDisplay = '<span class="text-[9px] text-gray-400 uppercase italic">Coming up soon...</span>';
                     }
-                    
-                    const arrow = (i < steps.length - 1) ? 
+
+                    const arrow = (i < steps.length - 1) ?
                         `<div class="w-8 md:flex-1 flex-shrink-0 flex justify-center pt-[24px]">
                             <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
                         </div>` : '';
@@ -741,7 +1078,7 @@
                         const safeTracking = t.tracking.replace(/'/g, "\\'");
                         const trackings = t.tracking.split(/[,，\s]+/).filter(x => x);
                         const carrierName = (t.carrier || 'CARRIER').toUpperCase();
-                        
+
                         trackingHtml = `<div class="mt-4 flex flex-col items-center justify-center w-full px-1 z-10">
                             <div class="font-black text-gray-800 text-[13px] uppercase cursor-pointer hover:text-blue-600 transition tracking-wider text-center" onclick="openTrackingLinks('${safeCarrier}', '${safeTracking}')" title="Click to track all numbers">${carrierName}</div>
                             <div class="flex flex-col gap-2 mt-2 items-center w-full">
@@ -755,26 +1092,38 @@
                             </div>
                         </div>`;
                     }
-                    
-                    /* ✨ 新增素材渲染：从 order.attachments 读取多类型素材 */
+
                     let stepMediaHtml = '';
                     if (order.attachments && order.attachments[i] && order.attachments[i].length > 0) {
                         stepMediaHtml = '<div class="mt-3 w-full flex flex-col items-center gap-2 z-10">';
                         order.attachments[i].forEach(att => {
                             const safeData = att.data.replace(/'/g, "\\'");
                             if (att.type === 'image') {
-                                stepMediaHtml += `<div class="w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-square cursor-pointer hover:shadow-md transition bg-white flex items-center justify-center p-1" onclick="event.stopPropagation(); showBigImage('${safeData}')"><img src="${safeData}" class="w-full h-full object-contain"></div>`;
+                                stepMediaHtml +=
+                                    `<div class="w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-square cursor-pointer hover:shadow-md transition bg-white flex items-center justify-center p-1" onclick="event.stopPropagation(); showBigImage('${safeData}')"><img src="${safeData}" class="w-full h-full object-contain"></div>`;
                             } else if (att.type === 'video') {
-                                stepMediaHtml += `<div class="w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-video"><video src="${safeData}" controls class="w-full h-full object-cover pointer-events-auto"></video></div>`;
+                                stepMediaHtml +=
+                                    `<div class="w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-video"><video src="${safeData}" controls class="w-full h-full object-cover pointer-events-auto"></video></div>`;
                             } else if (att.type === 'youtube') {
-                                stepMediaHtml += `<div class="w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-video"><iframe src="https://www.youtube.com/embed/${att.data}" frameborder="0" allowfullscreen class="w-full h-full pointer-events-auto"></iframe></div>`;
+                                const ytId = att.data;
+                                const ytThumb = `https://i3.ytimg.com/vi/${ytId}/hqdefault.jpg`;
+                                stepMediaHtml += `
+                                <div class="yt-thumb-wrapper" onclick="event.stopPropagation(); openVideoPopup('${ytId}', event)" title="Click to play video">
+                                    <img src="${ytThumb}" alt="YouTube video thumbnail" loading="lazy" onload="this.classList.add('loaded')">
+                                    <div class="yt-play-overlay">
+                                        <div class="yt-play-circle">
+                                            <div class="yt-play-triangle"></div>
+                                        </div>
+                                    </div>
+                                </div>`;
                             } else if (att.type === 'pdf') {
-                                stepMediaHtml += `<div class="w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-[3/4] cursor-pointer hover:shadow-md transition bg-white flex items-center justify-center" onclick="window.open('${safeData}', '_blank')"><span class="text-sm font-bold text-red-600">PDF</span></div>`;
+                                stepMediaHtml +=
+                                    `<div class="w-full max-w-[140px] rounded-lg overflow-hidden border border-gray-200 shadow-sm mx-auto aspect-[3/4] cursor-pointer hover:shadow-md transition bg-white flex items-center justify-center" onclick="window.open('${safeData}', '_blank')"><span class="text-sm font-bold text-red-600">PDF</span></div>`;
                             }
                         });
                         stepMediaHtml += '</div>';
                     }
-                    
+
                     return `<div class="flex flex-col items-center w-24 md:flex-1 flex-shrink-0 relative">
                         <span class="text-[10px] text-gray-400 font-bold h-4 flex items-center justify-center text-center whitespace-nowrap mb-1">${dateDisplay}</span>
                         <div class="step-icon ${iconClass} flex-shrink-0">${iconContent}</div>
@@ -785,40 +1134,45 @@
                         </div>
                     </div>` + arrow;
                 }).join('');
-                
+
                 const urgeBtn = document.getElementById('urge-btn');
-                urgeBtn.innerHTML = `<span class="w-2.5 h-2.5 bg-red-600 rounded-full inline-block animate-pulse"></span><span>Urge Order</span>`;
-                urgeBtn.className = "bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-8 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm w-full md:w-auto";
+                urgeBtn.innerHTML =
+                    `<span class="w-2.5 h-2.5 bg-red-600 rounded-full inline-block animate-pulse"></span><span>Urge Order</span>`;
+                urgeBtn.className =
+                    "bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-8 py-3 rounded-xl font-bold transition flex items-center justify-center gap-2 shadow-sm w-full md:w-auto";
                 urgeBtn.disabled = false;
                 document.getElementById('urge-container').style.display = 'flex';
 
-                document.getElementById('result').classList.remove('hidden'); document.getElementById('tracking-hint').style.display = 'none';
-            } catch (e) { document.getElementById('error').innerText = e.message; document.getElementById('error').classList.remove('hidden'); }
-            finally { btn.disabled = false; btn.innerText = "Track"; }
+                document.getElementById('result').classList.remove('hidden');
+                document.getElementById('tracking-hint').style.display = 'none';
+            } catch (e) { document.getElementById('error').innerText = e.message;
+                document.getElementById('error').classList.remove('hidden'); } finally { btn.disabled = false;
+                btn.innerText = "Track"; }
         }
 
         function parseStepData(rawStr) {
             if (!rawStr) return { date: "", carrier: "", tracking: "" };
             const parts = rawStr.split(':');
             const d = parts[0].trim().split(' ');
-            return { date: d[0] || "", carrier: (d[1] || "").replace('[', ''), tracking: parts[1] ? parts[1].replace(']', '').trim() : "" };
+            return { date: d[0] || "", carrier: (d[1] || "").replace('[', ''),
+            tracking: parts[1] ? parts[1].replace(']', '').trim() : "" };
         }
 
         async function urgeOrder() {
             const btn = document.getElementById('urge-btn');
             if (!window.currentTrackedPI) return;
-            
+
             const originalHtml = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = "Processing...";
-            
+
             try {
                 const API_URL = "https://eddie-unified-backend.mfgift.workers.dev";
                 const AUTH_KEY = "SAGE_SECURE_2026";
-                
+
                 const res = await fetch(API_URL, { headers: { "X-Auth-Key": AUTH_KEY }, cache: "no-store" });
                 const data = await res.json();
-                
+
                 let found = false;
                 if (data.orders) {
                     for (let o of data.orders) {
@@ -829,7 +1183,7 @@
                         }
                     }
                 }
-                
+
                 if (found) {
                     await fetch(API_URL, {
                         method: "PUT",
@@ -849,7 +1203,7 @@
                 alert("Network error, please try again.");
             }
         }
-        
+
         init();
     </script>
 </body>
